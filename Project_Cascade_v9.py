@@ -313,9 +313,9 @@ def calc_matching_stats(clustdf, extractdf, processes, dirs, conf_file_num):
 		statdf.to_csv(os.getcwd() + str(dirs['stats_file']+'_'+ str(conf_file_num) + '.csv'))
 	# if it does exist, concat current results (if possible in a separate table) with previous
 	else:
-		main_stat_file = pd.read_csv(os.getcwd() + str(dirs['stats_file']) + '_' + str(proc_num) + '.csv', index_col=None)
+		main_stat_file = pd.read_csv(os.getcwd() + str(dirs['stats_file']) + '_' + str(conf_file_num) + '.csv', index_col=None)
 		main_stat_file = pd.concat([main_stat_file, statdf],ignore_index=True, sort=True)
-		main_stat_file.to_csv(os.getcwd() + str(dirs['stats_file']) + '_' + str(proc_num) + '.csv', index=False)
+		main_stat_file.to_csv(os.getcwd() + str(dirs['stats_file']) + '_' + str(conf_file_num) + '.csv', index=False)
 
 
 def manual_matching(dirs):
@@ -354,7 +354,7 @@ def manual_matching(dirs):
 			break
 
 	print("Saving...")
-	manual_match_file.to_csv(os.getcwd() + dirs['manual_matches_file']+ '_' + str(conf_choice) + '.csv', index=False)	
+	manual_match_file.to_csv(os.getcwd() + str(dirs['manual_matches_file']) + '_' + str(conf_choice) + '.csv', index=False)	
 	return manual_match_file
 
 def convert_to_training(config_dirs, man_matched):
@@ -468,7 +468,7 @@ if __name__ == '__main__':
 	# User defined manual matching:
 	man_matched = manual_matching(config_dirs)
 	# Convert manual matches to JSON training file.
-	man_matched = pd.read_csv(config_dirs['manual_matches_file'] + '_' + str(1) + '.csv', usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
+	man_matched = pd.read_csv(os.getcwd() + str(config_dirs['manual_matches_file']) + '_' + str(1) + '.csv', usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
 	convert_to_training(config_dirs, man_matched)
 
 
