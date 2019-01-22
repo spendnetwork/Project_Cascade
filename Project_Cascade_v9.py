@@ -76,9 +76,7 @@ def clean_private_data(configs, config_dirs):
 
 	:return df: the amended private datafile
 	'''
-	# pdb.set_trace()
-	# raw_data = config_dirs['raw_dir'] + config_dirs['raw_priv_data']
-	# adj_data = config_dirs['adj_dir'] + config_dirs['adj_priv_data']
+
 	raw_data = os.getcwd() + str(config_dirs['raw_dir']) + str(config_dirs['raw_priv_data'])
 	adj_data = os.getcwd() + str(config_dirs['adj_dir']) + str(config_dirs['adj_priv_data'])
 
@@ -107,8 +105,7 @@ def clean_public_data(configs, config_dirs):
 	'''
 	raw_data = os.getcwd() + str(config_dirs['raw_dir']) + str(config_dirs['raw_pub_data'])
 	adj_data = os.getcwd() + str(config_dirs['adj_dir']) + str(config_dirs['adj_pub_data'])
-	# raw_data =  os.path.join(home_path,Path(config_dirs['raw_dir']),Path(config_dirs['raw_pub_data'])
-	# adj_data = home_path + config_dirs['adj_dir'] + config_dirs['adj_pub_data']
+	
 	if not os.path.exists(adj_data):
 		print("Re-organising public data...")
 		df = pd.read_csv(raw_data, \
@@ -155,7 +152,6 @@ def dedupe_match_cluster(dirs,proc_fields):
 	priv_file = os.getcwd() + str(dirs['adj_dir'] + dirs['adj_priv_data'])
 	pub_file = os.getcwd() + str(dirs['adj_dir'] + dirs['adj_pub_data'])
 	# Matching:
-	pdb.set_trace()
 	if not os.path.exists(os.getcwd() + str(proc_fields['match_output_file'])):
 		
 		print("Starting matching...")
@@ -169,11 +165,8 @@ def dedupe_match_cluster(dirs,proc_fields):
 		p = subprocess.Popen(cmd, shell=True)
 		p.wait() 
 
-		df = pd.read_csv(os.getcwd() + str(proc_fields['match_output_file']), \
-			usecols=['id','priv_name','priv_address','priv_name_adj','Org_ID','pub_name_adj','pub_address'], \
-			dtype = {'id': np.str,'priv_name': np.str,'priv_address': np.str,'priv_name_adj': np.str,'Org_ID': np.str,'pub_name_adj': np.str,'pub_address': np.str})
+		df = pd.read_csv(os.getcwd() + str(proc_fields['match_output_file']), usecols=['id','priv_name','priv_address','priv_name_adj','Org_ID','pub_name_adj','pub_address'], dtype = {'id': np.str,'priv_name': np.str,'priv_address': np.str,'priv_name_adj': np.str,'Org_ID': np.str,'pub_name_adj': np.str,'pub_address': np.str})
 		df = df[pd.notnull(df['priv_name'])]
-		df.drop(columns=['Unnamed: 0', 'Unnamed: 5'], axis=0, inplace=True)
 		df.to_csv(os.getcwd() + str(proc_fields['match_output_filt_file']), index=False)
 
 	# Clustering:
@@ -265,7 +258,6 @@ def extract_matches(df, proc_fields, dirs, proc_num, proc_type, processes, conf_
 	'''
 
 	# Add column containing levenshtein distance between the matched public & private org names
-	# pdb.set_trace()
 	if 'leven_dist' not in df.columns:
 		df['leven_dist'] = df.apply(calc_match_ratio, axis=1)
 
@@ -282,13 +274,13 @@ def extract_matches(df, proc_fields, dirs, proc_num, proc_type, processes, conf_
 	
 	#Add process number to column for calculating stats purposes:
 	df['process_num'] = str(proc_num)
-	if not os.path.exists(dirs['extract_matches_file']+ '_' + str(conf_file_num) + '.csv'):
-		df.to_csv(dirs['extract_matches_file']+ '_' + str(conf_file_num) + '.csv')
+	if not os.path.exists(os.getcwd() + str(dirs['extract_matches_file'])+ '_' + str(conf_file_num) + '.csv'):
+		df.to_csv(os.getcwd() + str(dirs['extract_matches_file']) + '_' + str(conf_file_num) + '.csv')
 		return df
 	else:
-		extracts_file = pd.read_csv(str(dirs['extract_matches_file']+ '_' + str(conf_file_num) + '.csv'), index_col=None)
+		extracts_file = pd.read_csv(os.getcwd() + str(dirs['extract_matches_file']+ '_' + str(conf_file_num) + '.csv'), index_col=None)
 		extracts_file = pd.concat([extracts_file, df],ignore_index=True, sort=True)
-		extracts_file.to_csv(dirs['extract_matches_file'] + '_' + str(conf_file_num) + '.csv', index=False)
+		extracts_file.to_csv(os.getcwd() + str(dirs['extract_matches_file']) + '_' + str(conf_file_num) + '.csv', index=False)
 		return extracts_file
 
 
@@ -301,8 +293,7 @@ def calc_matching_stats(clustdf, extractdf, processes, dirs, conf_file_num):
 	:return : None
 	:output : a short stats file for each config file for manual comparison to see which is better
 	'''
-
-	statdf = pd.DataFrame(columns=['Config_File','Total_Matches', 'Percent_Matches','Optim_Matches','Percent_Precision','Percent_Recall', 'Leven_Dist_WAvg'])
+	statdf = pd.DataFrame(columns=['Config_File','Total_Matches', 'Percent_Matches','Optim_Matches','Percent_Precision','Percent_Recall', 'Leven_Dist_Avg'])
 	# Overall matches, including poor quality:
 	statdf.at[conf_file_num, 'Config_File'] = conf_file_num
 	statdf.at[conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['Org_ID'])])
@@ -316,16 +307,15 @@ def calc_matching_stats(clustdf, extractdf, processes, dirs, conf_file_num):
 	statdf.at[conf_file_num,'Leven_Dist_Avg'] = extractdf.groupby(extractdf.process_num).apply(lambda grp: np.average(grp.leven_dist))
 	
 	statdf = statdf.transpose()
+	
 	# if statsfile doesnt exist, create it
-	if not os.path.exists(dirs['stats_file']+'_'+ str(proc_num) + '.csv'):
-		statdf['Combination_num'] = 1
-		statdf.to_csv(dirs['stats_file']+'_'+ str(proc_num) + '.csv')
+	if not os.path.exists(os.getcwd() + str(dirs['stats_file']) + '_' + str(conf_file_num) + '.csv'):
+		statdf.to_csv(os.getcwd() + str(dirs['stats_file']+'_'+ str(conf_file_num) + '.csv'))
 	# if it does exist, concat current results (if possible in a separate table) with previous
 	else:
-		main_stat_file = pd.read_csv(str(dirs['stats_file']+'_'+str(proc_num) + '.csv'), index_col=None)
-		statdf['Combination_num'] = max(main_stat_file['Combination_num']) + 1
+		main_stat_file = pd.read_csv(os.getcwd() + str(dirs['stats_file']) + '_' + str(proc_num) + '.csv', index_col=None)
 		main_stat_file = pd.concat([main_stat_file, statdf],ignore_index=True, sort=True)
-		main_stat_file.to_csv(dirs['stats_file']+'_'+str(proc_num) + '.csv', index=False)
+		main_stat_file.to_csv(os.getcwd() + str(dirs['stats_file']) + '_' + str(proc_num) + '.csv', index=False)
 
 
 def manual_matching(dirs):
@@ -333,9 +323,8 @@ def manual_matching(dirs):
 	Provides user-input functionality for manual matching based on the extracted records
 	:return manual_match_file: extracted file with added column (Y/N/Unsure)
 	'''
-	conf_num = input("\nChoose best config file number:")
-
-	manual_match_file = pd.read_csv(str(dirs['extract_matches_file']+'_'+str(conf_num) + '.csv'), index_col=None)
+	conf_choice = input("\nChoose best config file number:")
+	manual_match_file = pd.read_csv(os.getcwd() + str(dirs['extract_matches_file']+'_'+str(conf_choice) + '.csv'), index_col=None)
 	manual_match_file['Manual_Match'] = ''
 
 	choices = ['n', 'na']
@@ -345,12 +334,12 @@ def manual_matching(dirs):
 
 	for index, row in manual_match_file.iterrows():
 		if choice.lower() == 'n':
-			print("\nPrivate name: " + str(row.priv_name))
-			print("\nPublic name: " + str(row.org_name))
+			print("\nPrivate name: " + str(row.priv_name_adj))
+			print("\nPublic name: " + str(row.pub_name_adj))
 		else:
-			print("\nPrivate name: " + str(row.priv_name))
+			print("\nPrivate name: " + str(row.priv_name_adj))
 			print("Private address: " + str(row.priv_address))
-			print("\nPublic name: " + str(row.org_name))
+			print("\nPublic name: " + str(row.pub_name_adj))
 			print("Public address: " + str(row.pub_address))
 		
 		match_options = ["y", "n", "u", "f"]
@@ -365,7 +354,7 @@ def manual_matching(dirs):
 			break
 
 	print("Saving...")
-	manual_match_file.to_csv(dirs['manual_matches_file']+ '_' + str(conf_num) + '.csv', index=False)	
+	manual_match_file.to_csv(os.getcwd() + dirs['manual_matches_file']+ '_' + str(conf_choice) + '.csv', index=False)	
 	return manual_match_file
 
 def convert_to_training(config_dirs, man_matched):
@@ -406,14 +395,12 @@ def convert_to_training(config_dirs, man_matched):
 		else:
 			continue
 	# Write dict to training file:
-	with open(config_dirs['manual_training_file'], 'w') as outfile:
+	with open(os.getcwd() + str(config_dirs['manual_training_file']), 'w') as outfile:
 		json.dump(manualdict, outfile)
 
 
 
 if __name__ == '__main__':
-	# BEFORE STARTING, REMOVE FILES FROM EXTRACTED_MATCHES_FOLDER
-	# pdb.set_trace()
 	#Silence warning for df['process_num'] = str(proc_num)
 	pd.options.mode.chained_assignment = None 
 
@@ -441,31 +428,39 @@ if __name__ == '__main__':
 				privdf = clean_private_data(configs, config_dirs)
 				pubdf = clean_public_data(configs, config_dirs)
 				
-				# pdb.set_trace()
 				# For each process type ( eg: Name & Add, Name only) outlined in the configs file:
-				# for proc_type in processes:
 				for proc_type in processes:
 					for proc_num in processes[proc_type]:
 					#Retrieve the fields for each separate process
 						proc_fields = processes[proc_type][proc_num]
 						main_proc = min(processes[proc_type].keys())
+						# Define data types for clustered file. Enables faster loading.
+						clustdtype = {'Cluster ID':np.int, 'Confidence Score': np.float, \
+											'id':np.int, 'priv_name':np.str, 'priv_address':np.str, \
+											'priv_name_adj':np.str, 'Org_ID':np.str, 'pub_name_adj': np.str, \
+											'pub_address':np.str }
 							
 						# Run dedupe for matching and calculate related stats for comparison
-						if 'dedupe_field_names' in proc_fields:
+						if not os.path.exists(os.getcwd() + str(processes[proc_type][main_proc]['assigned_output_file'])):
+							# if 'dedupe_field_names' in proc_fields:
 							dedupe_match_cluster(config_dirs, proc_fields)
-							clustdf = pd.read_csv(str(proc_fields["cluster_output_file"]), index_col=None)
+							
+							clustdf = pd.read_csv(os.getcwd() + str(proc_fields["cluster_output_file"]), index_col=None, \
+								dtype=clustdtype)
 							# Copy public data to high-confidence cluster records
-							clustdf = assign_pub_data_to_clusters(clustdf, proc_fields['assigned_output_file'])
+							clustdf = assign_pub_data_to_clusters(clustdf, os.getcwd() + str(proc_fields['assigned_output_file']))
+							clustdf.to_csv(os.getcwd() + str(processes[proc_type][main_proc]['assigned_output_file']), index=False)
 						else:
-							clustdf = pd.read_csv(str(processes[proc_type][main_proc]["assigned_output_file"]), index_col=None)
+							clustdf = pd.read_csv(str(os.getcwd() + processes[proc_type][main_proc]["assigned_output_file"]), index_col=None, dtype=clustdtype)
 
 						# Remove company suffixes for more relevant levenshtein distance calculation
 						clustdf['priv_name_short'] = clustdf.priv_name_adj.apply(shorten_name)
 						clustdf['pub_name_short'] = clustdf.pub_name_adj.apply(shorten_name)
 						
 						#Adds leven_dist column and extract matches based on config process criteria:
-						extract_matches(clustdf, proc_fields, config_dirs, proc_num, proc_type, processes, conf_file_num)
-				calc_matching_stats(clustdf, extracts_file, processes, config_dirs, conf_file_num)
+						extracts_file = extract_matches(clustdf, proc_fields, config_dirs, proc_num, proc_type, processes, conf_file_num)
+					
+					calc_matching_stats(clustdf, extracts_file, processes, config_dirs, conf_file_num)
 		
 	except StopIteration:
 		# End program if no more config files found
