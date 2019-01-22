@@ -2,3 +2,4 @@ Previous_Versions/
 *.csv
 Config_Files/__pycache__/
 .gitignore
+.DS_Store/

@@ -293,6 +293,7 @@ def calc_matching_stats(clustdf, extractdf, processes, dirs, conf_file_num):
 	:return : None
 	:output : a short stats file for each config file for manual comparison to see which is better
 	'''
+
 	statdf = pd.DataFrame(columns=['Config_File','Total_Matches', 'Percent_Matches','Optim_Matches','Percent_Precision','Percent_Recall', 'Leven_Dist_Avg'])
 	# Overall matches, including poor quality:
 	statdf.at[conf_file_num, 'Config_File'] = conf_file_num
@@ -304,26 +305,30 @@ def calc_matching_stats(clustdf, extractdf, processes, dirs, conf_file_num):
 	statdf.at[conf_file_num,'Percent_Precision'] = round(len(extractdf) / len(clustdf) * 100, 2)
 	# Recall - how many relevant items have been selected from the entire original private data 
 	statdf.at[conf_file_num,'Percent_Recall'] = round(len(extractdf) / len(privdf) * 100, 2)
-	statdf.at[conf_file_num,'Leven_Dist_Avg'] = extractdf.groupby(extractdf.process_num).apply(lambda grp: np.average(grp.leven_dist))
+	statdf.at[conf_file_num,'Leven_Dist_Avg'] = np.average(extractdf.leven_dist)
 	
-	statdf = statdf.transpose()
+	# statdf = statdf.transpose()
 	
 	# if statsfile doesnt exist, create it
-	if not os.path.exists(os.getcwd() + str(dirs['stats_file']) + '_' + str(conf_file_num) + '.csv'):
-		statdf.to_csv(os.getcwd() + str(dirs['stats_file']+'_'+ str(conf_file_num) + '.csv'))
+	# if not os.path.exists(os.getcwd() + str(dirs['stats_file']) + '_' + str(conf_file_num) + '.csv'):
+	if not os.path.exists(os.getcwd() + str(dirs['stats_file']) + '.csv'):
+		# statdf.to_csv(os.getcwd() + str(dirs['stats_file']+'_'+ str(conf_file_num) + '.csv'))
+		statdf.to_csv(os.getcwd() + str(dirs['stats_file'] + '.csv'))
 	# if it does exist, concat current results (if possible in a separate table) with previous
 	else:
-		main_stat_file = pd.read_csv(os.getcwd() + str(dirs['stats_file']) + '_' + str(conf_file_num) + '.csv', index_col=None)
+		# main_stat_file = pd.read_csv(os.getcwd() + str(dirs['stats_file']) + '_' + str(conf_file_num) + '.csv', index_col=None)
+		main_stat_file = pd.read_csv(os.getcwd() + str(dirs['stats_file']) + '.csv', index_col=None)
 		main_stat_file = pd.concat([main_stat_file, statdf],ignore_index=True, sort=True)
-		main_stat_file.to_csv(os.getcwd() + str(dirs['stats_file']) + '_' + str(conf_file_num) + '.csv', index=False)
+		# main_stat_file.to_csv(os.getcwd() + str(dirs['stats_file']) + '_' + str(conf_file_num) + '.csv', index=False)
+		main_stat_file.to_csv(os.getcwd() + str(dirs['stats_file']) + '.csv', index=False)
 
 
-def manual_matching(dirs):
+def manual_matching(dirs, conf_choice):
 	'''
 	Provides user-input functionality for manual matching based on the extracted records
 	:return manual_match_file: extracted file with added column (Y/N/Unsure)
 	'''
-	conf_choice = input("\nChoose best config file number:")
+	
 	manual_match_file = pd.read_csv(os.getcwd() + str(dirs['extract_matches_file']+'_'+str(conf_choice) + '.csv'), index_col=None)
 	manual_match_file['Manual_Match'] = ''
 
@@ -332,16 +337,19 @@ def manual_matching(dirs):
 	while choice.lower() not in choices:
 		choice = input("\nMatching name only or name and address? (N / NA):")
 
-	for index, row in manual_match_file.iterrows():
+	# Iterate over the file, shuffled with sample, as best matches otherwise would show first:
+	for index, row in manual_match_file.sample(frac=1).iterrows():
 		if choice.lower() == 'n':
 			print("\nPrivate name: " + str(row.priv_name_adj))
 			print("\nPublic name: " + str(row.pub_name_adj))
+			print("\nLevenshtein distance: " + str(row.leven_dist))
 		else:
 			print("\nPrivate name: " + str(row.priv_name_adj))
 			print("Private address: " + str(row.priv_address))
 			print("\nPublic name: " + str(row.pub_name_adj))
 			print("Public address: " + str(row.pub_address))
-		
+			print("\nLevenshtein distance (names): " + str(row.leven_dist))
+
 		match_options = ["y", "n", "u", "f"]
 		match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
 		while match.lower() not in match_options:
@@ -354,7 +362,8 @@ def manual_matching(dirs):
 			break
 
 	print("Saving...")
-	manual_match_file.to_csv(os.getcwd() + str(dirs['manual_matches_file']) + '_' + str(conf_choice) + '.csv', index=False)	
+	manual_match_file.to_csv(os.getcwd() + str(dirs['manual_matches_file']) + '_' + str(conf_choice) + '.csv', index=False, \
+		columns=['Cluster ID', 'Confidence Score','Org_ID','id', 'leven_dist', 'org_name', 'priv_address','priv_name','priv_name_adj','process_num', 'pub_address','pub_name_adj','Manual_Match'])	
 	return manual_match_file
 
 def convert_to_training(config_dirs, man_matched):
@@ -408,8 +417,6 @@ if __name__ == '__main__':
 	config_path = Path('./Config_Files')
 	config_dirs = config_dirs.dirs["dirs"]
 	
-
-	
 	# Ignores config_dirs - convention is <num>_config.py
 	pyfiles = "*_config.py"
 	
@@ -460,16 +467,18 @@ if __name__ == '__main__':
 						#Adds leven_dist column and extract matches based on config process criteria:
 						extracts_file = extract_matches(clustdf, proc_fields, config_dirs, proc_num, proc_type, processes, conf_file_num)
 					
-					calc_matching_stats(clustdf, extracts_file, processes, config_dirs, conf_file_num)
+				calc_matching_stats(clustdf, extracts_file, processes, config_dirs, conf_file_num)
 		
 	except StopIteration:
 		# End program if no more config files found
 		print("Done")
 	# User defined manual matching:
-	man_matched = manual_matching(config_dirs)
+	conf_choice = input("\nReview Matches_Stats.csv and choose best config file number:")
+	man_matched = manual_matching(config_dirs, conf_choice)
 	# Convert manual matches to JSON training file.
-	man_matched = pd.read_csv(os.getcwd() + str(config_dirs['manual_matches_file']) + '_' + str(1) + '.csv', usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
+	man_matched = pd.read_csv(os.getcwd() + str(config_dirs['manual_matches_file']) + '_' + str(conf_choice) + '.csv', usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
 	convert_to_training(config_dirs, man_matched)
+	print("Process complete - review Manual Matches file.")
 
 
 
