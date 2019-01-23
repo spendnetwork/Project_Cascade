@@ -3,3 +3,6 @@ Previous_Versions/
 Config_Files/__pycache__/
 .gitignore
 .DS_Store/
+Backups/
+__pycache__/
+.DS_Store
