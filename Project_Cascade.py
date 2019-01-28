@@ -30,12 +30,12 @@ def get_input_args():
     return args
 
 def clean_private_data(config_dirs):
-	'''
-	Takes the private data file, org type suffixes are replaced with abbreviated versions 
+	"""
+	Takes the private data file, org type suffixes are replaced with abbreviated versions
 	and strings reformatted for consistency across the two datasets
 
 	:return df: the amended private datafile
-	'''
+	"""
 	raw_data = config_dirs['raw_dir'] + config_dirs['raw_priv_data'].format(in_args.priv_raw_name)
 	adj_data = config_dirs['adj_dir'] + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
 
@@ -57,19 +57,19 @@ def clean_private_data(config_dirs):
 
 
 def clean_public_data(config_dirs):
-	'''
-	Takes the raw public data file and splits into chunks. 
-	Multiple address columns are merged into one column, 
+	"""
+	Takes the raw public data file and splits into chunks.
+	Multiple address columns are merged into one column,
 	org type suffixes are replaced with abbreviated versions and strings reformatted for consistency across the two datasets
 
 	:return dffullmerge: the public dataframe adjusted as above
-	'''
+	"""
 	raw_data = config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)
 	adj_data = config_dirs['adj_dir'] + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
 	
 	if not os.path.exists(adj_data):
 		print("Re-organising public data...")
-		df = pd.read_csv(raw_data, \
+		df = pd.read_csv(raw_data,
 							usecols={'org_name','street_address1','street_address2','street_address3','Org_ID'}, \
 							dtype={'org_name':np.str, 'street_address1':np.str,'street_address2':np.str, 'street_address3':np.str, 'Org_ID':np.str}, \
 							chunksize=500000)
@@ -101,8 +101,8 @@ def clean_public_data(config_dirs):
 
 
 def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
-	'''
-	Deduping - first the public and private data are matched using dedupes csvlink, 
+	"""
+	Deduping - first the public and private data are matched using dedupes csvlink,
 	then the matched file is put into clusters
 	:param dirs: file/folder locations
 	:param  configs: the main config files
@@ -110,8 +110,8 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 	:param proc_num: the individual process within the config file
 	:return None
 	:output : matched output file
-	:output : matched and clustered output file 
-	'''
+	:output : matched and clustered output file
+	"""
 	
 	priv_fields = configs['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
 	pub_fields = configs['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
@@ -153,13 +153,13 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 
 
 def shorten_name(row):
-	'''
-	Removes the company suffixes according to the org_suffixes.org_type_dict. This helps with the extraction phase 
+	"""
+	Removes the company suffixes according to the org_suffixes.org_type_dict. This helps with the extraction phase
 	because it improves the relevance of the levenshtein distances.
 
 	:param row: each row of the dataframe
 	:return row: shortened string i.e. from "coding ltd" to "coding"
-	'''
+	"""
 
 	row = str(row).replace('-',' ').replace("  "," ").strip()
 	rowsplit = str(row).split(" ")
@@ -173,7 +173,7 @@ def shorten_name(row):
 
 
 def assign_pub_data_to_clusters(df, assigned_file):
-    '''
+	"""
     Unmatched members of a cluster are assigned the public data of the highest-confidence matched
     row in that cluster. At this stage the amount of confidence is irrelevant as these will be measured
     by the levenshtein distance during the match extraction phase.
@@ -181,7 +181,7 @@ def assign_pub_data_to_clusters(df, assigned_file):
     :param df: the main clustered and matched dataframe
     :param assigned_file : file-path to save location
     :return altered df
-    '''
+    """
 
     st = set(df['Cluster ID'])
     df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
@@ -193,14 +193,14 @@ def assign_pub_data_to_clusters(df, assigned_file):
     
 
 def get_max_id(group):
-	'''
-	Used by assign_pub_data_to_clusters(). Takes one entire cluster, 
-	finds the row with the best confidence score and applies the public data of that row 
+	"""
+	Used by assign_pub_data_to_clusters(). Takes one entire cluster,
+	finds the row with the best confidence score and applies the public data of that row
 	to the rest of the rows in that cluster which don't already have matches
 
 	:param group: all rows belonging to one particular cluster
 	:return group: the amended cluster to be updated into the main df
-	'''
+	"""
 	max_conf_idx = group['Confidence Score'].idxmax()
 	for index, row in group.iterrows():
 		# If the row is unmatched (has no public org_id):
@@ -212,22 +212,22 @@ def get_max_id(group):
 
 
 def calc_match_ratio(row):
-	'''
+	"""
 	Used in extract_matches() - use fuzzywuzzy to calculate levenshtein distance
 
 	:return ratio: individual levenshtein distance between the public and private org string
-	'''
+	"""
 	if pd.notnull(row.priv_name_short) and pd.notnull(row.pub_name_short):
 		return fuzz.ratio(row.priv_name_short, row.pub_name_short)
 
 
 def extract_matches(clustdf, configs, config_dirs, proc_num, proc_type, conf_file_num):
-	'''
+	"""
 	Import config file containing variable assignments for i.e. char length, match ratio
 	Based on the 'cascading' config details, extract matches to new csv
 
 	:return extracts_file: contains dataframe with possible acceptable matches
-	'''
+	"""
 
 	# Round confidence scores to 2dp : 
 	clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
@@ -264,14 +264,14 @@ def extract_matches(clustdf, configs, config_dirs, proc_num, proc_type, conf_fil
 
 
 def calc_matching_stats(clustdf, extractdf, config_dirs, conf_file_num):
-	'''
+	"""
 	For each process outlined in the config file, after each process is completed
 	extract the matches that meet the match % criteria into a new file
 	extractions based on the different leven ratio values
 
 	:return : None
 	:output : a short stats file for each config file for manual comparison to see which is better
-	'''
+	"""
 	# Remove old stats file if exists:
 	if os.path.exists(config_dirs['stats_file'] + '.csv'):
 		os.remove(config_dirs['stats_file'] + '.csv')
@@ -299,10 +299,10 @@ def calc_matching_stats(clustdf, extractdf, config_dirs, conf_file_num):
 
 
 def manual_matching(config_dirs, conf_choice):
-	'''
+	"""
 	Provides user-input functionality for manual matching based on the extracted records
 	:return manual_match_file: extracted file with added column (Y/N/Unsure)
-	'''
+	"""
 	
 	manual_match_file = pd.read_csv(config_dirs['extract_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv', index_col=None)
 	manual_match_file['Manual_Match'] = ''
@@ -346,11 +346,11 @@ def manual_matching(config_dirs, conf_choice):
 
 
 def convert_to_training(config_dirs, man_matched):
-	'''
+	"""
 	Converts the manually matched dataframe into a training file for dedupe
 	:return : None
 	:output : template.json training file
-	'''
+	"""
 	
 	# Filter for matched entries
 	man_matched = man_matched[pd.notnull(man_matched['Manual_Match'])]
@@ -431,16 +431,16 @@ if __name__ == '__main__':
 						main_proc = min(configs['processes'][proc_type].keys())
 						
 						# Define data types for clustered file. Enables faster loading.
-						clustdtype = {'Cluster ID':np.int, 'Confidence Score': np.float, \
-											'id':np.int, 'priv_name':np.str, 'priv_address':np.str, \
-											'priv_name_adj':np.str, 'Org_ID':np.str, 'pub_name_adj': np.str, \
+						clustdtype = {'Cluster ID':np.int, 'Confidence Score': np.float,
+											'id':np.int, 'priv_name':np.str, 'priv_address':np.str,
+											'priv_name_adj':np.str, 'Org_ID':np.str, 'pub_name_adj': np.str,
 											'pub_address':np.str }
 						# Run dedupe for matching and calculate related stats for comparison
 						if not os.path.exists(config_dirs['assigned_output_file'].format(proc_type)):
 							# if 'dedupe_field_names' in proc_fields:
 							dedupe_match_cluster(config_dirs, configs, proc_type, proc_num)
 							
-							clustdf = pd.read_csv(config_dirs["cluster_output_file"].format(proc_type), index_col=None, \
+							clustdf = pd.read_csv(config_dirs["cluster_output_file"].format(proc_type), index_col=None,
 								dtype=clustdtype)
 							
 							# Copy public data to high-confidence cluster records
