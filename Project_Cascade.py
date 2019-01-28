@@ -3,19 +3,12 @@ import argparse
 import pandas as pd
 import os
 import subprocess
-import re
 from pathlib import Path
-import os.path as path
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
-from time import time
 import numpy as np
-import math
-import glob
 import ast
-import sys
 import json
-from collections import defaultdict
 import org_suffixes
 from Config_Files import config_dirs
 import string
@@ -29,8 +22,10 @@ def get_input_args():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--priv_raw_name', default='private_data.csv', type=str),
+    parser.add_argument('--priv_raw_name', default='private_data.csv', type=str)
     parser.add_argument('--pub_raw_name', default='public_data.csv', type=str)
+	parser.add_argument('--priv_adj_name', default='priv_data_adj.csv', type=str)
+	parser.add_argument('--pub_adj_name', default='pub_data_adj.csv', type=str)
     args = parser.parse_args()
     return args
 
@@ -42,7 +37,7 @@ def clean_private_data(config_dirs):
 	:return df: the amended private datafile
 	'''
 	raw_data = config_dirs['raw_dir'] + config_dirs['raw_priv_data'].format(in_args.priv_raw_name)
-	adj_data = config_dirs['adj_dir'] + config_dirs['adj_priv_data']
+	adj_data = config_dirs['adj_dir'] + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
 
 	if not os.path.exists(adj_data):
 		df = pd.read_csv(raw_data, usecols=['id','supplier_name','supplier_streetadd'], \
@@ -70,7 +65,7 @@ def clean_public_data(config_dirs):
 	:return dffullmerge: the public dataframe adjusted as above
 	'''
 	raw_data = config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)
-	adj_data = config_dirs['adj_dir'] + config_dirs['adj_pub_data']
+	adj_data = config_dirs['adj_dir'] + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
 	
 	if not os.path.exists(adj_data):
 		print("Re-organising public data...")

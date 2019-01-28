@@ -14,8 +14,8 @@ dirs = {
       "adj_pub_data": "pub_data_adj.csv",
       "proc_type_dir" : os.getcwd() + '/Outputs/{0}',
       "proc_type_train_dir" : os.getcwd() + '/Training_Files/{0}',
-      "proc_type_train_clust_dir" : os.getcwd() + '/Training_Files/{0}/Clustering,
-      "proc_type_train_match_dir" : os.getcwd() + '/Training_Files/{0}/Matching,
+      "proc_type_train_clust_dir" : os.getcwd() + '/Training_Files/{0}/Clustering',
+      "proc_type_train_match_dir" : os.getcwd() + '/Training_Files/{0}/Matching',
       "match_training_file": os.getcwd() + '/Training_Files/{0}/Matching/training.json',
       "match_output_file": os.getcwd() + '/Outputs/{0}/{0}_matched.csv',
 
