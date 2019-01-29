@@ -22,10 +22,11 @@ def get_input_args():
 	"""
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--priv_raw_name', default='private_data.csv', type=str)
-	parser.add_argument('--pub_raw_name', default='public_data.csv', type=str)
-	parser.add_argument('--priv_adj_name', default='priv_data_adj.csv', type=str)
-	parser.add_argument('--pub_adj_name', default='pub_data_adj.csv', type=str)
+	parser.add_argument('--priv_raw_name', default='private_data.csv', type=str, required=True, help='<Required> - set raw private/source datafile name')
+	parser.add_argument('--pub_raw_name', default='public_data.csv', type=str, required=True, help='<Required> - set raw public datafile name')
+	parser.add_argument('--priv_adj_name', default='priv_data_adj.csv', type=str, required=True, help='<Required> - set cleaned private/source datafile name')
+	parser.add_argument('--pub_adj_name', default='pub_data_adj.csv', type=str, required=True, help='<Required> - set cleaned public datafile name')
+	# parser.add_argument('--priv_fields', nargs='+', default=['required=True, help='<Required> - set private data dedupe fields' )
 	args = parser.parse_args()
 	return args
 

@@ -41,19 +41,27 @@ Modification of the module in its current state will be required depending on th
 
 ### Initial Set Up & Familiarisation
 
-1. Clone the repo:
+##### 1. Clone the repo:
 ```
 git clone https://github.com/DMells/Project_Cascade_Ita
 ```
 
-2. Install requirements
+##### 2. Installation
+Install with pipenv
 ```
+pipenv install
+```
+Install with virtualenv
+
+```
+virtualenv venv -p python3
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
 3. Place your two raw data files into Raw_Data
 
-The default file formats are as follows:
+The module uses argument parsing, 
 
 ##### Private Data
 Filename : private_data.csv
@@ -62,11 +70,6 @@ Fields : 'id' (int), 'supplier_name' (str), 'supplier_streetadd' (str)
 ##### Public Data
 Filename : public_data.csv
 Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'Org_ID'
-
-
-4. In Config_Files open `config_dirs.py` to see the naming conventions used for the private and public/source data files. This module was built around data with the following format, extracted from much larger public datasets using Postgres (see Postgres_Queries file for commands used)
-
-5. For matching purposes, from the public data I extracted the org name, street_addresses 1 to 3, and the org ID, as the private data only contains the org name and the street address. Modification here will be necessary as future datasets differ
 
 ### Training Conventions
 #### 1. Matching
