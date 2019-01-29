@@ -5,13 +5,11 @@ dirs = {
       {
       "raw_dir": os.getcwd() + "/Raw_Data/",
       "adj_dir":  os.getcwd() + "/Adj_Data/",
-      # "raw_priv_data": "private_data.csv",
-      # "raw_pub_data": "public_data.csv",
-      "raw_priv_data": "{0}", # Defined by argument parses (default private_data.csv)
-      "raw_pub_data": "{0}", # Defined by argument parses (default public_data.csv)
+      "raw_priv_data": "{0}",
+      "raw_pub_data": "{0}",
 
-      "adj_priv_data": "priv_data_adj.csv",
-      "adj_pub_data": "pub_data_adj.csv",
+      "adj_priv_data": "{0}",
+      "adj_pub_data": "{0}",
       "proc_type_dir" : os.getcwd() + '/Outputs/{0}',
       "proc_type_train_dir" : os.getcwd() + '/Training_Files/{0}',
       "proc_type_train_clust_dir" : os.getcwd() + '/Training_Files/{0}/Clustering',
