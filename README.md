@@ -6,10 +6,64 @@ The first set of data will contain poor quality, manually curated data, which pr
 
 The second set contains publicly available information on all registered Italian organisations. 
 
-The objective at all times is to find as many possible matches between the two datasets, and verifying the quality of the manually curated (aka "private") data.
+The purpose is to find as many possible matches between the two datasets, verifying the quality of the manually curated (aka "private") data.
 
 Should the process be stopped at any point, the module has been constructed to check for each file created as it progresses. Therefore you can end the module and resume from where you left off.
 
+## Using the Module
+Modification of the module in its current state will be required depending on the datasets used.
+
+### Initial Set Up & Familiarisation
+
+1. Clone the repo:
+```
+git clone https://github.com/DMells/Project_Cascade_Ita
+```
+
+2. Install with pipenv:
+```
+pipenv install
+```
+
+OR 
+
+Install with virtualenv:
+
+```
+virtualenv venv -p python3
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+3. Place the two raw data files into Raw_Data/
+
+4. Run the module
+```
+cd Project_Cascade_Ita
+python Project_Cascade.py
+```
+
+The module makes use of argument parsing, with the following arguments:
+```
+--priv_raw_name (default: 'private_data.csv')
+--pub_raw_name (default: 'public_data.csv')
+--priv_adj_name (default: 'priv_data_adj.csv')
+--pub_adj_name (default: 'pub_data_adj.csv')
+```
+To amend the names if needed :
+```
+python Project_Cascade.py --priv_raw_name <filename>  # ...etc
+```
+
+The default file formats are :
+
+##### Private Data
+Filename : private_data.csv
+Fields : 'id' (int), 'supplier_name' (str), 'supplier_streetadd' (str)
+
+##### Public Data
+Filename : public_data.csv
+Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'Org_ID'
 
 ## General Processes
 
@@ -35,41 +89,6 @@ Should the process be stopped at any point, the module has been constructed to c
 ### 5. Re-cycling the matches
 - With the best matches obtained, the user can then pick the best config settings, and then will be prompted to go through and manually verify the quality of each match. 
 - These quality matches, and poor quality matches, are then converted to a json training file, which can then be re-fed back into dedupe as a kick-start to more accurate training.
-
-## Using the Module
-Modification of the module in its current state will be required depending on the datasets used.
-
-### Initial Set Up & Familiarisation
-
-##### 1. Clone the repo:
-```
-git clone https://github.com/DMells/Project_Cascade_Ita
-```
-
-##### 2. Installation
-Install with pipenv
-```
-pipenv install
-```
-Install with virtualenv
-
-```
-virtualenv venv -p python3
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-3. Place your two raw data files into Raw_Data
-
-The module uses argument parsing, 
-
-##### Private Data
-Filename : private_data.csv
-Fields : 'id' (int), 'supplier_name' (str), 'supplier_streetadd' (str)
-
-##### Public Data
-Filename : public_data.csv
-Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'Org_ID'
 
 ### Training Conventions
 #### 1. Matching
