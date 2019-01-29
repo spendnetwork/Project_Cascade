@@ -119,22 +119,22 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 
 	priv_file = dirs['adj_dir'] + dirs['adj_priv_data']
 	pub_file = dirs['adj_dir'] + dirs['adj_pub_data']
+	# pdb.set_trace()
 
 	# Matching:
 	if not os.path.exists(dirs['match_output_file'].format(proc_type)):
 		print("Starting matching...")
 		cmd = ['csvlink '
-				+ str(priv_file) + ' '
-				+ str(pub_file)
-				+ ' --field_names_1 ' + ' '.join(priv_fields) \
-				+ ' --field_names_2 ' + ' '.join(pub_fields) \
-				+ ' --training_file ' + dirs['match_training_file'].format(proc_type) \
+				+ str(priv_file).format(in_args.priv_adj_name) + ' '
+				+ str(pub_file).format(in_args.pub_adj_name)
+				+ ' --field_names_1 ' + ' '.join(priv_fields)
+				+ ' --field_names_2 ' + ' '.join(pub_fields)
+				+ ' --training_file ' + dirs['match_training_file'].format(proc_type)
 				+ ' --output_file ' + dirs['match_output_file'].format(proc_type)]
 		p = subprocess.Popen(cmd, shell=True)
 		p.wait() 
-
-		df = pd.read_csv(dirs['match_output_file'].format(proc_type), \
-		usecols=['id','priv_name','priv_address','priv_name_adj','Org_ID','pub_name_adj','pub_address'], \
+		df = pd.read_csv(dirs['match_output_file'].format(proc_type),
+		usecols=['id','priv_name','priv_address','priv_name_adj','Org_ID','pub_name_adj','pub_address'],
 		dtype = {'id': np.str,'priv_name': np.str,'priv_address': np.str,'priv_name_adj': np.str,'Org_ID': np.str,'pub_name_adj': np.str,'pub_address': np.str})
 		df = df[pd.notnull(df['priv_name'])]
 		df.to_csv(dirs['match_output_file'].format(proc_type), index=False)
@@ -144,8 +144,8 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 		print("Starting clustering...")
 		cmd = ['python csvdedupe.py '
 				+ dirs['match_output_file'].format(proc_type) + ' '
-				+ ' --field_names ' + ' '.join(priv_fields) \
-				+ ' --training_file ' + dirs['cluster_training_file'].format(proc_type) \
+				+ ' --field_names ' + ' '.join(priv_fields)
+				+ ' --training_file ' + dirs['cluster_training_file'].format(proc_type)
 				+ ' --output_file ' + dirs['cluster_output_file'].format(proc_type)]
 		p = subprocess.Popen(cmd, cwd= os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
 		p.wait() # wait for subprocess to finish
@@ -188,6 +188,7 @@ def assign_pub_data_to_clusters(df, assigned_file):
 	df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 	df.reset_index(drop=True, inplace=True)
 	tqdm.pandas()
+	print("Assigning close matches within clusters...")
 	df = df.groupby(['Cluster ID']).progress_apply(get_max_id)
 	df.to_csv(assigned_file, index=False)
 	return df
@@ -391,7 +392,6 @@ def convert_to_training(config_dirs, man_matched):
 
 if __name__ == '__main__':
 	in_args = get_input_args()
-
 	#Silence warning for df['process_num'] = str(proc_num)
 	pd.options.mode.chained_assignment = None 
 	#Define config file variables and related arguments

@@ -75,6 +75,7 @@ Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'O
 ### 2. Deduplication
 - First the module links the two datasets together, to join our manual private data to more official sources. It does this using [dedupe](https://github.com/dedupeio/csvdedupe)'s csvlink command.
 - Second, the module takes this matched data and assigns rows to clusters, in the event that two rows actually refer to the same company. This outputs both a cluster_ID and a confidence score of how likely that row belongs to that cluster. Clustering is done using dedupe's csvdedupe command.
+- Training files for both clustering and matching are provided already.
 
 ### 3. Further Data Manipulation
 - If any data within the cluster hasn't been matched to a public source, then if there is a match anywhere within that cluster, that public data is applied to the rest of the cluster.
