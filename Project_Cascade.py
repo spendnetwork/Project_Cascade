@@ -41,7 +41,7 @@ def clean_private_data(config_dirs):
 	adj_data = config_dirs['adj_dir'] + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
 
 	if not os.path.exists(adj_data):
-		df = pd.read_csv(raw_data, usecols=['id','supplier_name','supplier_streetadd'], \
+		df = pd.read_csv(raw_data, usecols=['id','supplier_name','supplier_streetadd'],
 			dtype={'supplier_name':np.str, 'supplier_streetadd':np.str})
 		df.rename(columns = {'supplier_name':'priv_name', 'supplier_streetadd': 'priv_address'}, inplace = True)
 		print("Re-organising private data...")
@@ -52,7 +52,7 @@ def clean_private_data(config_dirs):
 		df.to_csv(adj_data, index=False)
 	else:
 		# Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
-		df = pd.read_csv(adj_data, usecols=['id','priv_name','priv_name_adj','priv_address'], \
+		df = pd.read_csv(adj_data, usecols=['id','priv_name','priv_name_adj','priv_address'],
 			dtype={'id':np.str ,'priv_name':np.str, 'priv_address':np.str, 'priv_name_adj':np.str})
 	return df
 
@@ -71,8 +71,8 @@ def clean_public_data(config_dirs):
 	if not os.path.exists(adj_data):
 		print("Re-organising public data...")
 		df = pd.read_csv(raw_data,
-							usecols={'org_name','street_address1','street_address2','street_address3','Org_ID'}, \
-							dtype={'org_name':np.str, 'street_address1':np.str,'street_address2':np.str, 'street_address3':np.str, 'Org_ID':np.str}, \
+							usecols={'org_name','street_address1','street_address2','street_address3','Org_ID'},
+							dtype={'org_name':np.str, 'street_address1':np.str,'street_address2':np.str, 'street_address3':np.str, 'Org_ID':np.str},
 							chunksize=500000)
 		
 		dffullmerge = pd.DataFrame([])
@@ -96,7 +96,7 @@ def clean_public_data(config_dirs):
 
 		dffullmerge.to_csv(adj_data, index=False)
 	else:
-		dffullmerge = pd.read_csv(adj_data, usecols=['Org_ID', 'org_name','pub_name_adj','pub_address'], \
+		dffullmerge = pd.read_csv(adj_data, usecols=['Org_ID', 'org_name','pub_name_adj','pub_address'],
 			dtype={'Org_ID':np.str, 'org_name':np.str, 'pub_name_adj':np.str, 'pub_address':np.str })
 	return dffullmerge
 
@@ -192,7 +192,7 @@ def assign_pub_data_to_clusters(df, assigned_file):
 	df = df.groupby(['Cluster ID']).progress_apply(get_max_id)
 	df.to_csv(assigned_file, index=False)
 	return df
-    
+
 
 def get_max_id(group):
 	"""
@@ -285,9 +285,9 @@ def calc_matching_stats(clustdf, extractdf, config_dirs, conf_file_num):
 	statdf.at[conf_file_num,'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['Org_ID'])])/len(privdf) * 100, 2)
 	# Overall optimised matches :
 	statdf.at[conf_file_num,'Optim_Matches'] = len(extractdf)
-	# Recall - how many of the selected items are relevant to us?
+	# Precision - how many of the selected items are relevant to us? (TP/TP+FP)
 	statdf.at[conf_file_num,'Percent_Precision'] = round(len(extractdf) / len(clustdf) * 100, 2)
-	# Recall - how many relevant items have been selected from the entire original private data 
+	# Recall - how many relevant items have been selected from the entire original private data (TP/TP+FN)
 	statdf.at[conf_file_num,'Percent_Recall'] = round(len(extractdf) / len(privdf) * 100, 2)
 	statdf.at[conf_file_num,'Leven_Dist_Avg'] = np.average(extractdf.leven_dist)
 	# if statsfile doesnt exist, create it
@@ -341,8 +341,8 @@ def manual_matching(config_dirs, conf_choice):
 	manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 
 	print("Saving...")
-	manual_match_file.to_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv', index=False, \
-		columns=['Cluster ID', 'Confidence Score','Org_ID','id', 'leven_dist', 'org_name', 'priv_address',\
+	manual_match_file.to_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv', index=False,
+		columns=['Cluster ID', 'Confidence Score','Org_ID','id', 'leven_dist', 'org_name', 'priv_address',
 				'priv_name','priv_name_adj','process_num', 'pub_address','pub_name_adj','Manual_Match'])	
 	return manual_match_file
 
@@ -471,7 +471,7 @@ if __name__ == '__main__':
 
 	man_matched = manual_matching(config_dirs, conf_choice)
 	# Convert manual matches to JSON training file.
-	man_matched = pd.read_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv', \
+	man_matched = pd.read_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv',
 		usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
 
 	convert_to_training(config_dirs, man_matched)

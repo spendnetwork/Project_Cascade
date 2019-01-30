@@ -101,7 +101,7 @@ Clustering here is important because it will affect how much of the matched data
 #### 3. Altering the config files
 Once the training has complete, this is where the config files come into play, as we are now attempting to extract the best quality matches factoring in that longer strings can have lower levenshtein ratios and still be good matches compared to shorter strings.
 
-Create a new config file as required (following the naming convention) and experiment with the 'char_counts' and 'min_match_score', making sure to increase one as your decrease the other. The module will automatically register additional files and run the process and output the stats to separate csvs for you to compare. These files will be saved in `Outputs/Extracted_Matches`.
+Create a new config file as required (following the naming convention) and experiment with the 'char_counts' and 'min_match_score', making sure to increase one as you decrease the other. The module will automatically register additional files and run the process and output the stats to separate csvs for you to compare. These files will be saved in `Outputs/Extracted_Matches`.
 
 #### 4. Re-cycling the matches
 Once you've chosen the best config file, enter it's number in the prompt and you will be presented with the required options to create a manual set of training data. You can then use this training data to re-train the data or other datasets as required.
