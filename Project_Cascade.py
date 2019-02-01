@@ -121,7 +121,6 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 
 	priv_file = dirs['adj_dir'] + dirs['adj_priv_data']
 	pub_file = dirs['adj_dir'] + dirs['adj_pub_data']
-	pdb.set_trace()
 
 
 	# Matching:
@@ -399,7 +398,6 @@ def convert_to_training(config_dirs, man_matched):
 		# If row was 'unsure'd, ignore it as it doesn't contribute to training data
 		else:
 			continue
-	pdb.set_trace()
 	# Write dict to training file backup.
 	# 'w+' allows writing, and + creates if doesn't exist.
 	with open(config_dirs['manual_matching_train_backup'], 'w+') as outfile:
