@@ -11,20 +11,22 @@ dirs = {
       "adj_priv_data": "{0}",
       "adj_pub_data": "{0}",
       "proc_type_dir" : os.getcwd() + '/Outputs/{0}',
+      "proc_type_matches dir" : os.getcwd() + '/Outputs/{0}/Extracted_Matches',
       "proc_type_train_dir" : os.getcwd() + '/Training_Files/{0}',
       "proc_type_train_clust_dir" : os.getcwd() + '/Training_Files/{0}/Clustering',
       "proc_type_train_match_dir" : os.getcwd() + '/Training_Files/{0}/Matching',
-      "match_training_file": os.getcwd() + '/Training_Files/{0}/Matching/training.json',
       "match_output_file": os.getcwd() + '/Outputs/{0}/{0}_matched.csv',
 
-      "cluster_training_file":os.getcwd() + '/Training_Files/{0}/Clustering/training.json',
+      "cluster_training_file":os.getcwd() + '/Training_Files/{0}/Clustering/cluster_training.json',
       "cluster_output_file":os.getcwd() + '/Outputs/{0}/{0}_mtchd_clustered.csv',
 
       "assigned_output_file":os.getcwd() + '/Outputs/{0}/{0}_mtchd_clust_assigned.csv',
 
-      "extract_matches_file":os.getcwd() + "/Outputs/Extracted_Matches/Extracted_Matches",
-      "stats_file":os.getcwd() + "/Outputs/Extracted_Matches/Matches_Stats",
+      "extract_matches_file":os.getcwd() + "/Outputs/{0}/Extracted_Matches/Extracted_Matches",
+      "stats_file":os.getcwd() + "/Outputs/{0}/Extracted_Matches/Matches_Stats",
 
-      "manual_matches_file":os.getcwd() + "/Outputs/Extracted_Matches/Manual_Matches",
-      "manual_training_file":os.getcwd() + "/Training_Files/Manual_Training/template.json",
+      "manual_matches_file":os.getcwd() + "/Outputs/{0}/Extracted_Matches/Manual_Matches",
+      "manual_training_file":os.getcwd() + "/Training_Files/{0}/Matching/matching_training.json",
+      "manual_matching_train_backup":os.getcwd() + "/Training_Files/Manual_&_Backups/manual_matching_training.json",
+      "cluster_training_backup":os.getcwd() + "/Training_Files/Manual_&_Backups/cluster_training_backup.json",
 }}

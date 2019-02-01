@@ -5,7 +5,7 @@ dirs = {
       "adj_dir": "/Adj_Data/",
       "extract_matches_file": "/Outputs/Extracted_Matches/Extracted_Matches",
       "manual_matches_file": "/Outputs/Extracted_Matches/Manual_Matches",
-      "manual_training_file": "/Training_Files/Manual_Training/template.json",
+      "manual_training_file": "/Training_Files/Manual_Training/training.json",
       "stats_file": "/Outputs/Extracted_Matches/Matches_Stats",
       "raw_priv_data": "private_data.csv",
       "raw_pub_data": "public_data.csv",
