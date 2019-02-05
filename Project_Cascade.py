@@ -122,7 +122,6 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 	priv_file = dirs['adj_dir'] + dirs['adj_priv_data']
 	pub_file = dirs['adj_dir'] + dirs['adj_pub_data']
 
-
 	# Matching:
 	if not os.path.exists(dirs['match_output_file'].format(proc_type)):
 		if in_args.recycle == True:
@@ -175,7 +174,6 @@ def shorten_name(row):
 	:param row: each row of the dataframe
 	:return row: shortened string i.e. from "coding ltd" to "coding"
 	"""
-
 	row = str(row).replace('-',' ').replace("  "," ").strip()
 	rowsplit = str(row).split(" ")
 	for i in rowsplit:
@@ -244,13 +242,8 @@ def extract_matches(clustdf, configs, config_dirs, proc_num, proc_type, conf_fil
 
 	:return extracts_file: contains dataframe with possible acceptable matches
 	"""
-
-	# Round confidence scores to 2dp : 
+	# Round confidence scores to 2dp :
 	clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
-
-	# Add column containing levenshtein distance between the matched public & private org names
-	if 'leven_dist' not in clustdf.columns:
-		clustdf['leven_dist'] = clustdf.apply(calc_match_ratio, axis=1)
 
 	# Filter by current match_score:
 	clustdf = clustdf[clustdf['leven_dist'] >= configs['processes'][proc_type][proc_num]['min_match_score']]
@@ -261,15 +254,20 @@ def extract_matches(clustdf, configs, config_dirs, proc_num, proc_type, conf_fil
 			# Filter by char count and previous count (if exists):
 			clustdf = clustdf[clustdf.priv_name_short.str.len() <= configs['processes'][proc_type][proc_num]['char_counts']]
 			clustdf = clustdf[clustdf.priv_name_short.str.len() > configs['processes'][proc_type][proc_num - 1]['char_counts']]
+			# Filter by < 99 as first proc_num includes all lengths leading to duplicates
+			clustdf = clustdf[clustdf['leven_dist'] <= 99]
 		except:
 			clustdf = clustdf[clustdf.priv_name_short.str.len() <= configs['processes'][proc_type][proc_num]['char_counts']]
-	
+	else:
+		if os.path.exists(config_dirs['extract_matches_file'].format(proc_type) + '_' + str(conf_file_num) + '.csv'):
+			# Clear any previous extraction file for this config:
+			os.remove(config_dirs['extract_matches_file'].format(proc_type) + '_' + str(conf_file_num) + '.csv')
+
 	#Add process number to column for calculating stats purposes:
 	clustdf['process_num'] = str(proc_num)
 
-
 	if not os.path.exists(config_dirs['extract_matches_file'].format(proc_type) + '_' + str(conf_file_num) + '.csv'):
-		clustdf.to_csv(config_dirs['extract_matches_file'].format(proc_type) + '_' + str(conf_file_num) + '.csv')
+		clustdf.to_csv(config_dirs['extract_matches_file'].format(proc_type) + '_' + str(conf_file_num) + '.csv', index=False)
 		return clustdf
 	else:
 		extracts_file = pd.read_csv(config_dirs['extract_matches_file'].format(proc_type) + '_' + str(conf_file_num) + '.csv', index_col=None)
@@ -288,9 +286,10 @@ def calc_matching_stats(clustdf, extractdf, config_dirs, conf_file_num, proc_typ
 	:return : None
 	:output : a short stats file for each config file for manual comparison to see which is better
 	"""
-	# Remove old stats file if exists:
-	if os.path.exists(config_dirs['stats_file'].format(proc_type) + '.csv'):
-		os.remove(config_dirs['stats_file'].format(proc_type) + '.csv')
+	# Remove old stats file if exists and if first iteration over config files:
+	if os.path.exists(config_dirs['stats_file'].format(proc_type)):
+		if conf_file_num == 1:
+			os.remove(config_dirs['stats_file'].format(proc_type))
 
 	statdf = pd.DataFrame(columns=['Config_File','Total_Matches', 'Percent_Matches','Optim_Matches','Percent_Precision','Percent_Recall', 'Leven_Dist_Avg'])
 	# Overall matches, including poor quality:
@@ -305,13 +304,13 @@ def calc_matching_stats(clustdf, extractdf, config_dirs, conf_file_num, proc_typ
 	statdf.at[conf_file_num,'Percent_Recall'] = round(len(extractdf) / len(privdf) * 100, 2)
 	statdf.at[conf_file_num,'Leven_Dist_Avg'] = np.average(extractdf.leven_dist)
 	# if statsfile doesnt exist, create it
-	if not os.path.exists(config_dirs['stats_file'].format(proc_type) + '.csv'):
-		statdf.to_csv(config_dirs['stats_file'].format(proc_type) + '.csv')
+	if not os.path.exists(config_dirs['stats_file'].format(proc_type)):
+		statdf.to_csv(config_dirs['stats_file'].format(proc_type))
 	# if it does exist, concat current results with previous
 	else:
-		main_stat_file = pd.read_csv(config_dirs['stats_file'].format(proc_type) + '.csv', index_col=None)
+		main_stat_file = pd.read_csv(config_dirs['stats_file'].format(proc_type), index_col=None)
 		main_stat_file = pd.concat([main_stat_file, statdf],ignore_index=True, sort=True)
-		main_stat_file.to_csv(config_dirs['stats_file'].format(proc_type) + '.csv', index=False)
+		main_stat_file.to_csv(config_dirs['stats_file'].format(proc_type), index=False, columns=['Config_File', 'Leven_Dist_Avg','Optim_Matches','Percent_Matches','Percent_Precision','Percent_Recall','Total_Matches'])
 
 
 def manual_matching(config_dirs, conf_choice):
@@ -404,19 +403,17 @@ def convert_to_training(config_dirs, man_matched):
 		json.dump(manualdict, outfile)
 
 
-
-
 if __name__ == '__main__':
 	in_args = get_input_args()
 	#Silence warning for df['process_num'] = str(proc_num)
-	pd.options.mode.chained_assignment = None 
+	pd.options.mode.chained_assignment = None
 	#Define config file variables and related arguments
 	config_path = Path('./Config_Files')
 	config_dirs = config_dirs.dirs["dirs"]
 
 	# Ignores config_dirs - convention is <num>_config.py
 	pyfiles = "*_config.py"
-	
+
 	try:
 		# For each config file read it and convert to dictionary for accessing
 		for conf_file in config_path.glob(pyfiles):
@@ -433,16 +430,9 @@ if __name__ == '__main__':
 				privdf = clean_private_data(config_dirs)
 				if not in_args.recycle:
 					pubdf = clean_public_data(config_dirs)
-				
+
 				# For each process type (eg: Name & Add, Name only) outlined in the configs file:
 				for proc_type in configs['processes']:
-
-					# If user specifies manual training already done...
-					# if in_args.manual_training == True:
-					# 	# ...And if the proc_type iterable is not a manual training proc_type...
-					# 	if configs['processes'][proc_type][min(configs['processes'][proc_type].keys())]['manual_file'] == False:
-					# 		# ...then skip to the next proc_type
-					# 		continue
 
 					# Only run through the module once per initiation. Either to get the initial training file
 					# or to recycle it and get better matches.
@@ -471,7 +461,7 @@ if __name__ == '__main__':
 							clustdtype = {'Cluster ID':np.int, 'Confidence Score': np.float,
 												'id':np.int, 'priv_name':np.str, 'priv_address':np.str,
 												'priv_name_adj':np.str, 'Org_ID':np.str, 'pub_name_adj': np.str,
-												'pub_address':np.str}
+												'pub_address':np.str, 'priv_name_short':np.str, 'pub_name_short':np.str, 'leven_dist':np.int}
 							# Run dedupe for matching and calculate related stats for comparison
 							if not os.path.exists(config_dirs['assigned_output_file'].format(proc_type)):
 								# if 'dedupe_field_names' in proc_fields:
@@ -488,9 +478,13 @@ if __name__ == '__main__':
 
 								clustdf['pub_name_short'] = clustdf.pub_name_adj.apply(shorten_name)
 
+								# Add column containing levenshtein distance between the matched public & private org names
+								if 'leven_dist' not in clustdf.columns:
+									clustdf['leven_dist'] = clustdf.apply(calc_match_ratio, axis=1)
+
 								clustdf.to_csv(config_dirs["assigned_output_file"].format(proc_type), index=False)
 							else:
-								clustdf = pd.read_csv(config_dirs["assigned_output_file"].format(proc_type), index_col=None, dtype=clustdtype)
+								clustdf = pd.read_csv(config_dirs["assigned_output_file"].format(proc_type), index_col=None, dtype=clustdtype, usecols=clustdtype.keys())
 
 							#Adds leven_dist column and extract matches based on config process criteria:
 							extracts_file = extract_matches(clustdf, configs, config_dirs, proc_num, proc_type, conf_file_num)
@@ -499,7 +493,7 @@ if __name__ == '__main__':
 						continue
 				# Output stats file:
 				calc_matching_stats(clustdf, extracts_file, config_dirs, conf_file_num, proc_type)
-		
+
 	except StopIteration:
 		# End program if no more config files found
 		print("Done")
@@ -512,7 +506,7 @@ if __name__ == '__main__':
 		man_matched = manual_matching(config_dirs, conf_choice)
 		# Convert manual matches to JSON training file.
 		man_matched = pd.read_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv',
-			usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
+		usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
 
 		convert_to_training(config_dirs, man_matched)
 

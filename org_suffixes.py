@@ -1,48 +1,42 @@
 global org_type_dict
 org_type_dict = {
-    'società a responsabilità limitata semplificata': 's.r.l.s.',
-    'società\' a responsabilità\' limitata semplificata': 's.r.l.s.',
-    'societa a responsabilita limitata semplificata': 's.r.l.s.',
-    'societa\' a responsabilita\' limitata semplificata': 's.r.l.s.',
-    'società a responsabilità limitata': 's.r.l.',
-    'società\' a responsabilità\' limitata': 's.r.l.',
-    'societa a responsabilita limitata': 's.r.l.',
-    'societa\' a responsabilita\' limitata': 's.r.l.',
-    's r l': 's.r.l.',
-    ' srl ': ' s.r.l. ',  # srl - added whitespace
-    ' srl': ' s.r.l.',  # srl - added whitespace left (for EO string)
-    's. r. l.': 's.r.l.',
-    's r l s': 's.r.l.s.',
-    ' srls': ' s.r.l.s.',  # whitespace left
-    ' srls ': ' s.r.l.s. ',   # whitespace
-    's. r. l. s.': 's.r.l.s.',
-    'società per azioni': 's.p.a.',
-    'societa per azioni': 's.p.a.',
-    's p a': 's.p.a.',
-    's. p. a.': 's.p.a.',
-    ' spa ': ' s.p.a. ',  # whitespace
-    ' spa': ' s.p.a.',  # whitespace left
-    'Società in nome collettivo': 's.n.c.',
-    'Societa in nome collettivo': 's.n.c.',
-    's n c': 's.n.c.',
-    ' snc ': ' s.n.c. ',  # whitespace
-    ' snc': ' s.n.c.',  # whitespace left
-    's. n. c.': 's.n.c.',
-    'società in accomandita semplice': 's.a.s.',
-    'societa in accomandita semplice': 's.a.s.',
-    's a s': 's.a.s.',
-    's. a. s.': 's.a.s.',
-    ' sas ': ' s.a.s. ',  # whitespace
-    ' sas': ' s.a.s.',  # whitespace left
-    'società in accomandita semplice': 's.a.s.',
-    'societa in accomandita semplice': 's.a.s.',
-    's a s': 's.a.s.',
-    's. a. s.': 's.a.s.',
-    ' sas ': ' s.a.s. ',  # whitespace
-    ' sas': ' s.a.s.',  # whitespace left
-    'societa cooperativa sociale': 's.c.s.',
-    'società cooperativa sociale': 's.c.s.',
-    's c s': 's.c.s.',
-    's. c. s.': 's.c.s.',
-    ' scs ': 's.c.s.',
-    ' scs': 's.c.s.'}
+    'società a responsabilità limitata semplificata': 'srls',
+    'società\' a responsabilità\' limitata semplificata': 'srls',
+    'societa a responsabilita limitata semplificata': 'srls',
+    'societa\' a responsabilita\' limitata semplificata': 'srls',
+    'società a responsabilità limitata': 'srl',
+    'società\' a responsabilità\' limitata': 'srl',
+    'societa a responsabilita limitata': 'srl',
+    'societa\' a responsabilita\' limitata': 'srl',
+    's r l': 'srl',
+    ' srl ': ' srl ',  # srl - added whitespace
+    ' srl': ' srl',  # srl - added whitespace left (for EO string)
+    's. r. l.': 'srl',
+    's r l s': 'srls',
+    ' srls': ' srls',  # whitespace left
+    ' srls ': ' srls ',   # whitespace
+    's. r. l. s.': 'srls',
+    'società per azioni': 'spa',
+    'societa per azioni': 'spa',
+    's p a': 'spa',
+    's. p. a.': 'spa',
+    ' spa ': ' spa ',  # whitespace
+    ' spa': ' spa',  # whitespace left
+    'Società in nome collettivo': 'snc',
+    'Societa in nome collettivo': 'snc',
+    's n c': 'snc',
+    ' snc ': ' snc ',  # whitespace
+    ' snc': ' snc',  # whitespace left
+    's. n. c.': 'snc',
+    'società in accomandita semplice': 'sas',
+    'societa in accomandita semplice': 'sas',
+    's a s': 'sas',
+    's. a. s.': 'sas',
+    ' sas ': ' sas ',  # whitespace
+    ' sas': ' sas',  # whitespace left
+    'societa cooperativa sociale': 'scs',
+    'società cooperativa sociale': 'scs',
+    's c s': 'scs',
+    's. c. s.': 'scs',
+    ' scs ': 'scs',
+    ' scs': 'scs'}
