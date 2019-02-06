@@ -121,13 +121,15 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 
 	priv_file = dirs['adj_dir'] + dirs['adj_priv_data']
 	pub_file = dirs['adj_dir'] + dirs['adj_pub_data']
-
 	# Matching:
 	if not os.path.exists(dirs['match_output_file'].format(proc_type)):
 		if in_args.recycle == True:
 			# Copy manual matching file over to build on for clustering
 			copyfile(config_dirs['manual_matching_train_backup'], config_dirs['manual_training_file'].format(proc_type))
 
+		# Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
+		if os.path.exists('./learned_settings'):
+			os.remove('./learned_settings')
 		print("Starting matching...")
 		cmd = ['csvlink '
 				+ str(priv_file).format(in_args.priv_adj_name) + ' '
@@ -379,12 +381,12 @@ def convert_to_training(config_dirs, man_matched):
 		new_data = {"__class__" : "tuple",
 						"__value__" : [
 										{
-									   	"priv_name_adj": str(row.priv_name_adj),
-									   	"priv_address" : str(row.priv_address)
-									   	},
+										"priv_name_adj": str(row.priv_name_adj),
+										"priv_address" : str(row.priv_address)
+										},
 									   {
 									   "priv_name_adj": str(row.pub_name_adj),
-									   	"priv_address" : str(row.pub_address)
+										"priv_address" : str(row.pub_address)
 									   }
 									 ]}
 

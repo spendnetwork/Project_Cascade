@@ -1,6 +1,6 @@
 # Project_Cascade_Ita
 
-This repository takes two sets of Italian organisation data and links them together using dedupe.io's csvlink and csvdedupe modules.
+This repository takes two sets of Italian organisation data and links them together using dedupe.io's csvlink and csvdedupe modules. Given the limitations of quality assessment regarding matches, additional calculations take place to recycle the resulting training data in order to improve both the quantity and quality of the matches.
 
 The first set of data will contain poor quality, manually curated data, which probably contains many variations of the same organisation data.
 
@@ -49,11 +49,14 @@ The module makes use of argument parsing, with the following arguments:
 --pub_raw_name (default: 'public_data.csv')
 --priv_adj_name (default: 'priv_data_adj.csv')
 --pub_adj_name (default: 'pub_data_adj.csv')
+--recycle (No arguments)
 ```
 To amend the names if needed :
 ```
 python Project_Cascade.py --priv_raw_name <filename>  # ...etc
 ```
+
+The `--recycle` flag is used once the module has been run and trained for the first time. When this flag is used, the module will run for a second time, but will incorporate the training data obtained from the manual matching process created in the first 'round', as  kick-start of sorts. See 5. Recycling Matches below for more info.
 
 The default file formats are :
 
@@ -75,7 +78,7 @@ Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'O
 ### 2. Deduplication
 - First the module links the two datasets together, to join our manual private data to more official sources. It does this using [dedupe](https://github.com/dedupeio/csvdedupe)'s csvlink command.
 - Second, the module takes this matched data and assigns rows to clusters, in the event that two rows actually refer to the same company. This outputs both a cluster_ID and a confidence score of how likely that row belongs to that cluster. Clustering is done using dedupe's csvdedupe command.
-- Training files for both clustering and matching are provided already.
+- Training files for both clustering and matching are provided already. Note that the first 'round' of processing only uses one field, the organisation name. The second 'round' will include the address as well, 
 
 ### 3. Further Data Manipulation
 - If any data within the cluster hasn't been matched to a public source, then if there is a match anywhere within that cluster, that public data is applied to the rest of the cluster.
@@ -88,8 +91,8 @@ Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'O
 - For each configuration file, a separate short stats csv is created so the user can tweak the config files and retain some indication of which one produces the most/best quality matches.
 
 ### 5. Re-cycling the matches
-- With the best matches obtained, the user can then pick the best config settings, and then will be prompted to go through and manually verify the quality of each match. 
-- These quality matches, and poor quality matches, are then converted to a json training file, which can then be re-fed back into dedupe as a kick-start to more accurate training.
+- With the best matches obtained, the user can then pick the best config file (by reviewing the stats file), and then will be prompted to go through and manually verify the quality of each match. 
+- These quality matches, and poor quality matches, are then converted to a json training file, which can then be re-fed back into dedupe as a kick-start to more accurate training but now including the street address field.
 
 ### Training Conventions
 #### 1. Matching
@@ -102,9 +105,6 @@ Clustering here is important because it will affect how much of the matched data
 Once the training has complete, this is where the config files come into play, as we are now attempting to extract the best quality matches factoring in that longer strings can have lower levenshtein ratios and still be good matches compared to shorter strings.
 
 Create a new config file as required (must follow the current naming convention) and experiment with the 'char_counts' and 'min_match_score', making sure to increase one as you decrease the other. The module will automatically register additional files and run the process and output the stats to separate csvs for you to compare. These files will be saved in `Outputs/Extracted_Matches`.
-
-#### 4. Re-cycling the matches
-Once you've chosen the best config file, enter it's number in the prompt and you will be presented with the required options to create a manual set of training data. You can then use this training data to re-train the data or other datasets as required.'
 
 
 

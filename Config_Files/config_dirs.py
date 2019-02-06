@@ -18,9 +18,9 @@ dirs = {
       "match_output_file": os.getcwd() + '/Outputs/{0}/{0}_matched.csv',
 
       "cluster_training_file":os.getcwd() + '/Training_Files/{0}/Clustering/cluster_training.json',
-      "cluster_output_file":os.getcwd() + '/Outputs/{0}/{0}_mtchd_clustered.csv',
+      "cluster_output_file":os.getcwd() + '/Outputs/{0}/{0}_matched_clustered.csv',
 
-      "assigned_output_file":os.getcwd() + '/Outputs/{0}/{0}_mtchd_clust_assigned.csv',
+      "assigned_output_file":os.getcwd() + '/Outputs/{0}/{0}_matched_clust_assigned.csv',
 
       "extract_matches_file":os.getcwd() + "/Outputs/{0}/Extracted_Matches/Extracted_Matches",
       "stats_file":os.getcwd() + "/Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv",
