@@ -13,7 +13,7 @@ tqdm = "*"
 pathlib = "*"
 python-levenshtein = "*"
 dedupe = "*"
-csvdedupe = {path = "./csvdedupe"}
+csvdedupe = {path = "./csvdedupe", git="https://github.com/DMells/csvdedupe"}
 
 [requires]
 python_version = "3.6"

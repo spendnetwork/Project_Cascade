@@ -451,8 +451,10 @@ if __name__ == '__main__':
 							os.makedirs(config_dirs['proc_type_train_clust_dir'].format(proc_type))
 						if not os.path.exists(config_dirs['proc_type_train_match_dir'].format(proc_type)):
 							os.makedirs(config_dirs['proc_type_train_match_dir'].format(proc_type))
-						if not os.path.exists(config_dirs['proc_type_matches dir'].format(proc_type)):
-							os.makedirs(config_dirs['proc_type_matches dir'].format(proc_type))
+						if not os.path.exists(config_dirs['proc_type_matches_dir'].format(proc_type)):
+							os.makedirs(config_dirs['proc_type_matches_dir'].format(proc_type))
+						if not os.path.exists(config_dirs['backups_dir'].format(proc_type)):
+							os.makedirs(config_dirs['backups_dir'].format(proc_type))
 
 						# Iterate over each process number in the config file
 						for proc_num in configs['processes'][proc_type]:
