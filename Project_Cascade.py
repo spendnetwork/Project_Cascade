@@ -32,9 +32,10 @@ def get_input_args():
 	args = parser.parse_args()
 	return args
 
+
 def clean_private_data(config_dirs):
 	"""
-	Takes the private data file, org type suffixes are replaced with abbreviated versions
+	Takes the private data file as input, org type suffixes are replaced with abbreviated versions
 	and strings reformatted for consistency across the two datasets
 
 	:return df: the amended private datafile
