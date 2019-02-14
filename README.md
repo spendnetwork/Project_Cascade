@@ -35,13 +35,19 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Place the two raw data files into Raw_Data/
+3. Install dedupe repo:
+```
+git clone "https://github.com/DMells/csvdedupe"
+```
 
-4. Run the module
+4. Place the two raw data files into Raw_Data/
+
+5. Run the module
 ```
 cd Project_Cascade_Ita
 python Project_Cascade.py
 ```
+
 
 The module makes use of argument parsing, with the following arguments:
 ```
