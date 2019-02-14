@@ -5,4 +5,6 @@ Config_Files/__pycache__/
 .DS_Store/
 Backups/
 __pycache__/
-.DS_Store
+*.DS_Store
+.idea/
+*.zip
