@@ -13,7 +13,7 @@ tqdm = "*"
 pathlib = "*"
 python-levenshtein = "*"
 csvdedupe = {path = "./csvdedupe"}
+dedupe = "*"
 
 [requires]
 python_version = "3.6"
-
