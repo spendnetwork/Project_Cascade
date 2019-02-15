@@ -12,7 +12,6 @@ numpy = "*"
 tqdm = "*"
 pathlib = "*"
 python-levenshtein = "*"
-csvdedupe = {path = "./csvdedupe"}
 dedupe = "*"
 
 [requires]
