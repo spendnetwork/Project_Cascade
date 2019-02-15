@@ -45,9 +45,12 @@ git clone "https://github.com/DMells/csvdedupe"
 5. Run the module
 ```
 cd Project_Cascade_Ita
+python Project_Cascade.py --pub_raw_name 'public_data_sample.csv'
+```
+Or rename the sample file to public_data.csv, which is the default name used when calling 
+```
 python Project_Cascade.py
 ```
-
 
 The module makes use of argument parsing, with the following arguments:
 ```
