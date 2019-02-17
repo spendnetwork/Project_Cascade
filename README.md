@@ -91,6 +91,7 @@ Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'O
 python project_cascade.py --training
 ```
 It is recommended that you study the dedupe documentation before modifying the training data, as experimentation is required to prevent over or under-fitting of the matching process. I have provided some notes at the end of this readme to explain my methods.
+
 5. Second, the module takes this matched data and assigns rows into groups called clusters, in the event that two rows within the private data actually refer to the same company. This outputs both a cluster_ID and a confidence score of how likely that row belongs to that cluster.
 
 ### Further Data Manipulation
