@@ -20,12 +20,17 @@ Modification of the module in its current state will be required depending on th
 git clone https://github.com/DMells/Project_Cascade_Ita
 ```
 
-2. Install with pipenv:
+2. Install dedupe:
+```
+git clone "https://github.com/DMells/csvdedupe"
+```
+
+3. Install with pipenv:
 ```
 pipenv install
 ```
 
-OR 
+OR
 
 Install with virtualenv:
 
@@ -33,11 +38,6 @@ Install with virtualenv:
 virtualenv venv -p python3
 source venv/bin/activate
 pip install -r requirements.txt
-```
-
-3. Install dedupe repo:
-```
-git clone "https://github.com/DMells/csvdedupe"
 ```
 
 4. Place the two raw data files into Raw_Data/
@@ -60,6 +60,7 @@ The module makes use of argument parsing, with the following arguments:
 --pub_adj_name (default: 'pub_data_adj.csv')
 --recycle (No arguments)
 ```
+
 To amend the names if needed :
 ```
 python Project_Cascade.py --priv_raw_name <filename>  # ...etc
@@ -79,31 +80,41 @@ Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'O
 
 ## General Processes
 
-### 1.  Data Cleaning
-- Standardisation of company suffixes (i.e. ltd vs limited for UK companies)
-- Irrelevant punctuation removed
-- Multiple address columns in the public data merged into one single column, with the records duplicated. This is to help the learning/training process.
+### Data Cleaning
+1. The module takes both datafiles and creates a new column with the org name cleaned up to help the matching process. For example, all company type suffixes (ltd, llp, srl etc) are standardised.
+2. In the same new column, punctuation is removed.
+3. For the public data set which has several address columns, these are all merged into one, with related row entries duplicated.  
 
-### 2. Deduplication
-- First the module links the two datasets together, to join our manual private data to more official sources. It does this using [dedupe](https://github.com/dedupeio/csvdedupe)'s csvlink command.
-- Second, the module takes this matched data and assigns rows to clusters, in the event that two rows actually refer to the same company. This outputs both a cluster_ID and a confidence score of how likely that row belongs to that cluster. Clustering is done using dedupe's csvdedupe command.
-- Training files for both clustering and matching are provided already. Note that the first 'round' of processing only uses one field, the organisation name. The second 'round' will include the address as well, 
+### Deduplication
+4.  The dedupe module comes into play next in two stages. First is the matching phase, which joins together our manual private data to the public data. It does this using [dedupe](https://github.com/dedupeio/csvdedupe)'s csvlink command. Training data has been provided to provide the best quality matches, and so you are required to do nothing here, however if you want to modify the training data just use the `training` flag when calling the module:
+```
+python project_cascade.py --training
+```
+It is recommended that you study the dedupe documentation before modifying the training data, as experimentation is required to prevent over or under-fitting of the matching process. I have provided some notes at the end of this readme to explain my methods.
+5. Second, the module takes this matched data and assigns rows into groups called clusters, in the event that two rows within the private data actually refer to the same company. This outputs both a cluster_ID and a confidence score of how likely that row belongs to that cluster.
 
-### 3. Further Data Manipulation
-- If any data within the cluster hasn't been matched to a public source, then if there is a match anywhere within that cluster, that public data is applied to the rest of the cluster.
+### Further Data Manipulation
+6. We now have our matched and clustered dataset, which means that our private data is now linked to registry/public data for verification and it is also grouped into clusters so we don't eg: contact the same company twice.
+If any data **within a cluster** hasn't been matched to public data , then if there is a match anywhere within that cluster, that public data is applied to the rest of the cluster. This is to increase the number of absolute matches. Quality control comes next.
 
-### 4. Extracting the best matches
-- Because of the many different ways of writing a company name, dedupe's matching/clustering phase can only take us so far.
-- We then introduce a Levenshtein distance ratio to the data, which indicates just how good each match is.
-- A short string with a difference of 1 letter is much less likely to be a match than a long string with the same difference.
-- Based on this, and a pre-defined config file, we introduce a cascading quality filter, which decreases the minimum levenshtein distance we are willing to accept, as the string length increases.
-- For each configuration file, a separate short stats csv is created so the user can tweak the config files and retain some indication of which one produces the most/best quality matches.
+### Extracting the best matches
+7. Because of the many different ways of writing a company name, dedupe's matching/clustering phase can only take us so far.
+8. We then introduce a Levenshtein distance ratio to the data, which indicates just how good each match is based on the amount of alteration it would require to make one string the same as the other. The higher the score the better.
+9. Note that a short string with a difference of 1 letter between it and another string is much less likely to be a match than a long string with the same difference. Based on this, and a pre-defined config file, we introduce a cascading quality filter, which decreases the minimum levenshtein distance we are willing to accept, as the string length increases.
+You can add as many config files as you like to experiment with different combinations of this quality control filter system. 
+10. A short stats file is created so the user can see high level results of the different config files. 
 
-### 5. Re-cycling the matches
-- With the best matches obtained, the user can then pick the best config file (by reviewing the stats file), and then will be prompted to go through and manually verify the quality of each match. 
-- These quality matches, and poor quality matches, are then converted to a json training file, which can then be re-fed back into dedupe as a kick-start to more accurate training but now including the street address field.
+### Re-cycling the matches
+11. With the best matches filtered for, the user can then pick the best config file (by reviewing the stats file in `Outputs/<process_type>/Matches_Stats_x.csv`), and then will be prompted by the terminal to go through and manually verify the quality of each match.
+12. These quality matches, and poor quality matches, are then converted to a json training file, which can then be re-fed back into dedupe as a kick-start to more accurate training but now including the street address field. Once the process has completed for the first time, re-run the module using the `recycle` flag:
 
-### Training Conventions
+```
+python project_cascade.py --recycle
+```
+
+This will run the entire process again but will use the new training data and will attempt to match both the organisation name and the address.
+
+### Training Notes
 #### 1. Matching
 The best way to train the matching data is to have a strategy of sorts prior to entering the dedupe phase. The best approach I found was to use the 'Unsure' option liberally. For example, if the two strings are the same but one is clearly an abbreviated version of the other, hit 'Unsure'. Each decision will impact the rest of the training data and therefore the outcome of the matches. Dedupe cannot apply context to the data, and so being strict prevents any 'rules' being learnt that make no sense.
 
@@ -114,9 +125,3 @@ Clustering here is important because it will affect how much of the matched data
 Once the training has complete, this is where the config files come into play, as we are now attempting to extract the best quality matches factoring in that longer strings can have lower levenshtein ratios and still be good matches compared to shorter strings.
 
 Create a new config file as required (must follow the current naming convention) and experiment with the 'char_counts' and 'min_match_score', making sure to increase one as you decrease the other. The module will automatically register additional files and run the process and output the stats to separate csvs for you to compare. These files will be saved in `Outputs/Extracted_Matches`.
-
-
-
-
-
-

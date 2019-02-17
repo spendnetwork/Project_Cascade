@@ -28,6 +28,7 @@ def get_input_args():
 	parser.add_argument('--priv_adj_name', default='priv_data_adj.csv', type=str, help='Set cleaned private/source datafile name')
 	parser.add_argument('--pub_adj_name', default='pub_data_adj.csv', type=str, help='Set cleaned public datafile name')
 	parser.add_argument('--recycle', action='store_true', help='Call this to recycle the manual training data')
+	parser.add_argument('--training', action='store_true', help='Call this to modify/contribute to the training data')
 	# parser.add_argument('--priv_fields', nargs='+', default=[ help='Set private data dedupe fields' )
 	args = parser.parse_args()
 	return args
@@ -42,7 +43,7 @@ def clean_private_data(config_dirs):
 	"""
 	raw_data = config_dirs['raw_dir'] + config_dirs['raw_priv_data'].format(in_args.priv_raw_name)
 	adj_data = config_dirs['adj_dir'] + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
-
+	pdb.set_trace()
 	if not os.path.exists(adj_data):
 		df = pd.read_csv(raw_data, usecols=['id','supplier_name','supplier_streetadd'],
 			dtype={'supplier_name':np.str, 'supplier_streetadd':np.str})
@@ -137,6 +138,7 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 				+ str(pub_file).format(in_args.pub_adj_name)
 				+ ' --field_names_1 ' + ' '.join(priv_fields)
 				+ ' --field_names_2 ' + ' '.join(pub_fields)
+				+ ' --skip_training' + in_args.training
 				+ ' --training_file ' + dirs['manual_training_file'].format(proc_type)
 				+ ' --output_file ' + dirs['match_output_file'].format(proc_type)]
 		p = subprocess.Popen(cmd, shell=True)
@@ -157,6 +159,7 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 		cmd = ['python csvdedupe.py '
 				+ dirs['match_output_file'].format(proc_type) + ' '
 				+ ' --field_names ' + ' '.join(priv_fields)
+				+ ' --skip_training' + in_args.training
 				+ ' --training_file ' + dirs['cluster_training_file'].format(proc_type)
 				+ ' --output_file ' + dirs['cluster_output_file'].format(proc_type)]
 		p = subprocess.Popen(cmd, cwd= os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
