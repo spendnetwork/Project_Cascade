@@ -20,7 +20,7 @@ Modification of the module in its current state will be required depending on th
 git clone https://github.com/DMells/Project_Cascade_Ita
 ```
 
-2. Install dedupe:
+2. Clone dedupe (with slight modifications):
 ```
 git clone "https://github.com/DMells/csvdedupe"
 ```
