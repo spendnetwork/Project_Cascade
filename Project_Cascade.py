@@ -27,9 +27,8 @@ def get_input_args():
 	parser.add_argument('--pub_raw_name', default='public_data.csv', type=str, help='Set raw public datafile name')
 	parser.add_argument('--priv_adj_name', default='priv_data_adj.csv', type=str, help='Set cleaned private/source datafile name')
 	parser.add_argument('--pub_adj_name', default='pub_data_adj.csv', type=str, help='Set cleaned public datafile name')
-	parser.add_argument('--recycle', action='store_true', help='Call this to recycle the manual training data')
-	parser.add_argument('--training', action='store_true', help='Call this to modify/contribute to the training data')
-	# parser.add_argument('--priv_fields', nargs='+', default=[ help='Set private data dedupe fields' )
+	parser.add_argument('--recycle', action='store_true', help='Recycle the manual training data')
+	parser.add_argument('--training', action='store_false', help='Modify/contribute to the training data')
 	args = parser.parse_args()
 	return args
 
