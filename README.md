@@ -20,14 +20,20 @@ Modification of the module in its current state will be required depending on th
 git clone https://github.com/DMells/Project_Cascade_Ita
 ```
 
-2. Clone dedupe (with slight modifications):
+2. Navigate to project directory:
+```
+cd Project_Cascade_Ita
+```
+
+3. Clone dedupe (with slight modifications):
 ```
 git clone "https://github.com/DMells/csvdedupe"
 ```
 
-3. Install with pipenv:
+4. Install with pipenv and activate virtual environment:
 ```
 pipenv install
+pipenv shell
 ```
 
 OR
@@ -40,9 +46,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Place the two raw data files into Raw_Data/
+5. Place the two raw data files into Raw_Data/
 
-5. Run the module
+6. Run the module
 ```
 cd Project_Cascade_Ita
 python Project_Cascade.py --pub_raw_name 'public_data_sample.csv'

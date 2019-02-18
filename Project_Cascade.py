@@ -42,7 +42,7 @@ def clean_private_data(config_dirs):
 	"""
 	raw_data = config_dirs['raw_dir'] + config_dirs['raw_priv_data'].format(in_args.priv_raw_name)
 	adj_data = config_dirs['adj_dir'] + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
-	pdb.set_trace()
+
 	if not os.path.exists(adj_data):
 		df = pd.read_csv(raw_data, usecols=['id','supplier_name','supplier_streetadd'],
 			dtype={'supplier_name':np.str, 'supplier_streetadd':np.str})
@@ -137,7 +137,7 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 				+ str(pub_file).format(in_args.pub_adj_name)
 				+ ' --field_names_1 ' + ' '.join(priv_fields)
 				+ ' --field_names_2 ' + ' '.join(pub_fields)
-				+ ' --skip_training' + in_args.training
+				+ ' --skip_training' + str(in_args.training)
 				+ ' --training_file ' + dirs['manual_training_file'].format(proc_type)
 				+ ' --output_file ' + dirs['match_output_file'].format(proc_type)]
 		p = subprocess.Popen(cmd, shell=True)
@@ -158,7 +158,7 @@ def dedupe_match_cluster(dirs,configs, proc_type, proc_num):
 		cmd = ['python csvdedupe.py '
 				+ dirs['match_output_file'].format(proc_type) + ' '
 				+ ' --field_names ' + ' '.join(priv_fields)
-				+ ' --skip_training' + in_args.training
+				+ ' --skip_training' + str(in_args.training)
 				+ ' --training_file ' + dirs['cluster_training_file'].format(proc_type)
 				+ ' --output_file ' + dirs['cluster_output_file'].format(proc_type)]
 		p = subprocess.Popen(cmd, cwd= os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
@@ -518,7 +518,7 @@ if __name__ == '__main__':
 			convert_to_training(config_dirs, man_matched)
 
 		# Filter manual matches file and output to separate csv as confirmed matches
-		confirmed_matches = man_matched[man_matched['Manual_Match'] = 'Y']
+		confirmed_matches = man_matched[man_matched['Manual_Match'] == 'Y']
 		confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type), index=False)
 
 		print("Done.")
