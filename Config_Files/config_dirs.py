@@ -11,7 +11,7 @@ dirs = {
       "adj_priv_data": "{0}",
       "adj_pub_data": "{0}",
       "proc_type_dir" : os.getcwd() + '/Outputs/{0}',
-      "proc_type_matches_dir" : os.getcwd() + '/Outputs/{0}/Deduped_Data/Extracted_Matches',
+      "proc_type_matches_dir" : os.getcwd() + '/Outputs/{0}/Extracted_Matches',
       "proc_type_train_dir" : os.getcwd() + '/Data_Inputs/Training_Files/{0}',
       "proc_type_train_clust_dir" : os.getcwd() + '/Data_Inputs/Training_Files/{0}/Clustering',
       "proc_type_train_match_dir" : os.getcwd() + '/Data_Inputs/Training_Files/{0}/Matching',
@@ -30,5 +30,6 @@ dirs = {
       "manual_matching_train_backup":os.getcwd() + "/Data_Inputs/Training_Files/Manual_&_Backups/manual_matching_training.json",
       "backups_dir":os.getcwd() + "/Data_Inputs/Training_Files/Manual_&_Backups",
       "cluster_training_backup":os.getcwd() + "/Data_Inputs/Training_Files/Manual_&_Backups/cluster_training_backup.json",
-      "confirmed_matches_file":os.getcwd() + "/Outputs/{0}/Confirmed_Matches/Confirmed_Matches.csv"
+      "confirmed_matches_file":os.getcwd() + "/Outputs/{0}/Confirmed_Matches/Confirmed_Matches.csv",
+      "confirmed_matches_dir":os.getcwd() + "/Outputs/{0}/Confirmed_Matches/"
 }}
