@@ -78,6 +78,33 @@ Fields : 'id' (int), 'supplier_name' (str), 'supplier_streetadd' (str)
 Filename : public_data.csv
 Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'Org_ID'
 
+##### Directory Structure
+
+```
+Project_Cascade
+|--Config_Files
+|--csvdedupe
+|--Data_Inputs
+    |--Adj_Data
+    |--Raw_Data
+    |--Training_Files
+        |--Manual_&_Backups
+        |--process_type **  # I.e. Name_Only, or Name_Address
+            |--Clustering
+            |--Matching
+|--Outputs
+    |--process_type **  # I.e. Name_Only, or Name_Address
+        |--Confirmed_Matches
+        |--Deduped_Data
+        |--Extracted_Matches
+|--Project_Cascade.py
+|--org_suffixes.py
+|--Pipfile
+|--Pipfile.lock
+|--README.md
+```
+
+_** Subject to change/ depending on naming conventions chosen in config files._
 ## General Processes
 
 ### Data Cleaning
@@ -106,14 +133,14 @@ You can add as many config files as you like to experiment with different combin
 10. A short stats file is created so the user can see high level results of the different config files. 
 
 ### Re-cycling the matches
-11. With the best matches filtered for, the user can then pick the best config file (by reviewing the stats file in `Outputs/<process_type>/Matches_Stats_x.csv`), and then will be prompted by the terminal to go through and manually verify the quality of each match.
+11. With the best matches filtered for, the user can then pick the best config file (by reviewing the stats file in `Outputs/<process_type>/Extracted_Matches/Matches_Stats_x.csv`), and then will be prompted by the terminal to go through and manually verify the quality of each match.
 12. These quality matches, and poor quality matches, are then converted to a json training file, which can then be re-fed back into dedupe as a kick-start to more accurate training but now including the street address field. Once the process has completed for the first time, re-run the module using the `recycle` flag:
 
 ```
 python project_cascade.py --recycle
 ```
 
-This will run the entire process again but will use the new training data and will attempt to match both the organisation name and the address.
+This will run the entire process again but will use the new training data and will attempt to match both the organisation name and the address. Note that the old training data is duplicated here, so you can add to the training data for the recycle phase without impacting the initial phase if you wanted to re-run it. 
 
 ### Training Notes
 #### 1. Matching

@@ -505,16 +505,20 @@ if __name__ == '__main__':
 		# End program if no more config files found
 		print("Done")
 
-	# If initial round of processing
-	if in_args.recycle == False:
+
 		# User defined manual matching:
-		conf_choice = input("\nReview Matches_Stats.csv and choose best config file number:")
+		conf_choice = input("\nReview Outputs/{0}/Extracted_Matches/Matches_Stats.csv and choose best config file number:").format(proc_type)
 
 		man_matched = manual_matching(config_dirs, conf_choice)
 		# Convert manual matches to JSON training file.
 		man_matched = pd.read_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv',
 		usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
+		# If initial round of processing, create manual training file:
+		if in_args.recycle == False:
+			convert_to_training(config_dirs, man_matched)
 
-		convert_to_training(config_dirs, man_matched)
+		# Filter manual matches file and output to separate csv as confirmed matches
+		confirmed_matches = man_matched[man_matched['Manual_Match'] = 'Y']
+		confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type), index=False)
 
-		print("Process complete. If ran for first time, re-start with flag --recycle")
+		print("Done.")

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "51eb168d393c8442426955cec2aafd8c15e123fb95d5258ffacd221067a5fb2f"
+            "sha256": "25e3bf20ed7f41da5e892b55e505c8f2e395ecae5fa7105f43c61f897b8e370a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -90,6 +90,9 @@
                 "sha256:fb239cebc09e8355476573dd856e599407a81da962d79196b86f6c1b5006334d"
             ],
             "version": "==1.9"
+        },
+        "csvdedupe": {
+            "path": "./csvdedupe"
         },
         "datetime-distance": {
             "hashes": [
