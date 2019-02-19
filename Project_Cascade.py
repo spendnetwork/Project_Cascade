@@ -155,7 +155,7 @@ def dedupe_match_cluster(dirs, configs, proc_type, proc_num):
                                 'Org_ID': np.str, 'pub_name_adj': np.str, 'pub_address': np.str})
         df = df[pd.notnull(df['priv_name'])]
         df.to_csv(dirs['match_output_file'].format(proc_type), index=False)
-    pdb.set_trace()
+
     # Clustering:
     if not os.path.exists(dirs['cluster_output_file'].format(proc_type)):
         # Copy training file from first clustering session if recycle mode
@@ -465,14 +465,14 @@ if __name__ == '__main__':
                     # Only run through the module once per initiation. Either to get the initial training file
                     # or to recycle it and get better matches.
 
-                    if in_args.recycle == configs['processes'][proc_type][min(configs['processes'][proc_type].keys())][
-                        'recycle_phase']:
+                    if in_args.recycle == configs['processes'][proc_type][min(configs['processes'][proc_type].keys())]['recycle_phase']:
                         print("Process type :" + str(proc_type) + "\nConfig file: " + str(conf_file_num))
                         # Check if proc_type output directory exists, if not create it and training directories:
                         proc_type_dir = config_dirs['proc_type_dir'].format(proc_type)
                         if not os.path.exists(proc_type_dir):
                             os.makedirs(proc_type_dir)
-                            os.makedirs(config_dirs['confirmed_matches_dir'])
+                            os.makedirs(config_dirs['confirmed_matches_dir'].format(proc_type))
+                            os.makedirs(config_dirs['deduped_dir'].format(proc_type))
                         if not os.path.exists(config_dirs['proc_type_train_dir'].format(proc_type)):
                             os.makedirs(config_dirs['proc_type_train_dir'].format(proc_type))
                         if not os.path.exists(config_dirs['proc_type_train_clust_dir'].format(proc_type)):

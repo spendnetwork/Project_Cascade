@@ -16,6 +16,7 @@ dirs = {
       "proc_type_train_clust_dir" : os.getcwd() + '/Data_Inputs/Training_Files/{0}/Clustering',
       "proc_type_train_match_dir" : os.getcwd() + '/Data_Inputs/Training_Files/{0}/Matching',
       "match_output_file": os.getcwd() + '/Outputs/{0}/Deduped_Data/{0}_matched.csv',
+      "deduped_dir": os.getcwd() + '/Outputs/{0}/Deduped_Data/',
 
       "cluster_training_file":os.getcwd() + '/Data_Inputs/Training_Files/{0}/Clustering/cluster_training.json',
       "cluster_output_file":os.getcwd() + '/Outputs/{0}/Deduped_Data/{0}_matched_clustered.csv',
