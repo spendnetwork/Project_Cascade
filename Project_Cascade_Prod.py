@@ -419,7 +419,7 @@ def manual_matching(config_dirs, conf_choice):
                                       'priv_address',
                                       'priv_name', 'priv_name_adj', 'process_num', 'pub_address', 'pub_name_adj',
                                       'Manual_Match'])
-    return manual_match_file
+    return manual_match_file, choice
 
 
 def convert_to_training(config_dirs, man_matched):
@@ -609,7 +609,7 @@ if __name__ == '__main__':
             proc_type))
 
     # Takes user through the extracted_matches file, to confirm the matches and outputs to separate csv
-    man_matched = manual_matching(config_dirs, conf_choice)
+    man_matched, choice = manual_matching(config_dirs, conf_choice)
     # Convert manual matches to JSON training file.
     man_matched = pd.read_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv',
                               usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
@@ -622,7 +622,11 @@ if __name__ == '__main__':
     confirmed_matches = man_matched[man_matched['Manual_Match'] == 'Y']
     confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type), index=False)
 
-    # Add confirmed matches to database
-    add_data_to_table("spaziodati.confirmed_matches")
+    # Add confirmed matches to database depending on whether manual matching was name only or name and address
+    if choice.lower() == 'n':
+        add_data_to_table("spaziodati.confirmed_nameonly_matches")
+
+    elif choice.lower() == 'na':
+        add_data_to_table("spaziodati.confirmed_nameaddress_matches")
 
     print("Done.")
