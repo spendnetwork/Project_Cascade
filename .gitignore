@@ -1,11 +1,10 @@
 *.csv
 Config_Files/__pycache__/
 .DS_Store/
-Backups/
 __pycache__/
 __pycache__
 *.DS_Store
 .idea/
 *.zip
-.idea/
-.idea
+.idea/workspace.xml
+*.env
