@@ -32,7 +32,7 @@ def construct_query(source):
     json_doc::json->>'name'as priv_name,
     json_doc::json->'locations'->'items'-> 0 ->'address'->>'streetName' as street_address1,
     json_doc::json->'locations'->'items'-> 1 ->'address'->>'streetName' as street_address2,
-    json_doc::json->'locations'->'items'-> 2 ->'address'->>'streetName' as street_address3,
+    json_doc::json->'locations'->'items'-> 2 ->'address'->>'streetName' as street_address3
     from {}
     LIMIT 50
     """.format(source)
@@ -621,7 +621,7 @@ if __name__ == '__main__':
     # Filter manual matches file and output to separate csv as confirmed matches
     confirmed_matches = man_matched[man_matched['Manual_Match'] == 'Y']
     confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type), index=False)
-
+    pdb.set_trace()
     # Add confirmed matches to database depending on whether manual matching was name only or name and address
     if choice.lower() == 'n':
         add_data_to_table("spaziodati.confirmed_nameonly_matches")
