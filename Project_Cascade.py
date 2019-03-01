@@ -13,6 +13,7 @@ import org_suffixes
 from Config_Files import config_dirs
 import string
 from shutil import copyfile
+import sys
 
 
 def get_input_args():
@@ -25,13 +26,14 @@ def get_input_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--priv_raw_name', default='private_data.csv', type=str,
                         help='Set raw private/source datafile name')
-    parser.add_argument('--pub_raw_name', default='public_data.csv', type=str, help='Set raw public datafile name')
+    parser.add_argument('--pub_raw_data', default='public_data.csv', type=str, help='Set raw public datafile name')
     parser.add_argument('--priv_adj_name', default='priv_data_adj.csv', type=str,
                         help='Set cleaned private/source datafile name')
     parser.add_argument('--pub_adj_name', default='pub_data_adj.csv', type=str, help='Set cleaned public datafile name')
     parser.add_argument('--recycle', action='store_true', help='Recycle the manual training data')
     parser.add_argument('--training', action='store_false', help='Modify/contribute to the training data')
     parser.add_argument('--config_review', action='store_true', help='Manually review/choose best config file results')
+    parser.add_argument('--terminal_matching', action='store_true', help='Perform manual matching in terminal')
     args = parser.parse_args()
     return args
 
@@ -72,7 +74,7 @@ def clean_public_data(config_dirs):
 
 	:return dffullmerge: the public dataframe adjusted as above
 	"""
-    raw_data = config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)
+    raw_data = config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_data)
     adj_data = config_dirs['adj_dir'] + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
 
     if not os.path.exists(adj_data):
@@ -150,10 +152,10 @@ def dedupe_match_cluster(dirs, configs, proc_type, proc_num):
         p = subprocess.Popen(cmd, shell=True)
         p.wait()
         df = pd.read_csv(dirs['match_output_file'].format(proc_type),
-                         usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'Org_ID', 'pub_name_adj',
+                         usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'Org_ID', 'org_name', 'pub_name_adj',
                                   'pub_address'],
                          dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str,
-                                'Org_ID': np.str, 'pub_name_adj': np.str, 'pub_address': np.str})
+                                'Org_ID': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str})
         df = df[pd.notnull(df['priv_name'])]
         df.to_csv(dirs['match_output_file'].format(proc_type), index=False)
 
@@ -345,96 +347,110 @@ def manual_matching(config_dirs, best_config):
 	Provides user-input functionality for manual matching based on the extracted records
 	:return manual_match_file: extracted file with added column (Y/N/Unsure)
 	"""
-
     manual_match_file = pd.read_csv(
         config_dirs['extract_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv', index_col=None)
     manual_match_file['Manual_Match'] = ''
 
-    choices = ['n', 'na']
-    choice = input("\nMatching name only or name and address? (N / NA):")
-    while choice.lower() not in choices:
+    # Automatically confirm rows with leven dist of 100
+    for index, row in manual_match_file.iterrows():
+        if row.leven_dist == 100:
+            manual_match_file.at[index, 'Manual_Match'] = str('Y')
+
+    if in_args.terminal_matching:
+        choices = ['n', 'na']
         choice = input("\nMatching name only or name and address? (N / NA):")
+        while choice.lower() not in choices:
+            choice = input("\nMatching name only or name and address? (N / NA):")
 
-    # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
-    for index, row in manual_match_file.sample(frac=1).iterrows():
-        if choice.lower() == 'n':
-            print("\nPrivate name: " + str(row.priv_name_adj))
-            print("\nPublic name: " + str(row.pub_name_adj))
-            print("\nLevenshtein distance: " + str(row.leven_dist))
-        else:
-            print("\nPrivate name: " + str(row.priv_name_adj))
-            print("Private address: " + str(row.priv_address))
-            print("\nPublic name: " + str(row.pub_name_adj))
-            print("Public address: " + str(row.pub_address))
-            print("\nLevenshtein distance (names): " + str(row.leven_dist))
+        # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
+        for index, row in manual_match_file.sample(frac=1).iterrows():
+            if choice.lower() == 'n':
+                print("\nPrivate name: " + str(row.priv_name_adj))
+                print("\nPublic name: " + str(row.pub_name_adj))
+                print("\nLevenshtein distance: " + str(row.leven_dist))
+            else:
+                print("\nPrivate name: " + str(row.priv_name_adj))
+                print("Private address: " + str(row.priv_address))
+                print("\nPublic name: " + str(row.pub_name_adj))
+                print("Public address: " + str(row.pub_address))
+                print("\nLevenshtein distance (names): " + str(row.leven_dist))
 
-        match_options = ["y", "n", "u", "f"]
-        match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
-        while match.lower() not in match_options:
+            match_options = ["y", "n", "u", "f"]
             match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
+            while match.lower() not in match_options:
+                match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
 
-        if str(match).lower() != "f":
-            manual_match_file.at[index, 'Manual_Match'] = str(match).capitalize()
-            continue
-        else:
-            break
+            if str(match).lower() != "f":
+                manual_match_file.at[index, 'Manual_Match'] = str(match).capitalize()
+                continue
+            else:
+                break
 
-    manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+        manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 
-    print("Saving...")
-    manual_match_file.to_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
-                             index=False,
-                             columns=['Cluster ID', 'Confidence Score', 'Org_ID', 'id', 'leven_dist', 'org_name',
-                                      'priv_address',
-                                      'priv_name', 'priv_name_adj', 'process_num', 'pub_address', 'pub_name_adj',
-                                      'Manual_Match'])
-    return manual_match_file
+        print("Saving...")
+        manual_match_file.to_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
+                                 index=False,
+                                 # columns=['Cluster ID', 'Confidence Score', 'Org_ID', 'id', 'leven_dist', 'org_name',
+                                 #          'priv_address',
+                                 #          'priv_name', 'priv_name_adj', 'process_num', 'pub_address', 'pub_name_adj',
+                                 #          'Manual_Match'])
+                                columns=['Cluster ID', 'leven_dist', 'Org_ID', 'id','org_name', 'pub_address', 'priv_name', 'priv_address', 'Manual_Match'])
+        return manual_match_file
 
+    else:
+        manual_match_file.to_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
+                                 index=False,
+                                 columns=['Cluster ID', 'leven_dist', 'Org_ID', 'id', 'org_name', 'pub_address', 'priv_name',
+                                          'priv_address', 'Manual_Match'])
+        print("Please perform manual matching process in {} and then run X script".format(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))
+        sys.exit()
 
-def convert_to_training(config_dirs, man_matched):
-    """
-	Converts the manually matched dataframe into a training file for dedupe
-	:return : None
-	:output : training.json training file
-	"""
-
-    # Filter for matched entries
-    man_matched = man_matched[pd.notnull(man_matched['Manual_Match'])]
-    manualdict = {}
-    manualdict['distinct'] = []
-    manualdict['match'] = []
-
-    # For each row in in the manual matches df, create a sub-dict to be
-    # appended to manualdict
-    for index, row in man_matched.iterrows():
-        new_data = {"__class__": "tuple",
-                    "__value__": [
-                        {
-                            "priv_name_adj": str(row.priv_name_adj),
-                            "priv_address": str(row.priv_address)
-                        },
-                        {
-                            "priv_name_adj": str(row.pub_name_adj),
-                            "priv_address": str(row.pub_address)
-                        }
-                    ]}
-
-        # If the row was a match or not a match, append to
-        # either the match key or the distinct key, respectively:
-        if row.Manual_Match == 'Y':
-            manualdict['match'].append(new_data)
-        elif row.Manual_Match == 'N':
-            manualdict['distinct'].append(new_data)
-        # If row was 'unsure'd, ignore it as it doesn't contribute to training data
-        else:
-            continue
-    # Write dict to training file backup.
-    # 'w+' allows writing, and + creates if doesn't exist.
-    with open(config_dirs['manual_matching_train_backup'], 'w+') as outfile:
-        json.dump(manualdict, outfile)
+# def convert_to_training(config_dirs, man_matched):
+#     """
+# 	Converts the manually matched dataframe into a training file for dedupe
+# 	:return : None
+# 	:output : training.json training file
+# 	"""
+#
+#     # Filter for matched entries
+#     man_matched = man_matched[pd.notnull(man_matched['Manual_Match'])]
+#     manualdict = {}
+#     manualdict['distinct'] = []
+#     manualdict['match'] = []
+#
+#     # For each row in in the manual matches df, create a sub-dict to be
+#     # appended to manualdict
+#     for index, row in man_matched.iterrows():
+#         new_data = {"__class__": "tuple",
+#                     "__value__": [
+#                         {
+#                             "priv_name_adj": str(row.priv_name_adj),
+#                             "priv_address": str(row.priv_address)
+#                         },
+#                         {
+#                             "priv_name_adj": str(row.pub_name_adj),
+#                             "priv_address": str(row.pub_address)
+#                         }
+#                     ]}
+#
+#         # If the row was a match or not a match, append to
+#         # either the match key or the distinct key, respectively:
+#         if row.Manual_Match == 'Y':
+#             manualdict['match'].append(new_data)
+#         elif row.Manual_Match == 'N':
+#             manualdict['distinct'].append(new_data)
+#         # If row was 'unsure'd, ignore it as it doesn't contribute to training data
+#         else:
+#             continue
+#     # Write dict to training file backup.
+#     # 'w+' allows writing, and + creates if doesn't exist.
+#     with open(config_dirs['manual_matching_train_backup'], 'w+') as outfile:
+#         json.dump(manualdict, outfile)
 
 
 if __name__ == '__main__':
+    # main()
     in_args = get_input_args()
     # Silence warning for df['process_num'] = str(proc_num)
     pd.options.mode.chained_assignment = None
@@ -538,26 +554,30 @@ if __name__ == '__main__':
     except StopIteration:
         # Continue if no more config files found
         print("Done")
-    # If user has used --config_review flag, overwrite best_config variable following manual review of stats file
+
+    # If user has used --config_review flag, set best_config variable based on manual review of stats file...
     if in_args.config_review:
         best_config = input(
             ("\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
                 proc_type))
     else:
-        # Pick best config_file based on stats file:
+        # ...otherwise pick best config_file based on stats file (max leven dist avg):
         max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
         best_config = stat_file.at[max_lev, 'Config_File']
 
     man_matched = manual_matching(config_dirs, best_config)
-    # Convert manual matches to JSON training file.
     man_matched = pd.read_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
                               usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
-    # If initial round of processing, create manual training file:
-    if in_args.recycle == False:
-        convert_to_training(config_dirs, man_matched)
 
-    # Filter manual matches file and output to separate csv as confirmed matches
-    confirmed_matches = man_matched[man_matched['Manual_Match'] == 'Y']
-    confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type), index=False)
+    # FROM HERE GET USER TO MANUALLY MATCH AND THEN RUN CONVERT_TRAINING.PY
 
-    print("Done.")
+    # # If initial round of processing, create manual training file:
+    # if in_args.recycle == False:
+    #     # Convert manual matches to JSON training file.
+    #     convert_to_training(config_dirs, man_matched)
+    #
+    # # Filter manual matches file and output to separate csv as confirmed matches
+    # confirmed_matches = man_matched[man_matched['Manual_Match'] == 'Y']
+    # confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type), index=False)
+    #
+    # print("Done.")
