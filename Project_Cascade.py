@@ -31,6 +31,7 @@ def get_input_args():
     parser.add_argument('--pub_adj_name', default='pub_data_adj.csv', type=str, help='Set cleaned public datafile name')
     parser.add_argument('--recycle', action='store_true', help='Recycle the manual training data')
     parser.add_argument('--training', action='store_false', help='Modify/contribute to the training data')
+    parser.add_argument('--config_review', action='store_true', help='Manually review/choose best config file results')
     args = parser.parse_args()
     return args
 
@@ -321,6 +322,7 @@ def calc_matching_stats(clustdf, extractdf, config_dirs, conf_file_num, proc_typ
     # Overall optimised matches :
     statdf.at[conf_file_num, 'Optim_Matches'] = len(extractdf)
     # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
+    # This is the size of the extracted matches divided by the total number of
     statdf.at[conf_file_num, 'Percent_Precision'] = round(len(extractdf) / len(clustdf) * 100, 2)
     # Recall - how many relevant items have been selected from the entire original private data (TP/TP+FN)
     statdf.at[conf_file_num, 'Percent_Recall'] = round(len(extractdf) / len(privdf) * 100, 2)
@@ -335,16 +337,17 @@ def calc_matching_stats(clustdf, extractdf, config_dirs, conf_file_num, proc_typ
         main_stat_file.to_csv(config_dirs['stats_file'].format(proc_type), index=False,
                               columns=['Config_File', 'Leven_Dist_Avg', 'Optim_Matches', 'Percent_Matches',
                                        'Percent_Precision', 'Percent_Recall', 'Total_Matches'])
+        return main_stat_file
 
 
-def manual_matching(config_dirs, conf_choice):
+def manual_matching(config_dirs, best_config):
     """
 	Provides user-input functionality for manual matching based on the extracted records
 	:return manual_match_file: extracted file with added column (Y/N/Unsure)
 	"""
 
     manual_match_file = pd.read_csv(
-        config_dirs['extract_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv', index_col=None)
+        config_dirs['extract_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv', index_col=None)
     manual_match_file['Manual_Match'] = ''
 
     choices = ['n', 'na']
@@ -379,7 +382,7 @@ def manual_matching(config_dirs, conf_choice):
     manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 
     print("Saving...")
-    manual_match_file.to_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv',
+    manual_match_file.to_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
                              index=False,
                              columns=['Cluster ID', 'Confidence Score', 'Org_ID', 'id', 'leven_dist', 'org_name',
                                       'priv_address',
@@ -530,20 +533,24 @@ if __name__ == '__main__':
                     else:
                         continue
                 # Output stats file:
-                calc_matching_stats(clustdf, extracts_file, config_dirs, conf_file_num, proc_type)
+                stat_file = calc_matching_stats(clustdf, extracts_file, config_dirs, conf_file_num, proc_type)
 
     except StopIteration:
-        # End program if no more config files found
+        # Continue if no more config files found
         print("Done")
+    # If user has used --config_review flag, overwrite best_config variable following manual review of stats file
+    if in_args.config_review:
+        best_config = input(
+            ("\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
+                proc_type))
+    else:
+        # Pick best config_file based on stats file:
+        max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
+        best_config = stat_file.at[max_lev, 'Config_File']
 
-    # User defined manual matching:
-    conf_choice = input(
-        ("\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
-            proc_type))
-
-    man_matched = manual_matching(config_dirs, conf_choice)
+    man_matched = manual_matching(config_dirs, best_config)
     # Convert manual matches to JSON training file.
-    man_matched = pd.read_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(conf_choice) + '.csv',
+    man_matched = pd.read_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
                               usecols=['Manual_Match', 'priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address'])
     # If initial round of processing, create manual training file:
     if in_args.recycle == False:

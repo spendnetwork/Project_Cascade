@@ -65,6 +65,7 @@ The module makes use of argument parsing, with the following arguments:
 --priv_adj_name (default: 'priv_data_adj.csv')
 --pub_adj_name (default: 'pub_data_adj.csv')
 --recycle (No arguments)
+--training (No arguments)
 ```
 
 To amend the names if needed :
