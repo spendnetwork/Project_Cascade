@@ -406,6 +406,7 @@ def manual_matching(config_dirs, best_config):
         print("Please perform manual matching process in {} and then run X script".format(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))
         sys.exit()
 
+
 # def convert_to_training(config_dirs, man_matched):
 #     """
 # 	Converts the manually matched dataframe into a training file for dedupe
