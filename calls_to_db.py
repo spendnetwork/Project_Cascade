@@ -1,5 +1,6 @@
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
+import os
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -45,3 +46,4 @@ def add_data_to_table(table_name):
         # copy_expert allows access to csv methods (i.e. char escaping)
         cur.copy_expert("""COPY {} from stdin (format csv)""".format(table_name), f)
     conn.commit()
+

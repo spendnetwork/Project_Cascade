@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 from Config_Files import config_dirs
-from Project_Cascade import get_input_args, man_matched
+from run import get_input_args
 
 
 def convert_to_training(config_dirs, man_matched):
