@@ -1,4 +1,3 @@
-import pdb
 import argparse
 import pandas as pd
 import os
@@ -8,8 +7,7 @@ from fuzzywuzzy import fuzz
 from tqdm import tqdm
 import numpy as np
 import ast
-import json
-import org_suffixes
+from run_files import org_suffixes
 from Config_Files import config_dirs
 import string
 from shutil import copyfile
@@ -405,7 +403,6 @@ def manual_matching(config_dirs, best_config):
                                           'priv_address', 'Manual_Match'])
         print("Please perform manual matching process in {} and then run X script".format(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))
         sys.exit()
-
 
 # def convert_to_training(config_dirs, man_matched):
 #     """

@@ -1,4 +1,3 @@
-import pdb
 import argparse
 import pandas as pd
 import os
@@ -9,7 +8,7 @@ from tqdm import tqdm
 import numpy as np
 import ast
 import json
-import org_suffixes
+from run_files import org_suffixes
 from Config_Files import config_dirs
 import string
 from shutil import copyfile

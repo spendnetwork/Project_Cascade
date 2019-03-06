@@ -25,6 +25,7 @@ def construct_query(source):
     """.format(source)
     return query
 
+
 def fetch_data(query):
     """ retrieve data from the db using query"""
     print ('connecting to db...')
@@ -32,15 +33,16 @@ def fetch_data(query):
     print ('importing data...')
     df = pd.read_sql(query, con=conn)
     conn.close()
-
     return df
+
 
 def add_data_to_table(table_name, config_dirs, proc_type, man_matched):
     """adds the confirmed_matches data to table"""
 
-    # Filter manual matches file to just confirmed Yes matches
-    confirmed_matches = man_matched[man_matched['Manual_Match'] == 'Y']
-    confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type), index=False)
+    # Filter manual matches file to just confirmed Yes matches and non-blank org id's
+    confirmed_matches = man_matched[pd.notnull(man_matched['Org_ID'])]
+    confirmed_matches = confirmed_matches[(man_matched['Manual_Match'] == 'Y')]
+    confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type), columns=['priv_name','priv_address','Org_ID','org_name','pub_address','manual_match'], index=False)
 
     # make new connection
     conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)

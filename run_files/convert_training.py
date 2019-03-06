@@ -1,7 +1,5 @@
 import pandas as pd
 import json
-from Config_Files import config_dirs
-from run import get_input_args
 
 
 def convert_to_training(config_dirs, man_matched):
@@ -45,16 +43,3 @@ def convert_to_training(config_dirs, man_matched):
     # 'w+' allows writing, and + creates if doesn't exist.
     with open(config_dirs['manual_matching_train_backup'], 'w+') as outfile:
         json.dump(manualdict, outfile)
-
-
-if __name__ == '__main__':
-    in_args = get_input_args()
-
-    # If initial round of processing, create manual training file:
-    if not in_args.recycle:
-        # Convert manual matches to JSON training file.
-        convert_to_training(config_dirs, man_matched)
-
-
-
-    print("Done.")

@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
             man_matched = pd.read_csv(
                 config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
-                usecols=['Manual_Match', 'priv_name', 'priv_address', 'org_name', 'pub_address'])
+                usecols=['priv_name', 'priv_address', 'Org_ID', 'org_name', 'pub_address','Manual_Match'])
 
             if in_args.convert_training:
                 # Ensure not in recycle mode for training file to be converted

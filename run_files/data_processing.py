@@ -3,7 +3,7 @@ import os
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
 import numpy as np
-import org_suffixes
+from run_files import org_suffixes
 from Config_Files import config_dirs
 import string
 
@@ -150,8 +150,10 @@ def calc_match_ratio(row):
     if pd.notnull(row.priv_name_short) and pd.notnull(row.pub_name_short):
         return fuzz.ratio(row.priv_name_short, row.pub_name_short)
 
+
 def add_lev_dist(clust_df, clustdtype, proc_type):
-    # Remove company suffixes for more relevant levenshtein distance calculation
+    # Remove company suffixes for more relevant levenshtein distance calculation. Otherwise will have exaggerated
+    # Distances if i.e. priv name has 'srl' suffix but pub name doesn't.
     clust_df['priv_name_short'] = clust_df.priv_name_adj.apply(shorten_name)
 
     clust_df['pub_name_short'] = clust_df.pub_name_adj.apply(shorten_name)
