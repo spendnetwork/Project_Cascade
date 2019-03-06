@@ -23,11 +23,11 @@ def convert_to_training(config_dirs, man_matched):
         new_data = {"__class__": "tuple",
                     "__value__": [
                         {
-                            "priv_name_adj": str(row.priv_name_adj),
+                            "priv_name": str(row.priv_name),
                             "priv_address": str(row.priv_address)
                         },
                         {
-                            "priv_name_adj": str(row.pub_name_adj),
+                            "priv_name": str(row.org_name),
                             "priv_address": str(row.pub_address)
                         }
                     ]}
@@ -55,8 +55,6 @@ if __name__ == '__main__':
         # Convert manual matches to JSON training file.
         convert_to_training(config_dirs, man_matched)
 
-    # Filter manual matches file and output to separate csv as confirmed matches
-    confirmed_matches = man_matched[man_matched['Manual_Match'] == 'Y']
-    confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type), index=False)
+
 
     print("Done.")

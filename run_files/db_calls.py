@@ -1,6 +1,7 @@
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
+import pandas as pd
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -34,15 +35,19 @@ def fetch_data(query):
 
     return df
 
-def add_data_to_table(table_name):
+def add_data_to_table(table_name, config_dirs, proc_type, man_matched):
     """adds the confirmed_matches data to table"""
 
-    # Input the data into the dedupe table
+    # Filter manual matches file to just confirmed Yes matches
+    confirmed_matches = man_matched[man_matched['Manual_Match'] == 'Y']
+    confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type), index=False)
+
     # make new connection
     conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
     cur = conn.cursor() # call cursor() to be able to write to the db
     with open(config_dirs['confirmed_matches_file'].format(proc_type), 'r') as f:
         next(f) # Skip header row
+        # Input the data into the dedupe table
         # copy_expert allows access to csv methods (i.e. char escaping)
         cur.copy_expert("""COPY {} from stdin (format csv)""".format(table_name), f)
     conn.commit()
