@@ -4,7 +4,6 @@ from fuzzywuzzy import fuzz
 from tqdm import tqdm
 import numpy as np
 from run_files import org_suffixes
-from Config_Files import config_dirs
 import string
 
 
@@ -44,6 +43,7 @@ def clean_public_data(config_dirs, in_args):
 
 	:return dffullmerge: the public dataframe adjusted as above
 	"""
+
     raw_data = config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)
     adj_data = config_dirs['adj_dir'] + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
 
@@ -137,6 +137,7 @@ def get_max_id(group):
         if pd.isnull(row.Org_ID):
             group.at[index, 'Org_ID'] = group['Org_ID'][max_conf_idx]
             group.at[index, 'pub_name_adj'] = group['pub_name_adj'][max_conf_idx]
+            group.at[index, 'org_name'] = group['org_name'][max_conf_idx]
             group.at[index, 'pub_address'] = group['pub_address'][max_conf_idx]
     return group
 
@@ -151,7 +152,7 @@ def calc_match_ratio(row):
         return fuzz.ratio(row.priv_name_short, row.pub_name_short)
 
 
-def add_lev_dist(clust_df, clustdtype, proc_type):
+def add_lev_dist(clust_df, output_file):
     # Remove company suffixes for more relevant levenshtein distance calculation. Otherwise will have exaggerated
     # Distances if i.e. priv name has 'srl' suffix but pub name doesn't.
     clust_df['priv_name_short'] = clust_df.priv_name_adj.apply(shorten_name)
@@ -162,6 +163,6 @@ def add_lev_dist(clust_df, clustdtype, proc_type):
     if 'leven_dist' not in clust_df.columns:
         clust_df['leven_dist'] = clust_df.apply(calc_match_ratio, axis=1)
 
-    clust_df.to_csv(config_dirs["assigned_output_file"].format(proc_type), index=False)
+    clust_df.to_csv(output_file, index=False)
 
     return clust_df

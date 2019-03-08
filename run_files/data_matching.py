@@ -3,7 +3,6 @@ import os
 import subprocess
 import numpy as np
 import sys
-from Config_Files import config_dirs
 from shutil import copyfile
 
 
@@ -25,25 +24,30 @@ def dedupe_match_cluster(dirs, configs, proc_type, proc_num, in_args):
 
     priv_file = dirs['adj_dir'] + dirs['adj_priv_data']
     pub_file = dirs['adj_dir'] + dirs['adj_pub_data']
+
+    train = ['--skip_training' if in_args.training else '']
     # Matching:
     if not os.path.exists(dirs['match_output_file'].format(proc_type)):
         if in_args.recycle:
             # Copy manual matching file over to build on for clustering
-            copyfile(config_dirs['manual_matching_train_backup'], config_dirs['manual_training_file'].format(proc_type))
+            copyfile(dirs['manual_matching_train_backup'], dirs['manual_training_file'].format(proc_type))
 
         # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
         if os.path.exists('./learned_settings'):
             os.remove('./learned_settings')
         print("Starting matching...")
+
         cmd = ['csvlink '
                + str(priv_file).format(in_args.priv_adj_name) + ' '
                + str(pub_file).format(in_args.pub_adj_name)
                + ' --field_names_1 ' + ' '.join(priv_fields)
                + ' --field_names_2 ' + ' '.join(pub_fields)
-               + ' --skip_training ' + str(in_args.training)
                + ' --training_file ' + dirs['manual_training_file'].format(proc_type)
-               + ' --output_file ' + dirs['match_output_file'].format(proc_type)]
+               + ' --output_file ' + dirs['match_output_file'].format(proc_type) + ' '
+               + str(train[0])
+               ]
         p = subprocess.Popen(cmd, shell=True)
+
         p.wait()
         df = pd.read_csv(dirs['match_output_file'].format(proc_type),
                          usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'Org_ID', 'org_name',
@@ -58,13 +62,13 @@ def dedupe_match_cluster(dirs, configs, proc_type, proc_num, in_args):
     if not os.path.exists(dirs['cluster_output_file'].format(proc_type)):
         # Copy training file from first clustering session if recycle mode
         if in_args.recycle:
-            copyfile(config_dirs['cluster_training_backup'], config_dirs['cluster_training_file'].format(proc_type))
+            copyfile(dirs['cluster_training_backup'], dirs['cluster_training_file'].format(proc_type))
 
         print("Starting clustering...")
         cmd = ['python csvdedupe.py '
                + dirs['match_output_file'].format(proc_type) + ' '
-               + ' --field_names ' + ' '.join(priv_fields)
-               + ' --skip_training ' + str(in_args.training)
+               + ' --field_names ' + ' '.join(priv_fields) + ' '
+               + str(train[0])
                + ' --training_file ' + dirs['cluster_training_file'].format(proc_type)
                + ' --output_file ' + dirs['cluster_output_file'].format(proc_type)]
         p = subprocess.Popen(cmd, cwd=os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
@@ -72,7 +76,7 @@ def dedupe_match_cluster(dirs, configs, proc_type, proc_num, in_args):
 
         if not in_args.recycle:
             # Copy training file to backup, so it can be found and copied into recycle phase clustering
-            copyfile(dirs['cluster_training_file'].format(proc_type), config_dirs['cluster_training_backup'])
+            copyfile(dirs['cluster_training_file'].format(proc_type), dirs['cluster_training_backup'])
     else:
         pass
 
@@ -178,16 +182,15 @@ def manual_matching(config_dirs, best_config, proc_type, in_args):
                                  #          'priv_address',
                                  #          'priv_name', 'priv_name_adj', 'process_num', 'pub_address', 'pub_name_adj',
                                  #          'Manual_Match'])
-                                 columns=['Cluster ID', 'leven_dist', 'Org_ID', 'id', 'org_name', 'pub_address',
-                                          'priv_name', 'priv_address', 'Manual_Match'])
+                                 columns=['Cluster ID', 'leven_dist', 'Org_ID', 'id', 'org_name', 'pub_name_adj', 'pub_address',
+                                          'priv_name', 'priv_name_adj', 'priv_address', 'Manual_Match'])
         return manual_match_file
 
     else:
         manual_match_file.to_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
-                                 columns=['Cluster ID', 'leven_dist', 'Org_ID', 'id', 'org_name', 'pub_address',
-                                          'priv_name',
-                                          'priv_address', 'Manual_Match'])
+                                 columns=['Cluster ID', 'leven_dist', 'Org_ID', 'id', 'org_name', 'pub_name_adj',
+                                          'pub_address','priv_name', 'priv_name_adj', 'priv_address', 'Manual_Match'])
         # # If no arguments passed (i.e. pre-manual matching)
         if not len(sys.argv) > 1:
             print("\nPlease perform manual matching process in {} and then run 'python run.py --convert_training --upload_to_db script".format(

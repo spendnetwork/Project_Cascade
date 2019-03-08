@@ -37,6 +37,12 @@ def get_input_args():
     parser.add_argument('--convert_training', action='store_true', help='Convert confirmed matches to training file for recycle phase')
     parser.add_argument('--upload_to_db', action='store_true' , help='Add confirmed matches to database')
     args = parser.parse_args()
+
+    # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
+    # Force an error and prompt user to add the training flag
+    if args.training == True and not os.path.exists(os.getcwd() + "/Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json"):
+        parser.error("Dedupe training files do not exist, please try 'python run.py --training' to begin training process")
+
     return args
 
 
@@ -53,8 +59,9 @@ if __name__ == '__main__':
     # Ignores config_dirs - convention is <num>_config.py
     pyfiles = "*_config.py"
 
-    # # If no arguments passed
-    # if not len(sys.argv) > 1:
+    # If public/registry data file doesn't exist, pull from database
+    db_calls.check_data_exists(config_dirs,in_args)
+
     try:
         # For each config file read it and convert to dictionary for accessing
         for conf_file in config_path.glob(pyfiles):
@@ -78,7 +85,7 @@ if __name__ == '__main__':
                         'recycle_phase']:
 
                         # Create working directories if don't exist
-                        setup.setup_dirs(config_dirs,proc_type,conf_file_num)
+                        setup.setup_dirs(config_dirs,proc_type)
 
                         # Iterate over each process number in the config file
                         for proc_num in configs['processes'][proc_type]:
@@ -90,9 +97,11 @@ if __name__ == '__main__':
                                           'id': np.int, 'priv_name': np.str, 'priv_address': np.str,
                                           'priv_name_adj': np.str, 'Org_ID': np.str, 'pub_name_adj': np.str,
                                           'pub_address': np.str, 'priv_name_short': np.str, 'pub_name_short': np.str,
-                                          'leven_dist': np.int}
+                                          'leven_dist': np.int, 'org_name': np.str}
+
                             # Run dedupe for matching and calculate related stats for comparison
                             if not os.path.exists(config_dirs['assigned_output_file'].format(proc_type)):
+
                                 data_matching.dedupe_match_cluster(config_dirs, configs, proc_type, proc_num, in_args)
 
                                 clust_df = pd.read_csv(config_dirs["cluster_output_file"].format(proc_type),index_col=None,dtype=clustdtype)
@@ -101,9 +110,10 @@ if __name__ == '__main__':
                                 clust_df = data_processing.assign_pub_data_to_clusters(clust_df,config_dirs['assigned_output_file'].format(proc_type))
 
                                 # Adds leven_dist column and extract matches based on config process criteria:
-                                clust_df = data_processing.add_lev_dist(clust_df)
+                                clust_df = data_processing.add_lev_dist(clust_df, config_dirs["assigned_output_file"].format(proc_type))
 
                             else:
+
                                 clust_df = pd.read_csv(config_dirs["assigned_output_file"].format(proc_type),
                                                        index_col=None, dtype=clustdtype, usecols=clustdtype.keys())
 
@@ -147,12 +157,19 @@ if __name__ == '__main__':
                 # Ensure not in recycle mode for training file to be converted
                 assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run without --recycle flag."
 
+                conv_file = pd.read_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
+                    usecols=['priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address', 'Manual_Match'])
+
                 # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
-                convert_training.convert_to_training(config_dirs, man_matched)
+                convert_training.convert_to_training(config_dirs, conv_file)
 
             if in_args.upload_to_db:
+                upload_file = pd.read_csv(
+                    config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
+                    usecols=['priv_name', 'priv_address', 'Org_ID', 'org_name', 'pub_address', 'Manual_Match'])
+
                 # Add confirmed matches to relevant proc_type table
                 if not in_args.recycle:
-                    db_calls.add_data_to_table("spaziodati.confirmed_nameonly_matches", config_dirs, proc_type, man_matched)
+                    db_calls.add_data_to_table("spaziodati.confirmed_nameonly_matches", config_dirs, proc_type, upload_file)
                 if in_args.recycle:
-                    db_calls.add_data_to_table("spaziodati.confirmed_nameaddress_matches", config_dirs, proc_type, man_matched)
+                    db_calls.add_data_to_table("spaziodati.confirmed_nameaddress_matches", config_dirs, proc_type, upload_file)

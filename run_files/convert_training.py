@@ -2,7 +2,7 @@ import pandas as pd
 import json
 
 
-def convert_to_training(config_dirs, man_matched):
+def convert_to_training(config_dirs, conv_file):
     """
 	Converts the manually matched dataframe into a training file for dedupe
 	:return : None
@@ -10,22 +10,22 @@ def convert_to_training(config_dirs, man_matched):
 	"""
 
     # Filter for matched entries
-    man_matched = man_matched[pd.notnull(man_matched['Manual_Match'])]
+    conv_file = conv_file[pd.notnull(conv_file['Manual_Match'])]
     manualdict = {}
     manualdict['distinct'] = []
     manualdict['match'] = []
 
     # For each row in in the manual matches df, create a sub-dict to be
     # appended to manualdict
-    for index, row in man_matched.iterrows():
+    for index, row in conv_file.iterrows():
         new_data = {"__class__": "tuple",
                     "__value__": [
                         {
-                            "priv_name": str(row.priv_name),
+                            "priv_name_adj": str(row.priv_name_adj),
                             "priv_address": str(row.priv_address)
                         },
                         {
-                            "priv_name": str(row.org_name),
+                            "priv_name_adj": str(row.pub_name_adj),
                             "priv_address": str(row.pub_address)
                         }
                     ]}
