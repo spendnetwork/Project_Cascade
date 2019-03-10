@@ -134,6 +134,7 @@ def manual_matching(config_dirs, best_config, proc_type, in_args):
 	Provides user-input functionality for manual matching based on the extracted records
 	:return manual_match_file: extracted file with added column (Y/N/Unsure)
 	"""
+
     manual_match_file = pd.read_csv(
         config_dirs['extract_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv', index_col=None)
     manual_match_file['Manual_Match'] = ''
@@ -191,7 +192,6 @@ def manual_matching(config_dirs, best_config, proc_type, in_args):
                                  index=False,
                                  columns=['Cluster ID', 'leven_dist', 'Org_ID', 'id', 'org_name', 'pub_name_adj',
                                           'pub_address','priv_name', 'priv_name_adj', 'priv_address', 'Manual_Match'])
-        # # If no arguments passed (i.e. pre-manual matching)
-        if not len(sys.argv) > 1:
-            print("\nPlease perform manual matching process in {} and then run 'python run.py --convert_training --upload_to_db script".format(
-                config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))
+
+        print("\nIf required, please perform manual matching process in {} and then run 'python run.py --convert_training --upload_to_db".format(
+            config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))
