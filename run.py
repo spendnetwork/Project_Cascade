@@ -60,7 +60,7 @@ if __name__ == '__main__':
     pyfiles = "*_config.py"
 
     # If public/registry data file doesn't exist, pull from database
-    db_calls.check_data_exists(config_dirs,in_args)
+    db_calls.check_data_exists(config_dirs,in_args,"spaziodati.sd_sample")
 
     try:
         # For each config file read it and convert to dictionary for accessing

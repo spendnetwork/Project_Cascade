@@ -3,6 +3,8 @@ from dotenv import load_dotenv, find_dotenv
 import os
 import pandas as pd
 import sys
+import pdb
+import csv
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -12,13 +14,12 @@ user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
 
 
-def check_data_exists(config_dirs, in_args):
+def check_data_exists(config_dirs, in_args, data_source):
     # If public data doesn't exist:
     if not os.path.exists(config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)):
         choice = input("Public data not found, load from database? (y/n): ")
         if choice.lower() == 'y':
             # Load public data
-            data_source = "spaziodati.sd_sample"
             query = pull_public_data(data_source)
             df = fetch_data(query)
             df.to_csv(config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name))
@@ -45,7 +46,11 @@ def pull_public_data(source):
 
 
 def create_connection():
-    print('connecting to db...')
+    '''
+    :return connection : the database connection object
+    :return cur : the cursor (temporary storage for retrieved data
+    '''
+    print('Connecting to database...')
     conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
     cur = conn.cursor()
     return conn, cur
@@ -54,29 +59,40 @@ def create_connection():
 def fetch_data(query):
     """ retrieve data from the db using query"""
     conn, _ = create_connection()
-    print('importing data...')
+    print('Importing data...')
     df = pd.read_sql(query, con=conn)
     conn.close()
     return df
 
 
-def remove_duplicates(query):
-    print("Remove duplicates from table...")
-    # DELETE
-    # FROM
-    # people
-    # WHERE
-    # people.id
-    # NOT
-    # IN
-    # (SELECT id FROM (
-    # SELECT DISTINCT ON (firstname, lastname) *
-    # FROM
-    # people));
-    pass
+def remove_table_duplicates(table_name, headers):
+    """
+    :param table_name: the database table containing duplicates
+    :param headers: the csv headers
+    :return: the sql query to be executed
+    """
+
+    print("Removing duplicates from table...")
+    query = \
+        """
+        WITH dups AS 
+            (SELECT DISTINCT ON ({}) * FROM {})
+    
+        DELETE FROM {} WHERE {}.id NOT IN
+        (SELECT id FROM dups);
+        """.format(headers, table_name, table_name,table_name)
+    return query
+
 
 def add_data_to_table(table_name, config_dirs, proc_type, man_matched):
-    """adds the confirmed_matches data to table"""
+    '''
+    Adds the confirmed_matches data to table
+    :param table_name: the database table to which the confirmed matches will be addded
+    :param config_dirs:  directory variables
+    :param proc_type: Process type, initially name_only
+    :param man_matched: the dataframe containing the data
+    :return: None
+    '''
 
     # Filter manual matches file to just confirmed Yes matches and non-blank org id's
     confirmed_matches = man_matched[pd.notnull(man_matched['Org_ID'])]
@@ -87,10 +103,20 @@ def add_data_to_table(table_name, config_dirs, proc_type, man_matched):
 
     conn, cur = create_connection()
     with open(config_dirs['confirmed_matches_file'].format(proc_type), 'r') as f:
+        # Get headers dynamically
+        reader = csv.reader(f)
+        headers = next(reader, None)
+        headers = ", ".join(headers)
         next(f)  # Skip header row
         # Input the data into the dedupe table
         # copy_expert allows access to csv methods (i.e. char escaping)
-        cur.copy_expert("""COPY {} from stdin (format csv)""".format(table_name), f)
+        cur.copy_expert(
+            """COPY {}({}) from stdin (format csv)""".format(table_name, headers), f)
+        print("Data uploaded succesfully...")
+
+    query = remove_table_duplicates(table_name, headers)
+    cur.execute(query)
     conn.commit()
-    print("Data uploaded successfully.")
+
+
 
