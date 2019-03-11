@@ -52,7 +52,7 @@ pip install -r requirements.txt
 ```
 python run.py --pub_raw_name 'public_data_sample.csv'
 ```
-Or rename the sample file to public_data.csv, which is the default name used when calling 
+Or rename the sample file to public_data.csv, which is the default name used when calling. _If no public datafile is found, the user will be prompted with the option to download it from the remote database._
 ```
 python run.py
 ```
@@ -123,7 +123,7 @@ Project_Cascade
 _** Subject to change/ depending on naming conventions chosen in config files._
 ## General Processes
 
-### Data Cleaning
+### Data Cleaning 
 1. The module takes both datafiles and creates a new column with the org name cleaned up to help the matching process. For example, all company type suffixes (ltd, llp, srl etc) are standardised.
 2. In the same new column, punctuation is removed.
 3. For the public data set which has several address columns, these are all merged into one, with related row entries duplicated.  

@@ -17,16 +17,18 @@ password_remote = os.environ.get("PASSWORD_REMOTE")
 def check_data_exists(config_dirs, in_args, data_source):
     # If public data doesn't exist:
     if not os.path.exists(config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)):
-        choice = input("Public data not found, load from database? (y/n): ")
-        if choice.lower() == 'y':
-            # Load public data
-            query = pull_public_data(data_source)
-            df = fetch_data(query)
-            df.to_csv(config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name))
-        else:
-            print("Public/Registry data required - please copy in data csv to Data_Inputs\
-            /Raw_Data or load from database")
-            sys.exit()
+        # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
+        if not in_args.upload_to_db:
+            choice = input("Public data not found, load from database? (y/n): ")
+            if choice.lower() == 'y':
+                # Load public data
+                query = pull_public_data(data_source)
+                df = fetch_data(query)
+                df.to_csv(config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name))
+            else:
+                print("Public/Registry data required - please copy in data csv to Data_Inputs\
+                /Raw_Data or load from database")
+                sys.exit()
 
 
 def pull_public_data(source):
