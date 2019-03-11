@@ -50,12 +50,11 @@ pip install -r requirements.txt
 
 6. Run the module
 ```
-cd Project_Cascade_Ita
-python Project_Cascade.py --pub_raw_name 'public_data_sample.csv'
+python run.py --pub_raw_name 'public_data_sample.csv'
 ```
 Or rename the sample file to public_data.csv, which is the default name used when calling 
 ```
-python Project_Cascade.py
+python run.py
 ```
 
 The module makes use of argument parsing, with the following arguments:
@@ -64,13 +63,17 @@ The module makes use of argument parsing, with the following arguments:
 --pub_raw_name (default: 'public_data.csv')
 --priv_adj_name (default: 'priv_data_adj.csv')
 --pub_adj_name (default: 'pub_data_adj.csv')
---recycle (No arguments)
---training (No arguments)
+--recycle (No parameters)
+--training (No parameters)
+--config_review (No parameters)
+--terminal_matching (No parameters)
+--convert_training (No parameters)
+--upload_to_db (No parameters)
 ```
 
 To amend the names if needed :
 ```
-python Project_Cascade.py --priv_raw_name <filename>  # ...etc
+python run.py --priv_raw_name <filename>  # ...etc
 ```
 
 The `--recycle` flag is used once the module has been run and trained for the first time. When this flag is used, the module will run for a second time, but will incorporate the training data obtained from the manual matching process created in the first 'round', as  kick-start of sorts. See 5. Recycling Matches below for more info.
@@ -104,8 +107,14 @@ Project_Cascade
         |--Confirmed_Matches
         |--Deduped_Data
         |--Extracted_Matches
-|--Project_Cascade.py
-|--org_suffixes.py
+|--run_files
+    |--convert_training.py
+    |--data_analysis.py
+    |--data_matching.py
+    |--db_calls.py
+    |--org_suffixes.py
+    |--setup.py
+|--run.py
 |--Pipfile
 |--Pipfile.lock
 |--README.md
@@ -120,9 +129,9 @@ _** Subject to change/ depending on naming conventions chosen in config files._
 3. For the public data set which has several address columns, these are all merged into one, with related row entries duplicated.  
 
 ### Deduplication
-4.  The dedupe module comes into play next in two stages. First is the matching phase, which joins together our manual private data to the public data. It does this using [dedupe](https://github.com/dedupeio/csvdedupe)'s csvlink command. Training data has been provided to provide the best quality matches, and so you are required to do nothing here, however if you want to modify the training data just use the `training` flag when calling the module:
+4.  The dedupe module comes into play next in two stages. First is the matching phase, which joins together our manual private data to the public data. It does this using [dedupe](https://github.com/dedupeio/csvdedupe)'s `csvlink` command. Training data has been provided to provide the best quality matches, and so you are required to do nothing here, however if you want to modify the training data just use the `training` flag when calling the module:
 ```
-python project_cascade.py --training
+python run.py --training
 ```
 It is recommended that you study the dedupe documentation before modifying the training data, as experimentation is required to prevent over or under-fitting of the matching process. I have provided some notes at the end of this readme to explain my methods.
 
@@ -137,14 +146,19 @@ If any data **within a cluster** hasn't been matched to public data , then if th
 8. We then introduce a Levenshtein distance ratio to the data, which indicates just how good each match is based on the amount of alteration it would require to make one string the same as the other. The higher the score the better.
 9. Note that a short string with a difference of 1 letter between it and another string is much less likely to be a match than a long string with the same difference. Based on this, and a pre-defined config file, we introduce a cascading quality filter, which decreases the minimum levenshtein distance we are willing to accept, as the string length increases.
 You can add as many config files as you like to experiment with different combinations of this quality control filter system. 
-10. A short stats file is created so the user can see high level results of the different config files. 
-
+10. A short stats file is created so the user can see high level results of the different config files.
+11. The best config file is automatically chosen (based on the highest average Levenshtein distance) **unless** the `-config_review` flag is used when running the module. If this is done, the user will be prompted review the stats file and then enter their preferred config file in the terminal.
+12. The program will then exit, allowing the user to review the matches that have been extracted based on the chosen config file. The next stage is to manually review the 'Manual_Matches_x' file within Outputs/X/Confirmed_Matches and enter Y/N/U in the Manual_Match column. All matches with a Levenshtein distance of 100 (i.e. an exact match) are automatically assigned 'Y'. Note that these matches can be verified in the terminal if the `-terminal_matching` flag is used. In this case, the program will not exit, and instead the user will be prompted to verify the matches using the same Y/N/U responses.
+13. If the program has exited, we will then do 2 things. The first is to convert these manual confirmed matches into a json training file to be fed back into the system but using more fields in the dedupe phase (see recycling matches section below). The second is to get these confirmed matches uploaded to the database. Do this by running the command:
+```
+python run.py --convert_training --upload_to_db
+```
+The new training files are copied into the relevant training folders ready to be called by dedupe, and the confirmed 'Y' matches are converted to a Confirmed_Matches.csv file and then uploaded to the database. At this point duplicates within the database are sought and removed.
 ### Re-cycling the matches
-11. With the best matches filtered for, the user can then pick the best config file (by reviewing the stats file in `Outputs/<process_type>/Extracted_Matches/Matches_Stats_x.csv`), and then will be prompted by the terminal to go through and manually verify the quality of each match.
-12. These quality matches, and poor quality matches, are then converted to a json training file, which can then be re-fed back into dedupe as a kick-start to more accurate training but now including the street address field. Once the process has completed for the first time, re-run the module using the `recycle` flag:
+14. These quality matches (Y), and poor quality matches (N) which have been converted to a json training file, can then be re-fed back into dedupe as a kick-start to more accurate training but now including the street address field. Once the process has completed for the first time, re-run the module using the `recycle` flag:
 
 ```
-python project_cascade.py --recycle
+python run.py --recycle
 ```
 
 This will run the entire process again but will use the new training data and will attempt to match both the organisation name and the address. Note that the old training data is duplicated here, so you can add to the training data for the recycle phase without impacting the initial phase if you wanted to re-run it. 
