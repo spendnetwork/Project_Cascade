@@ -180,7 +180,8 @@ if __name__ == '__main__':
     # Ignores config_dirs - convention is <num>_config.py
     pyfiles = "*_config.py"
 
-    # If public/registry data file doesn't exist, pull from database
-    db_calls.check_data_exists(config_dirs,in_args,"spaziodati.sd_sample")
+    if not in_args.recycle:
+        # If public/registry data file doesn't exist, pull from database
+        db_calls.check_data_exists(config_dirs,in_args,"spaziodati.sd_sample")
 
     main(in_args, config_dirs)

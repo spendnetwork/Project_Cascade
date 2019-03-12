@@ -192,6 +192,9 @@ def manual_matching(config_dirs, best_config, proc_type, in_args):
                                  index=False,
                                  columns=['Cluster ID', 'leven_dist', 'Org_ID', 'id', 'org_name', 'pub_name_adj',
                                           'pub_address','priv_name', 'priv_name_adj', 'priv_address', 'Manual_Match'])
-
-        print("\nIf required, please perform manual matching process in {} and then run 'python run.py --convert_training --upload_to_db".format(
-            config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))
+        if not in_args.recycle:
+            print("\nIf required, please perform manual matching process in {} and then run 'python run.py --convert_training --upload_to_db".format(
+                config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))
+        else:
+            print("\nIf required, please perform manual matching process in {} and then run 'python run.py --recycle --upload_to_db".format(
+                config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))
