@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 import pdb
-from run_files import data_processing as dp
+from run_files import data_processing
 import run
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
@@ -36,7 +36,7 @@ def connection():
 def test_remvPunct(test_priv_df, test_input, expected):
     # Tests remvPunct ensure all punctuation removed and strings lowered
     input_index = test_priv_df.priv_name.str.find(test_input)
-    test_priv_df['priv_name_adj'] = dp.remvPunct(test_priv_df, 'priv_name','priv_name_adj')
+    test_priv_df['priv_name_adj'] = data_processing.remvPunct(test_priv_df, 'priv_name','priv_name_adj')
     assert test_priv_df.loc[input_index[0]].priv_name_adj == expected
 
 
@@ -57,20 +57,20 @@ def test_connection(connection):
 
 
 def test_shorten_name(test_input, expected):
-    assert dp.shorten_name(test_input) == expected
+    assert data_processing.shorten_name(test_input) == expected
 
 
 @pytest.fixture()
 def test_clustered_df():
-    df_unassigned = pd.read_csv('./test_clustered.csv')
-    df_assigned = pd.read_csv('./test_clustered_assigned.csv')
+    df_unassigned = pd.read_csv('./tests/test_clustered.csv')
+    df_assigned = pd.read_csv('./tests/test_clustered_assigned.csv')
     return df_unassigned, df_assigned
 
 
 def test_orgids_assigned_to_clusters(test_clustered_df):
     # Tests that any cluster containing rows that have both a match and a none match gets
     # the match data copied over to the non match rows (highest confidence score)
-    df_processed = dp.assign_pub_data_to_clusters(test_clustered_df[0])
+    df_processed = data_processing.assign_pub_data_to_clusters(test_clustered_df[0])
     assert_frame_equal(df_processed, test_clustered_df[1])
 
 # def test_priv_data_dtypes():
