@@ -1,1 +1,83 @@
-{"distinct": [], "match": [{"__class__": "tuple", "__value__": [{"priv_name_adj": "mc engineering srl", "priv_address": "nan"}, {"priv_name_adj": "mg engineering srl", "priv_address": "nan"}]}, {"__class__": "tuple", "__value__": [{"priv_name_adj": "esanastri srl", "priv_address": "Via A. Barducci 18/a"}, {"priv_name_adj": "esanastri srl", "priv_address": "Giovanni Pascoli"}]}, {"__class__": "tuple", "__value__": [{"priv_name_adj": "vico srl", "priv_address": "Corso Stalingrado 50"}, {"priv_name_adj": "vico srl", "priv_address": "nan"}]}, {"__class__": "tuple", "__value__": [{"priv_name_adj": "sorge srl", "priv_address": "via Gubbio 10"}, {"priv_name_adj": "sorge srl", "priv_address": "nan"}]}, {"__class__": "tuple", "__value__": [{"priv_name_adj": "mp service srl", "priv_address": "via Lama di Cervo, 165"}, {"priv_name_adj": "mp service srl", "priv_address": "nan"}]}, {"__class__": "tuple", "__value__": [{"priv_name_adj": "volcan srl", "priv_address": "Via Max Valier 5"}, {"priv_name_adj": "volcan srls", "priv_address": "Cuccubello"}]}]}
+{
+  "distinct": [],
+  "match": [
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "priv_name_adj": "mc engineering srl",
+          "priv_address": "nan"
+        },
+        {
+          "priv_name_adj": "mg engineering srl",
+          "priv_address": "nan"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "priv_name_adj": "esanastri srl",
+          "priv_address": "Via A. Barducci 18/a"
+        },
+        {
+          "priv_name_adj": "esanastri srl",
+          "priv_address": "Giovanni Pascoli"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "priv_name_adj": "vico srl",
+          "priv_address": "Corso Stalingrado 50"
+        },
+        {
+          "priv_name_adj": "vico srl",
+          "priv_address": "nan"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "priv_name_adj": "sorge srl",
+          "priv_address": "via Gubbio 10"
+        },
+        {
+          "priv_name_adj": "sorge srl",
+          "priv_address": "nan"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "priv_name_adj": "mp service srl",
+          "priv_address": "via Lama di Cervo, 165"
+        },
+        {
+          "priv_name_adj": "mp service srl",
+          "priv_address": "nan"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "priv_name_adj": "volcan srl",
+          "priv_address": "Via Max Valier 5"
+        },
+        {
+          "priv_name_adj": "volcan srls",
+          "priv_address": "Cuccubello"
+        }
+      ]
+    }
+  ]
+}
