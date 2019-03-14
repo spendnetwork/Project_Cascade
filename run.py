@@ -36,7 +36,9 @@ def get_input_args():
     # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
     # Force an error and prompt user to add the training flag
     if args.training == True and not os.path.exists(os.getcwd() + "/Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json"):
-        parser.error("Dedupe training files do not exist, please try 'python run.py --training' to begin training process")
+        print("Dedupe training files do not exist - running with --training flag to initiate training process")
+        args.training == False
+        # parser.error("Dedupe training files do not exist, please try 'python run.py --training' to begin training process")
 
     return args
 
@@ -57,6 +59,7 @@ def main(in_args, config_dirs):
 
                 # Clean public and private datasets for linking
                 # private df needed in memory for stats
+
                 privdf = data_processing.clean_private_data(config_dirs, in_args)
                 if not in_args.recycle:
                     pubdf = data_processing.clean_public_data(config_dirs, in_args)

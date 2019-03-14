@@ -3,8 +3,8 @@ from dotenv import load_dotenv, find_dotenv
 import os
 import pandas as pd
 import sys
-import pdb
 import csv
+
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -119,6 +119,3 @@ def add_data_to_table(table_name, config_dirs, proc_type, man_matched):
     query = remove_table_duplicates(table_name, headers)
     cur.execute(query)
     conn.commit()
-
-
-

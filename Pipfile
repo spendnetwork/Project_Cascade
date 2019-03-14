@@ -17,6 +17,9 @@ csvdedupe = {path = "./csvdedupe"}
 python-dotenv = "*"
 psycopg2 = "*"
 psycopg2-binary = "*"
+pytest = "*"
+string = "*"
+urlparse = "*"
 
 [requires]
 python_version = "3.6"

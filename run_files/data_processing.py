@@ -5,6 +5,7 @@ from tqdm import tqdm
 import numpy as np
 from run_files import org_suffixes
 import string
+import pdb
 
 
 def clean_private_data(config_dirs, in_args):
@@ -22,10 +23,15 @@ def clean_private_data(config_dirs, in_args):
                          dtype={'supplier_name': np.str, 'supplier_streetadd': np.str})
         df.rename(columns={'supplier_name': 'priv_name', 'supplier_streetadd': 'priv_address'}, inplace=True)
         print("Re-organising private data...")
+
         # Remove punctuation and double spacing
-        df['priv_name_adj'] = df['priv_name'].str.translate(
-            str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
-        df['priv_name_adj'].replace(org_suffixes.org_type_dict, regex=True, inplace=True)
+        adj_col = str('priv_name_adj')
+        orig_col = str('priv_name')
+        df[adj_col] = remvPunct(df, orig_col, adj_col)
+
+        # Replace organisation suffixes with standardised version
+        df[adj_col].replace(org_suffixes.org_type_dict, regex=True, inplace=True)
+
         print("...done")
         df.to_csv(adj_data, index=False)
     else:
@@ -57,11 +63,12 @@ def clean_public_data(config_dirs, in_args):
 
         dffullmerge = pd.DataFrame([])
         for chunk in df:
+
             # Remove punctuation and double spacing
-            chunk['pub_name_adj'] = chunk['org_name'].str.translate(
-                str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
-            chunk['pub_name_adj'].replace(org_suffixes.org_type_dict, regex=True, inplace=True)
-            ls = []
+            adj_col = str('pub_name_adj')
+            orig_col = str('org_name')
+            df[adj_col] = remvPunct(df, orig_col, adj_col)
+
             # Merge multiple address columns into one column
             for idx, row in tqdm(chunk.iterrows()):
                 ls.append(tuple([row['Org_ID'], row['org_name'], row['pub_name_adj'], row['street_address1']]))
@@ -82,6 +89,19 @@ def clean_public_data(config_dirs, in_args):
                                          'pub_address': np.str})
     return dffullmerge
 
+
+def remvPunct(df, orig_col, adj_col):
+    """
+    :param df: dataframe
+    :param orig_col: the original unmodified organisation data strings
+    :param adj_col: the orig_col with removed punctuation and standardised org_suffixes
+    :return: adjusted dataframe
+    """
+    df[adj_col] = df[orig_col].str.translate(
+        str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
+    return df[adj_col]
+
+
 def shorten_name(row):
     """
 	Removes the company suffixes according to the org_suffixes.org_type_dict. This helps with the extraction phase
@@ -94,14 +114,14 @@ def shorten_name(row):
     rowsplit = str(row).split(" ")
     for i in rowsplit:
         if i in org_suffixes.org_type_dict.values():
-            rowadj = row.replace(i, '').strip()
+            rowadj = row.replace(i, '').replace("  ", " ").strip()
     try:
         return rowadj
     except:
         return row
 
 
-def assign_pub_data_to_clusters(df, assigned_file):
+def assign_pub_data_to_clusters(df, assigned_file=None):
     """
 	Unmatched members of a cluster are assigned the public data of the highest-confidence matched
 	row in that cluster. At this stage the amount of confidence is irrelevant as these will be measured
@@ -166,3 +186,4 @@ def add_lev_dist(clust_df, output_file):
     clust_df.to_csv(output_file, index=False)
 
     return clust_df
+
