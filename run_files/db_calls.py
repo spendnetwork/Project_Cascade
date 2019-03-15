@@ -23,7 +23,6 @@ def check_data_exists(config_dirs, in_args, data_source):
         if not in_args.upload_to_db:
             choice = input("Public data not found, load from database? (y/n): ")
             if choice.lower() == 'y':
-                pdb.set_trace()
                 # Check env file exists
                 curdir = os.path.dirname(os.path.abspath(__file__))
                 envloc = os.path.join(curdir,'../.env')
