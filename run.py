@@ -78,9 +78,9 @@ def main(in_args, config_dirs):
                             main_proc = min(configs['processes'][proc_type].keys())
 
                             # Define data types for clustered file. Enables faster loading.
-                            clustdtype = {'Cluster ID': np.int, 'Confidence Score': np.float,
-                                          'id': np.int, 'priv_name': np.str, 'priv_address': np.str,
-                                          'priv_name_adj': np.str, 'Org_ID': np.str, 'pub_name_adj': np.str,
+                            clustdtype = {'Cluster ID': np.float64, 'Confidence Score': np.float,
+                                          'id': np.float, 'priv_name': np.str, 'priv_address': np.str,
+                                          'priv_name_adj': np.str, 'org_id': np.str, 'pub_name_adj': np.str,
                                           'pub_address': np.str, 'priv_name_short': np.str, 'pub_name_short': np.str,
                                           'leven_dist': np.int, 'org_name': np.str}
 
@@ -144,7 +144,7 @@ def main(in_args, config_dirs):
 
             man_matched = pd.read_csv(
                 config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
-                usecols=['priv_name', 'priv_address', 'Org_ID', 'org_name', 'pub_address', 'Manual_Match'])
+                usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match'])
 
             if in_args.convert_training:
                 # Ensure not in recycle mode for training file to be converted
@@ -160,12 +160,13 @@ def main(in_args, config_dirs):
             if in_args.upload_to_db:
                 upload_file = pd.read_csv(
                     config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
-                    usecols=['priv_name', 'priv_address', 'Org_ID', 'org_name', 'pub_address', 'Manual_Match'])
+                    usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match'])
 
                 # Add confirmed matches to relevant proc_type table
                 if not in_args.recycle:
                     db_calls.add_data_to_table("spaziodati.confirmed_nameonly_matches", config_dirs, proc_type,
                                                upload_file)
+                    print("Process complete. Run 'python run.py --recycle' to begin training against additional fields.")
                 if in_args.recycle:
                     db_calls.add_data_to_table("spaziodati.confirmed_nameaddress_matches", config_dirs, proc_type,
                                                upload_file)

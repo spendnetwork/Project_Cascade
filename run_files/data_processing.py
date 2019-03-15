@@ -56,9 +56,9 @@ def clean_public_data(config_dirs, in_args):
     if not os.path.exists(adj_data):
         print("Re-organising public data...")
         df = pd.read_csv(raw_data,
-                         usecols={'org_name', 'street_address1', 'street_address2', 'street_address3', 'Org_ID'},
+                         usecols={'org_name', 'street_address1', 'street_address2', 'street_address3', 'org_id'},
                          dtype={'org_name': np.str, 'street_address1': np.str, 'street_address2': np.str,
-                                'street_address3': np.str, 'Org_ID': np.str},
+                                'street_address3': np.str, 'org_id': np.str},
                          chunksize=500000)
 
         dffullmerge = pd.DataFrame([])
@@ -67,15 +67,19 @@ def clean_public_data(config_dirs, in_args):
             # Remove punctuation and double spacing
             adj_col = str('pub_name_adj')
             orig_col = str('org_name')
-            df[adj_col] = remvPunct(df, orig_col, adj_col)
+            chunk[adj_col] = remvPunct(chunk, orig_col, adj_col)
 
+            # Replace organisation suffixes with standardised version
+            chunk[adj_col].replace(org_suffixes.org_type_dict, regex=True, inplace=True)
+
+            ls = []
             # Merge multiple address columns into one column
             for idx, row in tqdm(chunk.iterrows()):
-                ls.append(tuple([row['Org_ID'], row['org_name'], row['pub_name_adj'], row['street_address1']]))
+                ls.append(tuple([row['org_id'], row['org_name'], row['pub_name_adj'], row['street_address1']]))
                 for key in ['street_address2', 'street_address3']:
                     if pd.notnull(row[key]):
-                        ls.append(tuple([row['Org_ID'], row['org_name'], row['pub_name_adj'], row[key]]))
-            labels = ['Org_ID', 'org_name', 'pub_name_adj', 'street_address']
+                        ls.append(tuple([row['org_id'], row['org_name'], row['pub_name_adj'], row[key]]))
+            labels = ['org_id', 'org_name', 'pub_name_adj', 'street_address']
             dfmerge = pd.DataFrame.from_records(ls, columns=labels)
             dffullmerge = pd.concat([dffullmerge, dfmerge], ignore_index=True)
         dffullmerge.drop_duplicates(inplace=True)
@@ -84,8 +88,8 @@ def clean_public_data(config_dirs, in_args):
 
         dffullmerge.to_csv(adj_data, index=False)
     else:
-        dffullmerge = pd.read_csv(adj_data, usecols=['Org_ID', 'org_name', 'pub_name_adj', 'pub_address'],
-                                  dtype={'Org_ID': np.str, 'org_name': np.str, 'pub_name_adj': np.str,
+        dffullmerge = pd.read_csv(adj_data, usecols=['org_id', 'org_name', 'pub_name_adj', 'pub_address'],
+                                  dtype={'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str,
                                          'pub_address': np.str})
     return dffullmerge
 
@@ -154,8 +158,8 @@ def get_max_id(group):
     max_conf_idx = group['Confidence Score'].idxmax()
     for index, row in group.iterrows():
         # If the row is unmatched (has no public org_id):
-        if pd.isnull(row.Org_ID):
-            group.at[index, 'Org_ID'] = group['Org_ID'][max_conf_idx]
+        if pd.isnull(row.org_id):
+            group.at[index, 'org_id'] = group['org_id'][max_conf_idx]
             group.at[index, 'pub_name_adj'] = group['pub_name_adj'][max_conf_idx]
             group.at[index, 'org_name'] = group['org_name'][max_conf_idx]
             group.at[index, 'pub_address'] = group['pub_address'][max_conf_idx]

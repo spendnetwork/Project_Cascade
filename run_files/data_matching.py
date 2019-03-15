@@ -50,11 +50,11 @@ def dedupe_match_cluster(dirs, configs, proc_type, proc_num, in_args):
 
         p.wait()
         df = pd.read_csv(dirs['match_output_file'].format(proc_type),
-                         usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'Org_ID', 'org_name',
+                         usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'org_id', 'org_name',
                                   'pub_name_adj',
                                   'pub_address'],
                          dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str,
-                                'Org_ID': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str})
+                                'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str})
         df = df[pd.notnull(df['priv_name'])]
         df.to_csv(dirs['match_output_file'].format(proc_type), index=False)
 
@@ -179,22 +179,19 @@ def manual_matching(config_dirs, best_config, proc_type, in_args):
         print("Saving...")
         manual_match_file.to_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
-                                 # columns=['Cluster ID', 'Confidence Score', 'Org_ID', 'id', 'leven_dist', 'org_name',
-                                 #          'priv_address',
-                                 #          'priv_name', 'priv_name_adj', 'process_num', 'pub_address', 'pub_name_adj',
-                                 #          'Manual_Match'])
-                                 columns=['Cluster ID', 'leven_dist', 'Org_ID', 'id', 'org_name', 'pub_name_adj', 'pub_address',
+                                 columns=['Cluster ID', 'leven_dist', 'org_id', 'id', 'org_name', 'pub_name_adj', 'pub_address',
                                           'priv_name', 'priv_name_adj', 'priv_address', 'Manual_Match'])
         return manual_match_file
 
     else:
         manual_match_file.to_csv(config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
-                                 columns=['Cluster ID', 'leven_dist', 'Org_ID', 'id', 'org_name', 'pub_name_adj',
+                                 columns=['Cluster ID', 'leven_dist', 'org_id', 'id', 'org_name', 'pub_name_adj',
                                           'pub_address','priv_name', 'priv_name_adj', 'priv_address', 'Manual_Match'])
         if not in_args.recycle:
             print("\nIf required, please perform manual matching process in {} and then run 'python run.py --convert_training --upload_to_db".format(
                 config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))
         else:
-            print("\nIf required, please perform manual matching process in {} and then run 'python run.py --recycle --upload_to_db".format(
-                config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))
+            if not in_args.upload_to_db:
+                print("\nIf required, please perform manual matching process in {} and then run 'python run.py --recycle --upload_to_db".format(
+                    config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv'))

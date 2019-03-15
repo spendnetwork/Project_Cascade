@@ -22,8 +22,8 @@ def calc_matching_stats(clustdf, extractdf, config_dirs, conf_file_num, proc_typ
                  'Percent_Recall', 'Leven_Dist_Avg'])
     # Overall matches, including poor quality:
     statdf.at[conf_file_num, 'Config_File'] = conf_file_num
-    statdf.at[conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['Org_ID'])])
-    statdf.at[conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['Org_ID'])]) / len(privdf) * 100,
+    statdf.at[conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['org_id'])])
+    statdf.at[conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['org_id'])]) / len(privdf) * 100,
                                                         2)
     # Overall optimised matches :
     statdf.at[conf_file_num, 'Optim_Matches'] = len(extractdf)

@@ -37,12 +37,13 @@ def pull_public_data(source):
     query = \
         """
         SELECT
-        json_doc::json->>'name'as priv_name,
+        json_doc::json->>'name'as org_name,
         json_doc::json->'locations'->'items'-> 0 ->'address'->>'streetName' as street_address1,
         json_doc::json->'locations'->'items'-> 1 ->'address'->>'streetName' as street_address2,
-        json_doc::json->'locations'->'items'-> 2 ->'address'->>'streetName' as street_address3
+        json_doc::json->'locations'->'items'-> 2 ->'address'->>'streetName' as street_address3,
+        json_doc::json->'id' as org_id
         from {}
-        LIMIT 500
+        LIMIT 5000
         """.format(source)
     return query
 
@@ -97,10 +98,10 @@ def add_data_to_table(table_name, config_dirs, proc_type, man_matched):
     '''
 
     # Filter manual matches file to just confirmed Yes matches and non-blank org id's
-    confirmed_matches = man_matched[pd.notnull(man_matched['Org_ID'])]
+    confirmed_matches = man_matched[pd.notnull(man_matched['org_id'])]
     confirmed_matches = confirmed_matches[(man_matched['Manual_Match'] == 'Y')]
     confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type),
-                             columns=['priv_name', 'priv_address', 'Org_ID', 'org_name', 'pub_address'],
+                             columns=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address'],
                              index=False)
 
     conn, cur = create_connection()

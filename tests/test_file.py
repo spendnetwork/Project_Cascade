@@ -2,7 +2,6 @@ import pytest
 import pandas as pd
 import pdb
 from run_files import data_processing
-import run
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
@@ -15,6 +14,7 @@ host_remote = os.environ.get("HOST_REMOTE")
 dbname_remote = os.environ.get("DBNAME_REMOTE")
 user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
+
 
 @pytest.fixture()
 def test_priv_df():
@@ -30,9 +30,12 @@ def connection():
     cur = conn.cursor()
     return conn
 
+
 @pytest.mark.parametrize("test_input, expected", [
     ("Ditta ABBOTT VASCULAR Knoll-Ravizza S.p.A.", "ditta abbott vascular knollravizza spa")
 ])
+
+
 def test_remvPunct(test_priv_df, test_input, expected):
     # Tests remvPunct ensure all punctuation removed and strings lowered
     input_index = test_priv_df.priv_name.str.find(test_input)
@@ -62,8 +65,11 @@ def test_shorten_name(test_input, expected):
 
 @pytest.fixture()
 def test_clustered_df():
-    df_unassigned = pd.read_csv('./tests/test_clustered.csv')
-    df_assigned = pd.read_csv('./tests/test_clustered_assigned.csv')
+    pdb.set_trace()
+    curdir = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(curdir, "{}")
+    df_unassigned = pd.read_csv(filepath.format('/test_clustered.csv'))
+    df_assigned = pd.read_csv(filepath.format('/test_clustered_assigned.csv'))
     return df_unassigned, df_assigned
 
 
@@ -73,6 +79,7 @@ def test_orgids_assigned_to_clusters(test_clustered_df):
     df_processed = data_processing.assign_pub_data_to_clusters(test_clustered_df[0])
     assert_frame_equal(df_processed, test_clustered_df[1])
 
+
 # def test_priv_data_dtypes():
 #     # Test that the data types of the private data are correct
 #     pass
@@ -81,7 +88,7 @@ def test_orgids_assigned_to_clusters(test_clustered_df):
 #     # Test that either a raw data file exists or the connection can be made to the database
 #     pass
 #
-
+# test imported data matches usecols format
 #
 # def test_if_private_file_exists_movetopublicdata():
 #     # Test that if private adj file exists then skip to cleaning the public data file
