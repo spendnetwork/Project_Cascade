@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import sys
 import csv
+import pdb
 
 
 # get the remote database details from .env
@@ -15,12 +16,21 @@ password_remote = os.environ.get("PASSWORD_REMOTE")
 
 
 def check_data_exists(config_dirs, in_args, data_source):
+
     # If public data doesn't exist:
     if not os.path.exists(config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)):
         # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
         if not in_args.upload_to_db:
             choice = input("Public data not found, load from database? (y/n): ")
             if choice.lower() == 'y':
+                pdb.set_trace()
+                # Check env file exists
+                curdir = os.path.dirname(os.path.abspath(__file__))
+                envloc = os.path.join(curdir,'../.env')
+                if not os.path.exists(envloc):
+                    print("Database credentials not found. Please complete the .env file using the '.env template'")
+                    sys.exit()
+
                 # Load public data
                 query = pull_public_data(data_source)
                 df = fetch_data(query)
