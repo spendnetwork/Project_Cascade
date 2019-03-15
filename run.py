@@ -148,7 +148,7 @@ def main(in_args, config_dirs):
 
             if in_args.convert_training:
                 # Ensure not in recycle mode for training file to be converted
-                assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run without --recycle flag."
+                assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
 
                 conv_file = pd.read_csv(
                     config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
