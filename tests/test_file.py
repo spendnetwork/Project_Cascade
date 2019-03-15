@@ -65,7 +65,7 @@ def test_shorten_name(test_input, expected):
 
 @pytest.fixture()
 def test_clustered_df():
-    pdb.set_trace()
+
     curdir = os.path.dirname(os.path.abspath(__file__))
     filepath = os.path.join(curdir, "{}")
     df_unassigned = pd.read_csv(filepath.format('/test_clustered.csv'))
