@@ -1,4 +1,4 @@
-,Cluster ID,Confidence Score,id,priv_name,priv_address,priv_name_adj,Org_ID,org_name,pub_name_adj,pub_address
+,Cluster ID,Confidence Score,id,priv_name,priv_address,priv_name_adj,org_id,org_name,pub_name_adj,pub_address
 0,"1
 ",0.35936433,9926,Esseci S.r.l.,Corso Siccardi 11 bis,esseci srl,,,,
 1,1,0.9,9634,SE.G.I. S.r.l.,,segi srl,afe0d8986368,SEGI S.R.L.,segi srl,
