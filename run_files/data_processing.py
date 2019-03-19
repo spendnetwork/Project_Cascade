@@ -8,15 +8,15 @@ import string
 import pdb
 
 
-def clean_private_data(config_dirs, in_args):
+def clean_private_data(rootdir, config_dirs, in_args):
     """
 	Takes the private data file as input, org type suffixes are replaced with abbreviated versions
 	and strings reformatted for consistency across the two datasets
 
 	:return df: the amended private datafile
 	"""
-    raw_data = config_dirs['raw_dir'] + config_dirs['raw_priv_data'].format(in_args.priv_raw_name)
-    adj_data = config_dirs['adj_dir'] + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
+    raw_data = config_dirs['raw_dir'].format(rootdir) + config_dirs['raw_priv_data'].format(in_args.priv_raw_name)
+    adj_data = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
 
     if not os.path.exists(adj_data):
         df = pd.read_csv(raw_data, usecols=['id', 'supplier_name', 'supplier_streetadd'],
@@ -30,7 +30,7 @@ def clean_private_data(config_dirs, in_args):
         df[adj_col] = remvPunct(df, orig_col, adj_col)
 
         # Replace organisation suffixes with standardised version
-        df[adj_col].replace(org_suffixes.org_type_dict, regex=True, inplace=True)
+        df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
         print("...done")
         df.to_csv(adj_data, index=False)
@@ -41,7 +41,7 @@ def clean_private_data(config_dirs, in_args):
     return df
 
 
-def clean_public_data(config_dirs, in_args):
+def clean_public_data(rootdir, config_dirs, in_args):
     """
 	Takes the raw public data file and splits into chunks.
 	Multiple address columns are merged into one column,
@@ -50,8 +50,8 @@ def clean_public_data(config_dirs, in_args):
 	:return dffullmerge: the public dataframe adjusted as above
 	"""
 
-    raw_data = config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)
-    adj_data = config_dirs['adj_dir'] + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
+    raw_data = config_dirs['raw_dir'].format(rootdir) + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)
+    adj_data = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
 
     if not os.path.exists(adj_data):
         print("Re-organising public data...")
@@ -70,7 +70,7 @@ def clean_public_data(config_dirs, in_args):
             chunk[adj_col] = remvPunct(chunk, orig_col, adj_col)
 
             # Replace organisation suffixes with standardised version
-            chunk[adj_col].replace(org_suffixes.org_type_dict, regex=True, inplace=True)
+            chunk[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
             ls = []
             # Merge multiple address columns into one column
@@ -108,7 +108,7 @@ def remvPunct(df, orig_col, adj_col):
 
 def shorten_name(row):
     """
-	Removes the company suffixes according to the org_suffixes.org_type_dict. This helps with the extraction phase
+	Removes the company suffixes according to the org_suffixes.org_suffixes_dict. This helps with the extraction phase
 	because it improves the relevance of the levenshtein distances.
 
 	:param row: each row of the dataframe
@@ -117,7 +117,7 @@ def shorten_name(row):
     row = str(row).replace('-', ' ').replace("  ", " ").strip()
     rowsplit = str(row).split(" ")
     for i in rowsplit:
-        if i in org_suffixes.org_type_dict.values():
+        if i in org_suffixes.org_suffixes_dict.values():
             rowadj = row.replace(i, '').replace("  ", " ").strip()
     try:
         return rowadj
@@ -136,7 +136,6 @@ def assign_pub_data_to_clusters(df, assigned_file=None):
 	:return altered df
 	"""
 
-    st = set(df['Cluster ID'])
     df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
     df.reset_index(drop=True, inplace=True)
     tqdm.pandas()
@@ -177,6 +176,14 @@ def calc_match_ratio(row):
 
 
 def add_lev_dist(clust_df, output_file):
+    '''
+    Adds the levenshtein distance ratio comparing the amount of change required to convert the private org name
+    to the public org name and therefore a measure of the quality of the match
+
+    :param clust_df: the clustered datafile
+    :param output_file: clustered file with added levenshtein distance
+    :return: clust_df
+    '''
     # Remove company suffixes for more relevant levenshtein distance calculation. Otherwise will have exaggerated
     # Distances if i.e. priv name has 'srl' suffix but pub name doesn't.
     clust_df['priv_name_short'] = clust_df.priv_name_adj.apply(shorten_name)
@@ -190,4 +197,3 @@ def add_lev_dist(clust_df, output_file):
     clust_df.to_csv(output_file, index=False)
 
     return clust_df
-

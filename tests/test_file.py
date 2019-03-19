@@ -6,6 +6,8 @@ import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
 from pandas.util.testing import assert_frame_equal
+from run_files import setup
+from Config_Files import config_dirs
 
 
 # get the remote database details from .env
@@ -79,11 +81,18 @@ def test_orgids_assigned_to_clusters(test_clustered_df):
     df_processed = data_processing.assign_pub_data_to_clusters(test_clustered_df[0])
     assert_frame_equal(df_processed, test_clustered_df[1])
 
+def test_dirscreation(tmpdir):
+    # Pull through setup.setup_dirs and use tmpdir to assert that directories get created
+    setup.setup_dirs(config_dirs.dirs['dirs'], tmpdir)
+    assert 1
 
-# def test_priv_data_dtypes():
-#     # Test that the data types of the private data are correct
-#     pass
-#
+def test_assignedblock():
+    # Test line 87 onwards in run.py is functional. Maybe do a separate test for each mini function to ensure the whole thing can run.
+    # If one thing doesn't work here and the file gets
+    # still created then the rest of the if statement is skipped i.e. leven_dist etc.
+    pass
+
+
 # def test_raw_data_access():
 #     # Test that either a raw data file exists or the connection can be made to the database
 #     pass
@@ -98,6 +107,7 @@ def test_orgids_assigned_to_clusters(test_clustered_df):
 #
 # def test_directory_creation():
 #     #Tests if directories don't exist that they get created.
+
 #
 # def test_same_directories():
 #     # Tests that
@@ -111,3 +121,12 @@ def test_orgids_assigned_to_clusters(test_clustered_df):
 # def initial_transform(data):
 #     outside_module.do_something()
 #     return data
+
+
+
+# test that delete duplicates within database actually returns a unique database
+# pass in test_clustered.csv to the database, run deduplication on the table, then assert that it matches the test_deduplicated_data.csv
+# could also combine this with a test_upload_to_db properly. Maybe upload test_clustered.csv and then assert that the table in the database is exactly equal to the original test_clustered.csv file.
+# OR can test the sql query is an insert function as per the test_insert() function in the core repo (test_database.py)
+# def test_uploadtodb():
+

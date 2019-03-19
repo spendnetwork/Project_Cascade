@@ -59,10 +59,9 @@ def main(in_args, config_dirs):
 
                 # Clean public and private datasets for linking
                 # private df needed in memory for stats
-
-                privdf = data_processing.clean_private_data(config_dirs, in_args)
+                privdf = data_processing.clean_private_data(rootdir, config_dirs, in_args)
                 if not in_args.recycle:
-                    pubdf = data_processing.clean_public_data(config_dirs, in_args)
+                    pubdf = data_processing.clean_public_data(rootdir, config_dirs, in_args)
 
                 # For each process type (eg: Name & Add, Name only) outlined in the configs file:
                 for proc_type in configs['processes']:
@@ -70,7 +69,7 @@ def main(in_args, config_dirs):
                         'recycle_phase']:
 
                         # Create working directories if don't exist
-                        setup.setup_dirs(config_dirs, proc_type)
+                        setup.setup_dirs(config_dirs, rootdir, proc_type)
 
                         # Iterate over each process number in the config file
                         for proc_num in configs['processes'][proc_type]:
@@ -85,35 +84,35 @@ def main(in_args, config_dirs):
                                           'leven_dist': np.int, 'org_name': np.str}
 
                             # Run dedupe for matching and calculate related stats for comparison
-                            if not os.path.exists(config_dirs['assigned_output_file'].format(proc_type)):
+                            if not os.path.exists(config_dirs['assigned_output_file'].format(rootdir, proc_type)):
 
-                                data_matching.dedupe_match_cluster(config_dirs, configs, proc_type, proc_num, in_args)
+                                data_matching.dedupe_match_cluster(rootdir, config_dirs, configs, proc_type, proc_num, in_args)
 
-                                clust_df = pd.read_csv(config_dirs["cluster_output_file"].format(proc_type),
+                                clust_df = pd.read_csv(config_dirs["cluster_output_file"].format(rootdir, proc_type),
                                                        index_col=None, dtype=clustdtype)
 
                                 # Copy public data to high-confidence cluster records
                                 clust_df = data_processing.assign_pub_data_to_clusters(clust_df, config_dirs[
-                                    'assigned_output_file'].format(proc_type))
+                                    'assigned_output_file'].format(rootdir, proc_type))
 
                                 # Adds leven_dist column and extract matches based on config process criteria:
                                 clust_df = data_processing.add_lev_dist(clust_df,
-                                                                        config_dirs["assigned_output_file"].format(
+                                                                        config_dirs["assigned_output_file"].format(rootdir,
                                                                             proc_type))
 
                             else:
 
-                                clust_df = pd.read_csv(config_dirs["assigned_output_file"].format(proc_type),
+                                clust_df = pd.read_csv(config_dirs["assigned_output_file"].format(rootdir, proc_type),
                                                        index_col=None, dtype=clustdtype, usecols=clustdtype.keys())
 
-                            extracts_file = data_matching.extract_matches(clust_df, configs, config_dirs, proc_num,
+                            extracts_file = data_matching.extract_matches(rootdir, clust_df, configs, config_dirs, proc_num,
                                                                           proc_type,
                                                                           conf_file_num)
                         break
                     else:
                         continue
                 # Output stats file:
-                stat_file = data_analysis.calc_matching_stats(clust_df, extracts_file, config_dirs, conf_file_num,
+                stat_file = data_analysis.calc_matching_stats(rootdir, clust_df, extracts_file, config_dirs, conf_file_num,
                                                               proc_type, privdf)
 
     except StopIteration:
@@ -140,10 +139,10 @@ def main(in_args, config_dirs):
                 max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
                 best_config = stat_file.at[max_lev, 'Config_File']
 
-            data_matching.manual_matching(config_dirs, best_config, proc_type, in_args)
+            data_matching.manual_matching(rootdir, config_dirs, best_config, proc_type, in_args)
 
             man_matched = pd.read_csv(
-                config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
+                config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
                 usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match'])
 
             if in_args.convert_training:
@@ -151,24 +150,24 @@ def main(in_args, config_dirs):
                 assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
 
                 conv_file = pd.read_csv(
-                    config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
+                    config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
                     usecols=['priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address', 'Manual_Match'])
 
                 # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
-                convert_training.convert_to_training(config_dirs, conv_file)
+                convert_training.convert_to_training(rootdir, config_dirs, conv_file)
 
             if in_args.upload_to_db:
                 upload_file = pd.read_csv(
-                    config_dirs['manual_matches_file'].format(proc_type) + '_' + str(best_config) + '.csv',
+                    config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
                     usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match'])
 
                 # Add confirmed matches to relevant proc_type table
                 if not in_args.recycle:
-                    db_calls.add_data_to_table("spaziodati.confirmed_nameonly_matches", config_dirs, proc_type,
+                    db_calls.add_data_to_table(rootdir, "spaziodati.confirmed_nameonly_matches", config_dirs, proc_type,
                                                upload_file)
                     print("Process complete. Run 'python run.py --recycle' to begin training against additional fields.")
                 if in_args.recycle:
-                    db_calls.add_data_to_table("spaziodati.confirmed_nameaddress_matches", config_dirs, proc_type,
+                    db_calls.add_data_to_table(rootdir, "spaziodati.confirmed_nameaddress_matches", config_dirs, proc_type,
                                                upload_file)
 
 if __name__ == '__main__':
@@ -180,12 +179,13 @@ if __name__ == '__main__':
     # Define config file variables and related arguments
     config_path = Path('./Config_Files')
     config_dirs = config_dirs.dirs["dirs"]
+    rootdir = os.path.dirname(os.path.abspath(__file__))
 
     # Ignores config_dirs - convention is <num>_config.py
     pyfiles = "*_config.py"
 
     if not in_args.recycle:
         # If public/registry data file doesn't exist, pull from database
-        db_calls.check_data_exists(config_dirs,in_args,"spaziodati.sd_sample")
+        db_calls.check_data_exists(rootdir, config_dirs,in_args,"spaziodati.sd_sample")
 
     main(in_args, config_dirs)

@@ -6,7 +6,6 @@ import sys
 import csv
 import pdb
 
-
 # get the remote database details from .env
 load_dotenv(find_dotenv())
 host_remote = os.environ.get("HOST_REMOTE")
@@ -15,25 +14,32 @@ user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
 
 
-def check_data_exists(config_dirs, in_args, data_source):
+def check_data_exists(rootdir, config_dirs, in_args, data_source):
+    '''
+    Checks whether a public/registry datafile exists already, and if not prompts the user to download from remote sources via .env
+    :param rootdir: root directory
+    :param config_dirs: dictionary containing various file/directories
+    :param in_args: arguments containing variables such as file names and specific options
+    :param data_source: database table
+    :return: None
+    '''
 
     # If public data doesn't exist:
-    if not os.path.exists(config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)):
+    if not os.path.exists(config_dirs['raw_dir'].format(rootdir) + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)):
         # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
         if not in_args.upload_to_db:
             choice = input("Public data not found, load from database? (y/n): ")
             if choice.lower() == 'y':
                 # Check env file exists
-                curdir = os.path.dirname(os.path.abspath(__file__))
-                envloc = os.path.join(curdir,'../.env')
-                if not os.path.exists(envloc):
+                env_fpath = os.path.join(rootdir,'.env')
+                if not os.path.exists(env_fpath):
                     print("Database credentials not found. Please complete the .env file using the '.env template'")
                     sys.exit()
 
                 # Load public data
                 query = pull_public_data(data_source)
                 df = fetch_data(query)
-                df.to_csv(config_dirs['raw_dir'] + config_dirs['raw_pub_data'].format(in_args.pub_raw_name))
+                df.to_csv(config_dirs['raw_dir'].format(rootdir) + config_dirs['raw_pub_data'].format(in_args.pub_raw_name))
             else:
                 print("Public/Registry data required - please copy in data csv to Data_Inputs\
                 /Raw_Data or load from database")
@@ -96,7 +102,7 @@ def remove_table_duplicates(table_name, headers):
     return query
 
 
-def add_data_to_table(table_name, config_dirs, proc_type, man_matched):
+def add_data_to_table(rootdir, table_name, config_dirs, proc_type, man_matched):
     '''
     Adds the confirmed_matches data to table
     :param table_name: the database table to which the confirmed matches will be addded
@@ -109,12 +115,12 @@ def add_data_to_table(table_name, config_dirs, proc_type, man_matched):
     # Filter manual matches file to just confirmed Yes matches and non-blank org id's
     confirmed_matches = man_matched[pd.notnull(man_matched['org_id'])]
     confirmed_matches = confirmed_matches[(man_matched['Manual_Match'] == 'Y')]
-    confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(proc_type),
+    confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(rootdir, proc_type),
                              columns=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address'],
                              index=False)
 
     conn, cur = create_connection()
-    with open(config_dirs['confirmed_matches_file'].format(proc_type), 'r') as f:
+    with open(config_dirs['confirmed_matches_file'].format(rootdir, proc_type), 'r') as f:
         # Get headers dynamically
         reader = csv.reader(f)
         headers = next(reader, None)
