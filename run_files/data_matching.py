@@ -4,6 +4,58 @@ import subprocess
 import numpy as np
 import sys
 from shutil import copyfile
+from Config_Files import config_dirs
+import pdb
+import runfile
+
+def dedupe_matchTEST(priv_file, pub_file, rootdir, config_dirs, config_files, proc_type, proc_num, in_args):
+    """
+	Deduping - first the public and private data are matched using dedupes csvlink,
+	then the matched file is put into clusters
+	:param config_dirs: file/folder locations
+	:param  config_files: the main config files
+	:param proc_type: the 'type' of the process (Name, Name & Address)
+	:param proc_num: the individual process within the config file
+	:return None
+	:output : matched output file
+	:output : matched and clustered output file
+	"""
+    pdb.set_trace()
+    priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
+    pub_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
+
+    train = ['--skip_training' if in_args.training else '']
+    # Matching:
+    if not os.path.exists(config_dirs['match_output_file'].format(rootdir, proc_type)):
+        if in_args.recycle:
+            # Copy manual matching file over to build on for clustering
+            copyfile(config_dirs['manual_matching_train_backup'].format(rootdir), config_dirs['manual_training_file'].format(rootdir, proc_type))
+
+        # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
+        if os.path.exists('./learned_settings'):
+            os.remove('./learned_settings')
+        print("Starting matching...")
+
+        cmd = ['csvlink '
+               + str(priv_file).format(in_args.priv_adj_name) + ' '
+               + str(pub_file).format(in_args.pub_adj_name)
+               + ' --field_names_1 ' + ' '.join(priv_fields)
+               + ' --field_names_2 ' + ' '.join(pub_fields)
+               + ' --training_file ' + config_dirs['manual_training_file'].format(rootdir, proc_type)
+               + ' --output_file ' + config_dirs['match_output_file'].format(rootdir, proc_type) + ' '
+               + str(train[0])
+               ]
+        p = subprocess.Popen(cmd, shell=True)
+
+        p.wait()
+        df = pd.read_csv(config_dirs['match_output_file'].format(rootdir, proc_type),
+                         usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'org_id', 'org_name',
+                                  'pub_name_adj',
+                                  'pub_address'],
+                         dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str,
+                                'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str})
+        df = df[pd.notnull(df['priv_name'])]
+        df.to_csv(config_dirs['match_output_file'].format(rootdir, proc_type), index=False)
 
 
 def dedupe_match_cluster(rootdir, config_dirs, config_files, proc_type, proc_num, in_args):
@@ -18,7 +70,7 @@ def dedupe_match_cluster(rootdir, config_dirs, config_files, proc_type, proc_num
 	:output : matched output file
 	:output : matched and clustered output file
 	"""
-
+    pdb.set_trace()
     priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
     pub_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
 
@@ -190,9 +242,9 @@ def manual_matching(rootdir, config_dirs, best_config, proc_type, in_args):
                                           'pub_address','priv_name', 'priv_name_adj', 'priv_address', 'Manual_Match'])
         if not in_args.recycle:
             if not in_args.upload_to_db:
-                print("\nIf required, please perform manual matching process in {} and then run 'python run.py --convert_training --upload_to_db".format(
+                print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(
                 config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv'))
         else:
             if not in_args.upload_to_db:
-                print("\nIf required, please perform manual matching process in {} and then run 'python run.py --recycle --upload_to_db".format(
+                print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --recycle --upload_to_db".format(
                     config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv'))

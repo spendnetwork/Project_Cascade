@@ -175,7 +175,7 @@ def calc_match_ratio(row):
         return fuzz.ratio(row.priv_name_short, row.pub_name_short)
 
 
-def add_lev_dist(clust_df, output_file):
+def add_lev_dist(clust_df, output_file=None):
     '''
     Adds the levenshtein distance ratio comparing the amount of change required to convert the private org name
     to the public org name and therefore a measure of the quality of the match

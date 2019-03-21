@@ -1,21 +1,29 @@
 import pytest
 import pandas as pd
 import pdb
-from run_files import data_processing
+from run_files import data_processing, data_matching, setup
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
 from pandas.util.testing import assert_frame_equal
-from run_files import setup
 from Config_Files import config_dirs
+import ast
+# from runfile import get_input_args
+import conftest
 
 
 # get the remote database details from .env
+from runfile import get_input_args
+
 load_dotenv(find_dotenv())
 host_remote = os.environ.get("HOST_REMOTE")
 dbname_remote = os.environ.get("DBNAME_REMOTE")
 user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
+
+
+# establish fpath to test directory
+testdir = os.path.dirname(os.path.abspath(__file__))
 
 
 @pytest.fixture()
@@ -40,6 +48,7 @@ def connection():
 
 def test_remvPunct(test_priv_df, test_input, expected):
     # Tests remvPunct ensure all punctuation removed and strings lowered
+    pdb.set_trace()
     input_index = test_priv_df.priv_name.str.find(test_input)
     test_priv_df['priv_name_adj'] = data_processing.remvPunct(test_priv_df, 'priv_name','priv_name_adj')
     assert test_priv_df.loc[input_index[0]].priv_name_adj == expected
@@ -68,8 +77,7 @@ def test_shorten_name(test_input, expected):
 @pytest.fixture()
 def test_clustered_df():
 
-    curdir = os.path.dirname(os.path.abspath(__file__))
-    filepath = os.path.join(curdir, "{}")
+    filepath = os.path.join(testdir, "{}")
     df_unassigned = pd.read_csv(filepath.format('/test_clustered.csv'))
     df_assigned = pd.read_csv(filepath.format('/test_clustered_assigned.csv'))
     return df_unassigned, df_assigned
@@ -81,16 +89,75 @@ def test_orgids_assigned_to_clusters(test_clustered_df):
     df_processed = data_processing.assign_pub_data_to_clusters(test_clustered_df[0])
     assert_frame_equal(df_processed, test_clustered_df[1])
 
+
+@pytest.fixture()
+def load_samplerawdata():
+    privraw = pd.read_csv(testdir + '/priv_data_raw_test.csv')
+    pubraw = pd.read_csv(testdir + '/pub_data_raw_test.csv')
+    return privraw, pubraw
+
+
+@pytest.fixture()
+def load_sampleadjdata():
+    privadj = pd.read_csv(testdir + '/priv_data_adj_test.csv')
+    pubadj = pd.read_csv(testdir + '/pub_data_adj_test.csv')
+    return privadj, pubadj
+
+
+# def test_dedupematchcluster():
+#     # pdb.set_trace()
+#     with open(testdir + '/testconfig.py') as testconfig:
+#         file_contents = []
+#         file_contents.append(testconfig.read())
+#
+#         # Convert list to dictionary
+#         configs = ast.literal_eval(file_contents[0])
+#
+#     data_matching.dedupe_match_cluster(testdir, config_dirs, testconfig, proc_type='Name_Only', proc_num=1)
+#     assert 1
+
+def test_parser():
+    # Pass [] as arg to ensure only the default args in the original function get called.
+    # Otherwise calling pytest tests/test_file.py will pass 'tests/test_file.py' as an argument resulting in error.
+    # https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
+    parser = get_input_args([])
+    assert 1
+
+def test_dedupematchcluster(load_sampleadjdata):
+    pdb.set_trace()
+    with open(testdir + '/testconfig.py') as testconfig:
+        file_contents = []
+        file_contents.append(testconfig.read())
+
+        # Convert list to dictionary
+        testconfig = ast.literal_eval(file_contents[0])
+    data_matching.dedupe_matchTEST(load_sampleadjdata[0], load_sampleadjdata[1], testdir, config_dirs, testconfig, 'Name_Only', 1)
+    assert 1
+
+
+def test_addlevdist(test_clustered_df):
+    # Assert the levenshtein distance column can be added and populated
+    levadded = data_processing.add_lev_dist(test_clustered_df[1], None)
+    assert pd.notnull(levadded.at[0, 'leven_dist'])
+
+
 def test_dirscreation(tmpdir):
     # Pull through setup.setup_dirs and use tmpdir to assert that directories get created
     setup.setup_dirs(config_dirs.dirs['dirs'], tmpdir)
     assert 1
 
-def test_assignedblock():
-    # Test line 87 onwards in run.py is functional. Maybe do a separate test for each mini function to ensure the whole thing can run.
-    # If one thing doesn't work here and the file gets
-    # still created then the rest of the if statement is skipped i.e. leven_dist etc.
-    pass
+
+def test_parser():
+    # Pass [] as arg to ensure only the default args in the original function get called.
+    # Otherwise calling pytest tests/test_file.py will pass 'tests/test_file.py' as an argument resulting in error.
+    # https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
+    parser = get_input_args([])
+    assert parser
+
+# Test line 87 onwards in runfile.py is functional. Maybe do a separate test for each mini function to ensure the whole thing can run.
+# If one thing doesn't work here and the file gets
+# still created then the rest of the if statement is skipped i.e. leven_dist etc.
+
 
 
 # def test_raw_data_access():
@@ -129,4 +196,3 @@ def test_assignedblock():
 # could also combine this with a test_upload_to_db properly. Maybe upload test_clustered.csv and then assert that the table in the database is exactly equal to the original test_clustered.csv file.
 # OR can test the sql query is an insert function as per the test_insert() function in the core repo (test_database.py)
 # def test_uploadtodb():
-

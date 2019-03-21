@@ -11,13 +11,12 @@ import pdb
 
 
 
-def get_input_args():
+def get_input_args(args=None):
     """
 	Assign arguments including defaults to pass to the python call
 
 	:return: arguments variable for both directory and the data file
 	"""
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--priv_raw_name', default='private_data.csv', type=str,
                         help='Set raw private/source datafile name')
@@ -31,16 +30,29 @@ def get_input_args():
     parser.add_argument('--terminal_matching', action='store_true', help='Perform manual matching in terminal')
     parser.add_argument('--convert_training', action='store_true', help='Convert confirmed matches to training file for recycle phase')
     parser.add_argument('--upload_to_db', action='store_true' , help='Add confirmed matches to database')
-    args = parser.parse_args()
+
+    # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
+    args = parser.parse_args(args)
 
     # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
     # Force an error and prompt user to add the training flag
     if args.training == True and not os.path.exists(os.getcwd() + "/Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json"):
         print("Dedupe training files do not exist - running with --training flag to initiate training process")
         args.training == False
-        # parser.error("Dedupe training files do not exist, please try 'python run.py --training' to begin training process")
+        # parser.error("Dedupe training files do not exist, please try 'python runfile.py --training' to begin training process")
 
     return args
+
+#
+#
+# def get_input_args(args=None):
+#     parser = argparse.ArgumentParser()
+#     # pdb.set_trace()
+#     parser.add_argument('--priv_raw_name', default='private_data.csv', type=str,
+#                         help='Set raw private/source datafile name')
+#     args = parser.parse_args(args)
+#     return args
+
 
 def main(in_args, config_dirs):
     # Ignores config_dirs - convention is <num>_config.py
@@ -85,7 +97,9 @@ def main(in_args, config_dirs):
 
                             # Run dedupe for matching and calculate related stats for comparison
                             if not os.path.exists(config_dirs['assigned_output_file'].format(rootdir, proc_type)):
-
+                                priv_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data']
+                                pub_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data']
+                                data_matching.dedupe_matchTEST(priv_file,pub_file, rootdir, )
                                 data_matching.dedupe_match_cluster(rootdir, config_dirs, configs, proc_type, proc_num, in_args)
 
                                 clust_df = pd.read_csv(config_dirs["cluster_output_file"].format(rootdir, proc_type),
@@ -165,7 +179,7 @@ def main(in_args, config_dirs):
                 if not in_args.recycle:
                     db_calls.add_data_to_table(rootdir, "spaziodati.confirmed_nameonly_matches", config_dirs, proc_type,
                                                upload_file)
-                    print("Process complete. Run 'python run.py --recycle' to begin training against additional fields.")
+                    print("Process complete. Run 'python runfile.py --recycle' to begin training against additional fields.")
                 if in_args.recycle:
                     db_calls.add_data_to_table(rootdir, "spaziodati.confirmed_nameaddress_matches", config_dirs, proc_type,
                                                upload_file)
