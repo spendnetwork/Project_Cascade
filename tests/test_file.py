@@ -8,12 +8,10 @@ import os
 from pandas.util.testing import assert_frame_equal
 from Config_Files import config_dirs
 import ast
-# from runfile import get_input_args
-import conftest
-
+from runfile import get_input_args
 
 # get the remote database details from .env
-from runfile import get_input_args
+
 
 load_dotenv(find_dotenv())
 host_remote = os.environ.get("HOST_REMOTE")
@@ -116,6 +114,7 @@ def load_sampleadjdata():
 #     data_matching.dedupe_match_cluster(testdir, config_dirs, testconfig, proc_type='Name_Only', proc_num=1)
 #     assert 1
 
+
 def test_parser():
     # Pass [] as arg to ensure only the default args in the original function get called.
     # Otherwise calling pytest tests/test_file.py will pass 'tests/test_file.py' as an argument resulting in error.
@@ -123,15 +122,22 @@ def test_parser():
     parser = get_input_args([])
     assert 1
 
-def test_dedupematchcluster(load_sampleadjdata):
+@pytest.fixture
+def in_args():
+    in_args = get_input_args([])
     pdb.set_trace()
+    return in_args
+
+
+def test_dedupematchcluster(in_args, load_sampleadjdata):
+    # pdb.set_trace()
     with open(testdir + '/testconfig.py') as testconfig:
         file_contents = []
         file_contents.append(testconfig.read())
 
         # Convert list to dictionary
         testconfig = ast.literal_eval(file_contents[0])
-    data_matching.dedupe_matchTEST(load_sampleadjdata[0], load_sampleadjdata[1], testdir, config_dirs, testconfig, 'Name_Only', 1)
+    data_matching.dedupe_matchTEST(load_sampleadjdata[0], load_sampleadjdata[1], testdir, config_dirs, testconfig, 'Name_Only', 1, in_args.in_args)
     assert 1
 
 
