@@ -8,6 +8,7 @@ from Config_Files import config_dirs
 import pdb
 import runfile
 
+
 def dedupe_matchTEST(priv_file, pub_file, rootdir, config_dirs, config_files, proc_type, proc_num, in_args):
     """
 	Deduping - first the public and private data are matched using dedupes csvlink,
@@ -20,7 +21,6 @@ def dedupe_matchTEST(priv_file, pub_file, rootdir, config_dirs, config_files, pr
 	:output : matched output file
 	:output : matched and clustered output file
 	"""
-    pdb.set_trace()
     priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
     pub_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
 
@@ -37,8 +37,8 @@ def dedupe_matchTEST(priv_file, pub_file, rootdir, config_dirs, config_files, pr
         print("Starting matching...")
 
         cmd = ['csvlink '
-               + str(priv_file).format(in_args.priv_adj_name) + ' '
-               + str(pub_file).format(in_args.pub_adj_name)
+               + str(priv_file) + ' '
+               + str(pub_file)
                + ' --field_names_1 ' + ' '.join(priv_fields)
                + ' --field_names_2 ' + ' '.join(pub_fields)
                + ' --training_file ' + config_dirs['manual_training_file'].format(rootdir, proc_type)
@@ -58,7 +58,7 @@ def dedupe_matchTEST(priv_file, pub_file, rootdir, config_dirs, config_files, pr
         df.to_csv(config_dirs['match_output_file'].format(rootdir, proc_type), index=False)
 
 
-def dedupe_match_cluster(rootdir, config_dirs, config_files, proc_type, proc_num, in_args):
+def dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, config_files, proc_type, proc_num, in_args):
     """
 	Deduping - first the public and private data are matched using dedupes csvlink,
 	then the matched file is put into clusters
@@ -74,8 +74,8 @@ def dedupe_match_cluster(rootdir, config_dirs, config_files, proc_type, proc_num
     priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
     pub_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
 
-    priv_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data']
-    pub_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data']
+    priv_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
+    pub_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
 
     train = ['--skip_training' if in_args.training else '']
     # Matching:
@@ -90,8 +90,8 @@ def dedupe_match_cluster(rootdir, config_dirs, config_files, proc_type, proc_num
         print("Starting matching...")
 
         cmd = ['csvlink '
-               + str(priv_file).format(in_args.priv_adj_name) + ' '
-               + str(pub_file).format(in_args.pub_adj_name)
+               + str(priv_file) + ' '
+               + str(pub_file)
                + ' --field_names_1 ' + ' '.join(priv_fields)
                + ' --field_names_2 ' + ' '.join(pub_fields)
                + ' --training_file ' + config_dirs['manual_training_file'].format(rootdir, proc_type)

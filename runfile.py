@@ -7,17 +7,16 @@ import ast
 from run_files import setup, data_matching, db_calls, convert_training, data_processing, data_analysis
 from pathlib import Path
 from Config_Files import config_dirs
-import pdb
 
 
-
-def get_input_args(args=None):
+def get_input_args(rootdir, args=None):
     """
 	Assign arguments including defaults to pass to the python call
 
 	:return: arguments variable for both directory and the data file
 	"""
-    parser = argparse.ArgumentParser()
+
+    parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
     parser.add_argument('--priv_raw_name', default='private_data.csv', type=str,
                         help='Set raw private/source datafile name')
     parser.add_argument('--pub_raw_name', default='public_data.csv', type=str, help='Set raw public datafile name')
@@ -36,22 +35,12 @@ def get_input_args(args=None):
 
     # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
     # Force an error and prompt user to add the training flag
-    if args.training == True and not os.path.exists(os.getcwd() + "/Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json"):
+    if args.training == True and not os.path.exists(rootdir + "/Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json"):
         print("Dedupe training files do not exist - running with --training flag to initiate training process")
         args.training == False
         # parser.error("Dedupe training files do not exist, please try 'python runfile.py --training' to begin training process")
 
-    return args
-
-#
-#
-# def get_input_args(args=None):
-#     parser = argparse.ArgumentParser()
-#     # pdb.set_trace()
-#     parser.add_argument('--priv_raw_name', default='private_data.csv', type=str,
-#                         help='Set raw private/source datafile name')
-#     args = parser.parse_args(args)
-#     return args
+    return args, parser
 
 
 def main(in_args, config_dirs):
@@ -97,10 +86,10 @@ def main(in_args, config_dirs):
 
                             # Run dedupe for matching and calculate related stats for comparison
                             if not os.path.exists(config_dirs['assigned_output_file'].format(rootdir, proc_type)):
-                                priv_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data']
-                                pub_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data']
-                                data_matching.dedupe_matchTEST(priv_file,pub_file, rootdir, )
-                                data_matching.dedupe_match_cluster(rootdir, config_dirs, configs, proc_type, proc_num, in_args)
+                                priv_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
+                                pub_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
+                                # data_matching.dedupe_matchTEST(priv_file,pub_file, rootdir, )
+                                data_matching.dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, configs, proc_type, proc_num, in_args)
 
                                 clust_df = pd.read_csv(config_dirs["cluster_output_file"].format(rootdir, proc_type),
                                                        index_col=None, dtype=clustdtype)
@@ -186,14 +175,15 @@ def main(in_args, config_dirs):
 
 if __name__ == '__main__':
 
-    # main()
-    in_args = get_input_args()
+
+    rootdir = os.path.dirname(os.path.abspath(__file__))
+    in_args, _ = get_input_args(rootdir)
     # Silence warning for df['process_num'] = str(proc_num)
     pd.options.mode.chained_assignment = None
     # Define config file variables and related arguments
     config_path = Path('./Config_Files')
     config_dirs = config_dirs.dirs["dirs"]
-    rootdir = os.path.dirname(os.path.abspath(__file__))
+
 
     # Ignores config_dirs - convention is <num>_config.py
     pyfiles = "*_config.py"

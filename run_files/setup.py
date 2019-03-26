@@ -8,11 +8,16 @@ def setup_dirs(config_dirs, rootpath, proc_type='Name_Only'):
     :param proc_type: process type i.e. Name_Only, Name_Address
     :return: None
     '''
+
     proc_type_dir = config_dirs['proc_type_dir'].format(rootpath, proc_type)
     if not os.path.exists(proc_type_dir):
         os.makedirs(proc_type_dir)
         os.makedirs(config_dirs['confirmed_matches_dir'].format(rootpath, proc_type))
         os.makedirs(config_dirs['deduped_dir'].format(rootpath, proc_type))
+    if not os.path.exists(config_dirs['raw_dir'].format(rootpath)):
+        os.makedirs(config_dirs['raw_dir'].format(rootpath))
+    if not os.path.exists(config_dirs['adj_dir'].format(rootpath)):
+        os.makedirs(config_dirs['adj_dir'].format(rootpath))
     if not os.path.exists(config_dirs['proc_type_train_dir'].format(rootpath, proc_type)):
         os.makedirs(config_dirs['proc_type_train_dir'].format(rootpath, proc_type))
     if not os.path.exists(config_dirs['proc_type_train_clust_dir'].format(rootpath, proc_type)):
