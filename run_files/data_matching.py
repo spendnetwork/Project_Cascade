@@ -8,6 +8,75 @@ from Config_Files import config_dirs
 import pdb
 import runfile
 
+# ORDERING IS MESSED UP. NOTE THAT THERE IS AN IF STATEMENT AT THE START OF THE MATCHING FUNCTION - I.E. THE MATCHING ONLY RUNS IF THE FILE DOESNT EXIST..
+
+# def dedupe_prep(rootdir, config_files, config_dirs, proc_type, proc_num, in_args):
+#
+#     priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
+#     pub_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
+#     train = ['--skip_training' if in_args.training else '']
+#
+#     if not os.path.exists(config_dirs['match_output_file'].format(rootdir, proc_type)):
+#         if in_args.recycle:
+#             # Copy manual matching file over to build on for clustering
+#             copyfile(config_dirs['manual_matching_train_backup'].format(rootdir),
+#                      config_dirs['manual_training_file'].format(rootdir, proc_type))
+#         # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
+#         if os.path.exists('./learned_settings'):
+#             os.remove('./learned_settings')
+#
+#         if not os.path.exists(config_dirs['cluster_output_file'].format(rootdir, proc_type)):
+#             # Copy training file from first clustering session if recycle mode
+#             if in_args.recycle:
+#                 copyfile(config_dirs['cluster_training_backup'].format(rootdir),
+#                          config_dirs['cluster_training_file'].format(rootdir, proc_type))
+#
+#     return priv_fields, pub_fields, train
+#
+# def dedupe_matching(priv_file, pub_file, priv_fields, pub_fields, rootdir, config_dirs, proc_type, train):
+#
+#     print("Starting matching...")
+#     cmd = ['csvlink '
+#            + str(priv_file) + ' '
+#            + str(pub_file)
+#            + ' --field_names_1 ' + ' '.join(priv_fields)
+#            + ' --field_names_2 ' + ' '.join(pub_fields)
+#            + ' --training_file ' + config_dirs['manual_training_file'].format(rootdir, proc_type)
+#            + ' --output_file ' + config_dirs['match_output_file'].format(rootdir, proc_type) + ' '
+#            + str(train[0])
+#            ]
+#     p = subprocess.Popen(cmd, shell=True)
+#     p.wait()
+#
+# def arrange_outputs(rootdir, proc_type, config_dirs):
+#     df = pd.read_csv(config_dirs['match_output_file'].format(rootdir, proc_type),
+#                      usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'org_id', 'org_name',
+#                               'pub_name_adj',
+#                               'pub_address'],
+#                      dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str,
+#                             'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str})
+#     df = df[pd.notnull(df['priv_name'])]
+#
+#     df.to_csv(config_dirs['match_output_file'].format(rootdir, proc_type), index=False)
+#
+# def clustering(priv_fields, train, rootdir, config_dirs, proc_type, in_args):
+#         print("Starting clustering...")
+#         cmd = ['python csvdedupe.py '
+#                + config_dirs['match_output_file'].format(rootdir, proc_type) + ' '
+#                + ' --field_names ' + ' '.join(priv_fields) + ' '
+#                + str(train[0])
+#                + ' --training_file ' + config_dirs['cluster_training_file'].format(rootdir, proc_type)
+#                + ' --output_file ' + config_dirs['cluster_output_file'].format(rootdir, proc_type)]
+#         p = subprocess.Popen(cmd, cwd=os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
+#         p.wait()  # wait for subprocess to finish
+#
+#         if not in_args.recycle:
+#             # Copy training file to backup, so it can be found and copied into recycle phase clustering
+#             copyfile(config_dirs['cluster_training_file'].format(rootdir, proc_type),
+#                      config_dirs['cluster_training_backup'].format(rootdir))
+#     else:
+#         pass
+
 
 def dedupe_matchTEST(priv_file, pub_file, rootdir, config_dirs, config_files, proc_type, proc_num, in_args):
     """
@@ -62,6 +131,8 @@ def dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, config_files
     """
 	Deduping - first the public and private data are matched using dedupes csvlink,
 	then the matched file is put into clusters
+    :param pub_file:
+    :param priv_file:
 	:param config_dirs: file/folder locations
 	:param  config_files: the main config files
 	:param proc_type: the 'type' of the process (Name, Name & Address)
@@ -70,12 +141,9 @@ def dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, config_files
 	:output : matched output file
 	:output : matched and clustered output file
 	"""
-    pdb.set_trace()
+
     priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
     pub_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
-
-    priv_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
-    pub_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
 
     train = ['--skip_training' if in_args.training else '']
     # Matching:

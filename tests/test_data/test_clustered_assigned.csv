@@ -1,13 +1,13 @@
-,Cluster ID,Confidence Score,id,priv_name,priv_address,priv_name_adj,org_id,org_name,pub_name_adj,pub_address
+,Cluster ID,Confidence Score,id,priv_name,priv_address,priv_name_adj,org_id,org_name,pub_name_adj,pub_address,leven_dist
 0,"1
-",0.35936433,9926,Esseci S.r.l.,Corso Siccardi 11 bis,esseci srl,afe0d8986368,SEGI S.R.L.,segi srl,
-1,1,0.9,9634,SE.G.I. S.r.l.,,segi srl,afe0d8986368,SEGI S.R.L.,segi srl,
-2,1,0.30301118,9532,SEA Srl,Corso Re Umberto 1,sea srl,9f0573028c57,SEA SRL,sea srl,
-3,1,0.0002489806440582054,9396,Servizi integrati SRL,via Sistina 121,servizi integrati srl,afe0d8986368,SEGI S.R.L.,segi srl,
-4,1,0.0,9217,Delta S.r.l.,Zona PIP Lotti 36 E 37 Loc. Galdo,delta srl,595bcce4ebd8,DELTA S.R.L.,delta srl,
-5,1,0.0,9101,Contek Srl,"Via S.S. Appia km 196,500",contek srl,d001bfcc79f4,CONTEK S.R.L.,contek srl,Appia
-6,2,0.0,8682,Capital Srl,Viale Comandante Umberto Maddalena 196,capital srl,53b63863f6cd,CAPITAL SRL,capital srl,
-7,2,0.00023281796225183002,8392,G.S.I. Gestione Servizi Integrati Srl,Corso Nigra 92,gsi gestione servizi integrati srl,263099270291,G.S.I. GESTIONE SERVIZI INTEGRATI S.R.L.,gsi gestione servizi integrati srl,Monsignore Filippo Schioppa
-8,2,0.118948266,8354,Orion S.r.l.,Via dei Gelsi 14,orion srl,0026611d2084,ORION - S.R.L.,orion srl,
-9,2,0.49200997,8254,AM-Next Srl,Via Salvatore Matarrese 47/G,amnext srl,126de8aed0a1,AM-NEXT S.R.L.,amnext srl,
-9,2,0.49200997,8254,AM-Next Srl,Via Salvatore Matarrese 47/G,amnext srl,126de8aed0a1,AM-NEXT S.R.L.,amnext srl,
+",0.35936433,9926,Esseci S.r.l.,Corso Siccardi 11 bis,esseci srl,afe0d8986368,SEGI S.R.L.,segi srl,,100
+1,1,0.9,9634,SE.G.I. S.r.l.,,segi srl,afe0d8986368,SEGI S.R.L.,segi srl,,100
+2,1,0.30301118,9532,SEA Srl,Corso Re Umberto 1,sea srl,9f0573028c57,SEA SRL,sea srl,,100
+3,1,0.0002489806440582054,9396,Servizi integrati SRL,via Sistina 121,servizi integrati srl,afe0d8986368,SEGI S.R.L.,segi srl,,100
+4,1,0.0,9217,Delta S.r.l.,Zona PIP Lotti 36 E 37 Loc. Galdo,delta srl,595bcce4ebd8,DELTA S.R.L.,delta srl,,100
+5,1,0.0,9101,Contek Srl,"Via S.S. Appia km 196,500",contek srl,d001bfcc79f4,CONTEK S.R.L.,contek srl,Appia,100
+6,2,0.0,8682,Capital Srl,Viale Comandante Umberto Maddalena 196,capital srl,53b63863f6cd,CAPITAL SRL,capital srl,,100
+7,2,0.00023281796225183002,8392,G.S.I. Gestione Servizi Integrati Srl,Corso Nigra 92,gsi gestione servizi integrati srl,263099270291,G.S.I. GESTIONE SERVIZI INTEGRATI S.R.L.,gsi gestione servizi integrati srl,Monsignore Filippo Schioppa,90
+8,2,0.118948266,8354,Orion S.r.l.,Via dei Gelsi 14,orion srl,0026611d2084,ORION - S.R.L.,orion srl,,90
+9,2,0.49200997,8254,AM-Next Srl,Via Salvatore Matarrese 47/G,amnext srl,126de8aed0a1,AM-NEXT S.R.L.,amnext srl,,90
+9,2,0.49200997,8254,AM-Next Srl,Via Salvatore Matarrese 47/G,amnext srl,126de8aed0a1,AM-NEXT S.R.L.,amnext srl,,90

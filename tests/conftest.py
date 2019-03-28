@@ -23,12 +23,14 @@ testdir = os.path.dirname(os.path.abspath(__file__))
 
 
 @pytest.fixture(scope="session")
-def in_args():
-    _, parser = get_input_args([])
-    # parser.add_argument('--test_priv_raw_file', default='/test_data/priv_data_raw_test.csv', type=str)
-    # parser.add_argument('--test_pub_raw_file', default='/test_data/pub_data_raw_test.csv', type=str)
-    # parser.add_argument('--test_priv_adj_file', default='/test_data/priv_data_adj_test.csv', type=str)
-    # parser.add_argument('--test_pub_adj_file', default='/test_data/pub_data_adj_test.csv', type=str)
+def in_args(tmp_root):
+    args, parser = get_input_args(tmp_root,[])
+    parser.add_argument('--priv_raw_name', default='Data_Inputs/Raw_Data/priv_data_raw_test.csv', type=str)
+    parser.add_argument('--pub_raw_name', default='Data_Inputs/Raw_Data/pub_data_raw_test.csv', type=str)
+    parser.add_argument('--priv_adj_name', default='Data_Inputs/Adj_Data/priv_data_adj_test.csv', type=str)
+    parser.add_argument('--pub_adj_name', default='Data_Inputs/Adj_Data/pub_data_adj_test.csv', type=str)
+    parser.add_argument('--assigned_file', default='Outputs/Name_Only/Deduped_Data/Name_Only_matched_clust_assigned.csv', type=str)
+    parser.add_argument('--assigned_file', default='Outputs/Name_Only/Deduped_Data/Name_Only_matched_clust_assigned.csv', type=str)
     args = parser.parse_args([])
     return args
 
@@ -51,7 +53,6 @@ def connection():
 @pytest.fixture(scope='session', autouse=True)
 def tmp_root(tmpdir_factory):
     """tmpdir_factory fixture for the session scope containing the construction of the required working directories"""
-
     tmp_root =  tmpdir_factory.mktemp('tmproot')
     setup.setup_dirs(config_dirs.dirs['dirs'], tmp_root)
     assert 1
@@ -69,5 +70,7 @@ def tmp_root(tmpdir_factory):
     copyfile(str(testdir) + '/test_data/cluster_training.json', str(tmp_root) + '/Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json')
     copyfile(str(testdir) + '/test_data/matching_training.json', str(tmp_root) + '/Data_Inputs/Training_Files/Name_Only/Matching/matching_training.json')
 
+    copyfile(str(testdir) + '/test_data/test_clustered_assigned.csv', str(tmp_root) + '/Outputs/Name_Only/Deduped_Data/Name_Only_matched_clust_assigned.csv')
+    copyfile(str(testdir) + '/test_data/testconfig.py', str(tmp_root) + '/Config_Files/1_config.py')
     return tmp_root
 

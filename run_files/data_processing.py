@@ -87,11 +87,11 @@ def clean_public_data(rootdir, config_dirs, in_args):
         print("...done")
 
         dffullmerge.to_csv(adj_data, index=False)
-    else:
-        dffullmerge = pd.read_csv(adj_data, usecols=['org_id', 'org_name', 'pub_name_adj', 'pub_address'],
-                                  dtype={'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str,
-                                         'pub_address': np.str})
-    return dffullmerge
+    # else:
+    #     dffullmerge = pd.read_csv(adj_data, usecols=['org_id', 'org_name', 'pub_name_adj', 'pub_address'],
+    #                               dtype={'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str,
+    #                                      'pub_address': np.str})
+
 
 
 def remvPunct(df, orig_col, adj_col):

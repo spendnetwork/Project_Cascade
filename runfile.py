@@ -6,6 +6,7 @@ import numpy as np
 import ast
 from run_files import setup, data_matching, db_calls, convert_training, data_processing, data_analysis
 from pathlib import Path
+import pdb
 from Config_Files import config_dirs
 
 
@@ -62,7 +63,7 @@ def main(in_args, config_dirs):
                 # private df needed in memory for stats
                 privdf = data_processing.clean_private_data(rootdir, config_dirs, in_args)
                 if not in_args.recycle:
-                    pubdf = data_processing.clean_public_data(rootdir, config_dirs, in_args)
+                    data_processing.clean_public_data(rootdir, config_dirs, in_args)
 
                 # For each process type (eg: Name & Add, Name only) outlined in the configs file:
                 for proc_type in configs['processes']:
@@ -89,6 +90,7 @@ def main(in_args, config_dirs):
                                 priv_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
                                 pub_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
                                 # data_matching.dedupe_matchTEST(priv_file,pub_file, rootdir, )
+
                                 data_matching.dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, configs, proc_type, proc_num, in_args)
 
                                 clust_df = pd.read_csv(config_dirs["cluster_output_file"].format(rootdir, proc_type),
@@ -174,7 +176,6 @@ def main(in_args, config_dirs):
                                                upload_file)
 
 if __name__ == '__main__':
-
 
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = get_input_args(rootdir)

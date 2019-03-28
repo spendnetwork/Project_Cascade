@@ -22,6 +22,7 @@ def test_remvPunct(test_priv_df, test_input, expected):
     ("test-org srl", "test org"),
     ("test srl org", "test org")])
 
+
 def test_shorten_name(test_input, expected):
     assert data_processing.shorten_name(test_input) == expected
 

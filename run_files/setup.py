@@ -28,3 +28,5 @@ def setup_dirs(config_dirs, rootpath, proc_type='Name_Only'):
         os.makedirs(config_dirs['proc_type_matches_dir'].format(rootpath, proc_type))
     if not os.path.exists(config_dirs['backups_dir'].format(rootpath, proc_type)):
         os.makedirs(config_dirs['backups_dir'].format(rootpath, proc_type))
+    if not os.path.exists(os.path.join(rootpath + 'Config_Files')):
+        os.makedirs(os.path.join(rootpath, 'Config_Files'))
