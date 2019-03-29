@@ -14,7 +14,7 @@ user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
 
 
-def check_data_exists(rootdir, config_dirs, in_args, data_source):
+def checkDataExists(rootdir, config_dirs, in_args, data_source):
     '''
     Checks whether a public/registry datafile exists already, and if not prompts the user to download from remote sources via .env
     :param rootdir: root directory
@@ -37,7 +37,7 @@ def check_data_exists(rootdir, config_dirs, in_args, data_source):
                     sys.exit()
 
                 # Load public data
-                query = pull_public_data(data_source)
+                query = createPublicDataSQLQuery(data_source)
                 df = fetch_data(query)
                 df.to_csv(config_dirs['raw_dir'].format(rootdir) + config_dirs['raw_pub_data'].format(in_args.pub_raw_name))
             else:
@@ -46,7 +46,7 @@ def check_data_exists(rootdir, config_dirs, in_args, data_source):
                 sys.exit()
 
 
-def pull_public_data(source):
+def createPublicDataSQLQuery(source):
     """create query for pulling data from db"""
 
     query = \

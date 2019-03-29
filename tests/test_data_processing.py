@@ -47,3 +47,4 @@ def test_addlevdist(test_clustered_df):
     # Assert the levenshtein distance column can be added and populated
     levadded = data_processing.add_lev_dist(test_clustered_df[1], None)
     assert pd.notnull(levadded.at[0, 'leven_dist'])
+

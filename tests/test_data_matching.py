@@ -26,7 +26,6 @@ def load_sampleadjdata(in_args, tmp_root):
     pubadj = pd.read_csv(pubadjPath)
     return privadjPath, privadj, pubadjPath, pubadj
 
-
 @pytest.fixture()
 def load_clusteredData(in_args, tmp_root):
     clustDfPath= os.path.join(tmp_root, in_args.assigned_file)
@@ -48,9 +47,11 @@ def test_extractMatches(load_clusteredData, tmp_root, load_testConfig):
     data_matching.extract_matches(tmp_root,load_clusteredData , load_testConfig, config_dirs.dirs['dirs'], 1, 'Name_Only', 1)
     assert 1
 
-
+def test_manualMatching():
+    pass
 
 #
+#https://www.google.com/search?client=safari&rls=en&q=pytest+how+to+test+a+function+requiring+multiple+repetitive+user+input&ie=UTF-8&oe=UTF-8
 #
 # def test_dedupematchcluster(in_args, load_sampleadjdata, tmp_root):
 #     pass
@@ -64,7 +65,7 @@ def test_extractMatches(load_clusteredData, tmp_root, load_testConfig):
 #     # data_matching.dedupe_matchTEST(load_sampleadjdata[0], load_sampleadjdata[2], tmp_root, config_dirs.dirs['dirs'],
 #     #                                testconfig, 'Name_Only', 1, in_args)
 #     # assert 1w
-#
+
 #
 # def test_matchprep(in_args, load_sampleadjdata, tmp_root):
 #     data_matching.match_prep(tmp_root, config_dirs.dirs['dirs'],'Name_Only', in_args)

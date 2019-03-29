@@ -44,7 +44,8 @@ def get_input_args(rootdir, args=None):
     return args, parser
 
 
-def main(in_args, config_dirs):
+def main(rootdir, in_args, config_dirs):
+    setup.setupRawDirs(rootdir, config_dirs)
     # Ignores config_dirs - convention is <num>_config.py
     pyfiles = "*_config.py"
 
@@ -75,8 +76,8 @@ def main(in_args, config_dirs):
 
                         # Iterate over each process number in the config file
                         for proc_num in configs['processes'][proc_type]:
-                            # Get first process from config file
-                            main_proc = min(configs['processes'][proc_type].keys())
+                            # # Get first process from config file
+                            # main_proc = min(configs['processes'][proc_type].keys())
 
                             # Define data types for clustered file. Enables faster loading.
                             clustdtype = {'Cluster ID': np.float64, 'Confidence Score': np.float,
@@ -191,6 +192,6 @@ if __name__ == '__main__':
 
     if not in_args.recycle:
         # If public/registry data file doesn't exist, pull from database
-        db_calls.check_data_exists(rootdir, config_dirs,in_args,"spaziodati.sd_sample")
+        db_calls.checkDataExists(rootdir, config_dirs, in_args, "spaziodati.sd_sample")
 
-    main(in_args, config_dirs)
+    main(rootdir, in_args, config_dirs)

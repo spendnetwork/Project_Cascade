@@ -17,6 +17,7 @@ csvdedupe = {path = "./csvdedupe"}
 python-dotenv = "*"
 psycopg2-binary = "*"
 pytest = "*"
+floyd-cli = "*"
 
 [requires]
 python_version = "3.6"
