@@ -15,9 +15,10 @@ python-levenshtein = "*"
 dedupe = "*"
 csvdedupe = {path = "./csvdedupe"}
 python-dotenv = "*"
-psycopg2 = "*"
 psycopg2-binary = "*"
 pytest = "*"
+floyd-cli = "*"
+google-cloud-storage = "*"
 
 [requires]
 python_version = "3.6"
