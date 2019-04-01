@@ -209,6 +209,7 @@ def extract_matches(rootdir, clustdf, config_files, config_dirs, proc_num, proc_
 	:return extracts_file: contains dataframe with possible acceptable matches
 	"""
     # Round confidence scores to 2dp :
+    # pdb.set_trace()
     clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
 
     # Filter by current match_score:
