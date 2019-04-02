@@ -24,20 +24,29 @@ def clean_private_data(rootdir, config_dirs, in_args):
         df.rename(columns={'supplier_name': 'priv_name', 'supplier_streetadd': 'priv_address'}, inplace=True)
         print("Re-organising private data...")
 
-        # Remove punctuation and double spacing
+        # Remove punctuation and double spacing in name
         adj_col = str('priv_name_adj')
         orig_col = str('priv_name')
-        df[adj_col] = remvPunct(df, orig_col, adj_col)
+        df = remvPunct(df, orig_col, adj_col)
 
         # Replace organisation suffixes with standardised version
         df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
+
+        # Remove punctuation and double spacing in address
+        adj_col = str('priv_address_adj')
+        orig_col = str('priv_address')
+        pdb.set_trace()
+        df = remvPunct(df, orig_col, adj_col)
+        df = remvStreetNumber(df, orig_col, adj_col)
+
+        df = joinfields(df, 'priv')
 
         print("...done")
         df.to_csv(adj_data, index=False)
     else:
         # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
-        df = pd.read_csv(adj_data, usecols=['id', 'priv_name', 'priv_name_adj', 'priv_address'],
-                         dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str})
+        df = pd.read_csv(adj_data, usecols=['id', 'priv_name', 'priv_name_adj', 'priv_address','priv_address_adj'],
+                         dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str, 'priv_address_adj': np.str})
     return df
 
 
@@ -67,7 +76,7 @@ def clean_public_data(rootdir, config_dirs, in_args):
             # Remove punctuation and double spacing
             adj_col = str('pub_name_adj')
             orig_col = str('org_name')
-            chunk[adj_col] = remvPunct(chunk, orig_col, adj_col)
+            chunk = remvPunct(chunk, orig_col, adj_col)
 
             # Replace organisation suffixes with standardised version
             chunk[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
@@ -80,18 +89,34 @@ def clean_public_data(rootdir, config_dirs, in_args):
                     if pd.notnull(row[key]):
                         ls.append(tuple([row['org_id'], row['org_name'], row['pub_name_adj'], row[key]]))
             labels = ['org_id', 'org_name', 'pub_name_adj', 'street_address']
+
             dfmerge = pd.DataFrame.from_records(ls, columns=labels)
+
+            dfmerge.rename(columns={'street_address': 'pub_address'}, inplace=True)
+
+            # Remove punctuation and double spacing in address
+            adj_col = str('pub_address_adj')
+            orig_col = str('pub_address')
+            dfmerge = remvPunct(dfmerge, orig_col, adj_col)
+            dfmerge = remvStreetNumber(dfmerge, orig_col, adj_col)
+            dfmerge = joinfields(dfmerge, 'pub')
+
             dffullmerge = pd.concat([dffullmerge, dfmerge], ignore_index=True)
         dffullmerge.drop_duplicates(inplace=True)
-        dffullmerge.rename(columns={'street_address': 'pub_address'}, inplace=True)
         print("...done")
 
         dffullmerge.to_csv(adj_data, index=False)
-    # else:
-    #     dffullmerge = pd.read_csv(adj_data, usecols=['org_id', 'org_name', 'pub_name_adj', 'pub_address'],
-    #                               dtype={'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str,
-    #                                      'pub_address': np.str})
 
+
+def joinfields(df, dftype):
+    '''
+    Join adjusted name and address strings into single column to be able to calculate levenshtein distance and thereby name and address matches
+    :param df: dataframe (public or private)
+    :return: df
+    '''
+
+    df['joinfields'] = df[''.join([str(dftype),'_name_adj'])] + ' ' + df[''.join([str(dftype),'_address_adj'])]
+    return df
 
 
 def remvPunct(df, orig_col, adj_col):
@@ -103,7 +128,12 @@ def remvPunct(df, orig_col, adj_col):
     """
     df[adj_col] = df[orig_col].str.translate(
         str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
-    return df[adj_col]
+    return df
+
+
+def remvStreetNumber(df, orig_col, adj_col):
+    df[adj_col] = df[orig_col].str.replace('\d+', '').str.strip()
+    return df
 
 
 def shorten_name(row):
@@ -197,3 +227,4 @@ def add_lev_dist(clust_df, output_file=None):
     clust_df.to_csv(output_file, index=False)
 
     return clust_df
+

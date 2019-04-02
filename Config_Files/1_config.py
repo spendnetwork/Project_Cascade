@@ -46,8 +46,8 @@
             "Name_Address":
                 {1:
                     {"dedupe_field_names": {
-                        "private_data": ["priv_name_adj", "priv_address"],
-                        "public_data": ["pub_name_adj", "pub_address"]
+                        "private_data": ["priv_name_adj", "priv_address_adj"],
+                        "public_data": ["pub_name_adj", "pub_address_adj"]
                     },
                         "char_counts": 0,
                         "min_match_score": 100,

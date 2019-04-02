@@ -7,18 +7,16 @@ verify_ssl = true
 
 [packages]
 fuzzywuzzy = "*"
-pandas = "*"
 numpy = "*"
 tqdm = "*"
 pathlib = "*"
 python-levenshtein = "*"
 dedupe = "*"
-csvdedupe = {path = "./csvdedupe"}
 python-dotenv = "*"
 psycopg2-binary = "*"
 pytest = "*"
-floyd-cli = "*"
-google-cloud-storage = "*"
+pandas = "*"
+csvdedupe = {editable = true,git = "https://www.github.com/DMells/csvdedupe"}
 
 [requires]
 python_version = "3.6"

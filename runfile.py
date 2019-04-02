@@ -58,6 +58,7 @@ def main(rootdir, in_args, config_dirs):
 
                 # Convert list to dictionary
                 configs = ast.literal_eval(file_contents[0])
+
                 conf_file_num = int(conf_file.name[0])
 
                 # Clean public and private datasets for linking
@@ -81,16 +82,15 @@ def main(rootdir, in_args, config_dirs):
 
                             # Define data types for clustered file. Enables faster loading.
                             clustdtype = {'Cluster ID': np.float64, 'Confidence Score': np.float,
-                                          'id': np.float, 'priv_name': np.str, 'priv_address': np.str,
+                                          'id': np.float, 'priv_name': np.str, 'priv_address': np.str, 'priv_address_adj': np.str,
                                           'priv_name_adj': np.str, 'org_id': np.str, 'pub_name_adj': np.str,
-                                          'pub_address': np.str, 'priv_name_short': np.str, 'pub_name_short': np.str,
+                                          'pub_address': np.str, 'pub_address_adj': np.str,'priv_name_short': np.str, 'pub_name_short': np.str,
                                           'leven_dist': np.int, 'org_name': np.str}
 
                             # Run dedupe for matching and calculate related stats for comparison
                             if not os.path.exists(config_dirs['assigned_output_file'].format(rootdir, proc_type)):
                                 priv_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
                                 pub_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
-                                # data_matching.dedupe_matchTEST(priv_file,pub_file, rootdir, )
 
                                 data_matching.dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, configs, proc_type, proc_num, in_args)
 
@@ -145,11 +145,8 @@ def main(rootdir, in_args, config_dirs):
                 max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
                 best_config = stat_file.at[max_lev, 'Config_File']
 
-            data_matching.manual_matching(rootdir, config_dirs, best_config, proc_type, in_args)
 
-            man_matched = pd.read_csv(
-                config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
-                usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match'])
+            data_matching.manual_matching(rootdir, config_dirs, best_config, proc_type, in_args)
 
             if in_args.convert_training:
                 # Ensure not in recycle mode for training file to be converted
