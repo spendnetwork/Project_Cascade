@@ -50,10 +50,10 @@ def dedupe_matchTEST(priv_file, pub_file, rootdir, config_dirs, config_files, pr
         p.wait()
         df = pd.read_csv(config_dirs['match_output_file'].format(rootdir, proc_type),
                          usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'priv_address_adj', 'org_id', 'org_name',
-                                  'pub_name_adj',
-                                  'pub_address', 'pub_address_adj'],
+                                  'pub_name_adj','pub_address_adj',
+                                  'pub_address', 'pub_address_adj', 'privjoinfields', 'pubjoinfields'],
                          dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str, 'priv_address_adj': np.str,
-                                'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str, 'pub_address_adj': np.str})
+                                'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str, 'pub_address_adj': np.str, 'privjoinfields':np.str, 'pubjoinfields':np.str})
         df = df[pd.notnull(df['priv_name'])]
         df.to_csv(config_dirs['match_output_file'].format(rootdir, proc_type), index=False)
 
@@ -102,10 +102,10 @@ def dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, config_files
         p.wait()
         df = pd.read_csv(config_dirs['match_output_file'].format(rootdir, proc_type),
                          usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'priv_address_adj', 'org_id', 'org_name',
-                                  'pub_name_adj',
-                                  'pub_address', 'pub_address_adj'],
+                                  'pub_name_adj', 'pub_address_adj',
+                                  'pub_address', 'pub_address_adj', 'privjoinfields', 'pubjoinfields'],
                          dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str, 'priv_address_adj': np.str,
-                                'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str, 'pub_address_adj': np.str})
+                                'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str, 'pub_address_adj': np.str, 'privjoinfields':np.str, 'pubjoinfields':np.str})
         df = df[pd.notnull(df['priv_name'])]
         df.to_csv(config_dirs['match_output_file'].format(rootdir, proc_type), index=False)
 
@@ -132,19 +132,26 @@ def dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, config_files
         pass
 
 
-def extract_matches(rootdir, clustdf, config_files, config_dirs, proc_num, proc_type, conf_file_num):
+def extract_matches(rootdir, clustdf, config_files, config_dirs, proc_num, proc_type, conf_file_num, in_args):
     """
 	Import config file containing variable assignments for i.e. char length, match ratio
 	Based on the 'cascading' config details, extract matches to new csv
 
 	:return extracts_file: contains dataframe with possible acceptable matches
 	"""
+
+    if in_args.recycle:
+        levendist = str('leven_dist_NA')
+    else:
+        levendist = str('leven_dist_N')
+
+
     # Round confidence scores to 2dp :
     # pdb.set_trace()
     clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
 
     # Filter by current match_score:
-    clustdf = clustdf[clustdf['leven_dist'] >= config_files['processes'][proc_type][proc_num]['min_match_score']]
+    clustdf = clustdf[clustdf[levendist] >= config_files['processes'][proc_type][proc_num]['min_match_score']]
 
     # if the earliest process, accept current clustdf as matches, if not (>min):
     if proc_num > min(config_files['processes'][proc_type]):
@@ -155,7 +162,7 @@ def extract_matches(rootdir, clustdf, config_files, config_dirs, proc_num, proc_
             clustdf = clustdf[
                 clustdf.priv_name_short.str.len() > config_files['processes'][proc_type][proc_num - 1]['char_counts']]
             # Filter by < 99 as first proc_num includes all lengths leading to duplicates
-            clustdf = clustdf[clustdf['leven_dist'] <= 99]
+            clustdf = clustdf[clustdf[levendist] <= 99]
         except:
             clustdf = clustdf[
                 clustdf.priv_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
@@ -189,12 +196,15 @@ def manual_matching(rootdir, config_dirs, best_config, proc_type, in_args):
 
     manual_match_file = pd.read_csv(
         config_dirs['extract_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv', index_col=None)
-    manual_match_file[''.join(['Manual_',str(proc_type), '_Match'])] = ''
+    manual_match_file['Manual_Match_N'] = ''
+    manual_match_file['Manual_Match_NA'] = ''
 
     # Automatically confirm rows with leven dist of 100
     for index, row in manual_match_file.iterrows():
-        if row.leven_dist == 100:
-            manual_match_file.at[index, 'Manual_Match'] = str('Y')
+        if row.leven_dist_N == 100:
+            manual_match_file.at[index, 'Manual_Match_N'] = str('Y')
+        if row.leven_dist_NA == 100:
+            manual_match_file.at[index, 'Manual_Match_NA'] = str('Y')
 
     if in_args.terminal_matching:
         choices = ['n', 'na']
@@ -207,13 +217,13 @@ def manual_matching(rootdir, config_dirs, best_config, proc_type, in_args):
             if choice.lower() == 'n':
                 print("\nPrivate name: " + str(row.priv_name_adj))
                 print("\nPublic name: " + str(row.pub_name_adj))
-                print("\nLevenshtein distance: " + str(row.leven_dist))
+                print("\nLevenshtein distance: " + str(row.leven_dist_N))
             else:
                 print("\nPrivate name: " + str(row.priv_name_adj))
                 print("Private address: " + str(row.priv_address_adj))
                 print("\nPublic name: " + str(row.pub_name_adj))
                 print("Public address: " + str(row.pub_address_adj))
-                print("\nLevenshtein distance (names): " + str(row.leven_dist))
+                print("\nLevenshtein distance : " + str(row.leven_dist_NA))
 
             match_options = ["y", "n", "u", "f"]
             match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
@@ -221,7 +231,8 @@ def manual_matching(rootdir, config_dirs, best_config, proc_type, in_args):
                 match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
 
             if str(match).lower() != "f":
-                manual_match_file.at[index, 'Manual_Match'] = str(match).capitalize()
+                manual_match_file.at[index, 'Manual_Match_N'] = str(match).capitalize()
+                # Need to add in NA version ? Might just remove terminal matching altogether...
                 continue
             else:
                 break
@@ -231,15 +242,21 @@ def manual_matching(rootdir, config_dirs, best_config, proc_type, in_args):
         print("Saving...")
         manual_match_file.to_csv(config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
-                                 columns=['Cluster ID', 'leven_dist', 'org_id', 'id', 'org_name', 'pub_name_adj', 'pub_address', 'pub_address_adj',
-                                          'priv_name', 'priv_name_adj', 'priv_address', 'priv_address_adj'])
+                                 # columns=['org_id', 'id', 'org_name',
+                                 #          'priv_name','pub_address', 'priv_address', 'leven_dist_N', 'leven_dist_NA','Manual_Match_N','Manual_Match_NA'])
+                                columns = ['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'org_id', 'id', 'org_name', 'pub_name_adj',
+                                           'pub_address', 'priv_name', 'priv_name_adj', 'priv_address', 'priv_address_adj', 'pub_address_adj',
+                                           'Manual_Match_N', 'Manual_Match_NA', 'privjoinfields', 'pubjoinfields'])
         return manual_match_file
 
     else:
         manual_match_file.to_csv(config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
-                                 columns=['Cluster ID', 'leven_dist', 'org_id', 'id', 'org_name', 'pub_name_adj',
-                                          'pub_address','priv_name', 'priv_name_adj', 'priv_address', 'priv_address_adj', 'pub_address_adj', 'Manual_Match'])
+                                 # columns=['org_id', 'id', 'org_name',
+                                 #          'priv_name', 'pub_address', 'priv_address', 'leven_dist_N', 'leven_dist_NA',
+                                 #          'Manual_Match_N', 'Manual_Match_NA'])
+                                 columns=['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'org_id', 'id', 'org_name', 'pub_name_adj',
+                                          'pub_address','priv_name', 'priv_name_adj', 'priv_address', 'priv_address_adj', 'pub_address_adj', 'Manual_Match_N','Manual_Match_NA', 'privjoinfields', 'pubjoinfields'])
         if not in_args.recycle:
             if not in_args.upload_to_db:
                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(

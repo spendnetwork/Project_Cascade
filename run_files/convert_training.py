@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-
+import pdb
 
 def convert_to_training(rootdir, config_dirs, conv_file):
     """
@@ -8,9 +8,9 @@ def convert_to_training(rootdir, config_dirs, conv_file):
 	:return : None
 	:output : training.json training file
 	"""
-
+    pdb.set_trace()
     # Filter for matched entries
-    conv_file = conv_file[pd.notnull(conv_file['Manual_Match'])]
+    conv_file = conv_file[pd.notnull(conv_file['Manual_Match_NA'])]
     manualdict = {}
     manualdict['distinct'] = []
     manualdict['match'] = []
@@ -22,19 +22,19 @@ def convert_to_training(rootdir, config_dirs, conv_file):
                     "__value__": [
                         {
                             "priv_name_adj": str(row.priv_name_adj),
-                            "priv_address": str(row.priv_address)
+                            "priv_address": str(row.priv_address_adj)
                         },
                         {
                             "priv_name_adj": str(row.pub_name_adj),
-                            "priv_address": str(row.pub_address)
+                            "priv_address": str(row.pub_address_adj)
                         }
                     ]}
 
         # If the row was a match or not a match, append to
         # either the match key or the distinct key, respectively:
-        if row.Manual_Match == 'Y':
+        if row.Manual_Match_NA == 'Y':
             manualdict['match'].append(new_data)
-        elif row.Manual_Match == 'N':
+        elif row.Manual_Match_NA == 'N':
             manualdict['distinct'].append(new_data)
         # If row was 'unsure'd, ignore it as it doesn't contribute to training data
         else:

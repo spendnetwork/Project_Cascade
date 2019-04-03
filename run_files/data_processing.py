@@ -35,9 +35,9 @@ def clean_private_data(rootdir, config_dirs, in_args):
         # Remove punctuation and double spacing in address
         adj_col = str('priv_address_adj')
         orig_col = str('priv_address')
-        pdb.set_trace()
+
         df = remvPunct(df, orig_col, adj_col)
-        df = remvStreetNumber(df, orig_col, adj_col)
+        df = remvStreetNumber(df, adj_col)
 
         df = joinfields(df, 'priv')
 
@@ -46,7 +46,7 @@ def clean_private_data(rootdir, config_dirs, in_args):
     else:
         # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
         df = pd.read_csv(adj_data, usecols=['id', 'priv_name', 'priv_name_adj', 'priv_address','priv_address_adj'],
-                         dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str, 'priv_address_adj': np.str})
+                         dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str, 'priv_address_adj': np.str, 'privjoinfields':np.str})
     return df
 
 
@@ -98,7 +98,7 @@ def clean_public_data(rootdir, config_dirs, in_args):
             adj_col = str('pub_address_adj')
             orig_col = str('pub_address')
             dfmerge = remvPunct(dfmerge, orig_col, adj_col)
-            dfmerge = remvStreetNumber(dfmerge, orig_col, adj_col)
+            dfmerge = remvStreetNumber(dfmerge, adj_col)
             dfmerge = joinfields(dfmerge, 'pub')
 
             dffullmerge = pd.concat([dffullmerge, dfmerge], ignore_index=True)
@@ -115,7 +115,7 @@ def joinfields(df, dftype):
     :return: df
     '''
 
-    df['joinfields'] = df[''.join([str(dftype),'_name_adj'])] + ' ' + df[''.join([str(dftype),'_address_adj'])]
+    df[''.join([str(dftype),'joinfields'])] = df[''.join([str(dftype),'_name_adj'])] + ' ' + df[''.join([str(dftype),'_address_adj'])]
     return df
 
 
@@ -131,8 +131,8 @@ def remvPunct(df, orig_col, adj_col):
     return df
 
 
-def remvStreetNumber(df, orig_col, adj_col):
-    df[adj_col] = df[orig_col].str.replace('\d+', '').str.strip()
+def remvStreetNumber(df, adj_col):
+    df[adj_col] = df[adj_col].str.replace('\d+', '').str.strip()
     return df
 
 
@@ -202,7 +202,10 @@ def calc_match_ratio(row):
 	:return ratio: individual levenshtein distance between the public and private org string
 	"""
     if pd.notnull(row.priv_name_short) and pd.notnull(row.pub_name_short):
-        return fuzz.ratio(row.priv_name_short, row.pub_name_short)
+        if pd.notnull(row.priv_address_adj) and pd.notnull(row.pub_address_adj):
+            return fuzz.ratio(row.priv_name_short, row.pub_name_short), fuzz.ratio(row.privjoinfields, row.pubjoinfields)
+    if pd.notnull(row.priv_name_short) and pd.notnull(row.pub_name_short):
+        return fuzz.ratio(row.priv_name_short, row.pub_name_short), 0
 
 
 def add_lev_dist(clust_df, output_file=None):
@@ -221,8 +224,8 @@ def add_lev_dist(clust_df, output_file=None):
     clust_df['pub_name_short'] = clust_df.pub_name_adj.apply(shorten_name)
 
     # Add column containing levenshtein distance between the matched public & private org names
-    if 'leven_dist' not in clust_df.columns:
-        clust_df['leven_dist'] = clust_df.apply(calc_match_ratio, axis=1)
+    if 'leven_dist_N' not in clust_df.columns:
+        clust_df['leven_dist_N'], clust_df['leven_dist_NA'] = zip(*clust_df.apply(calc_match_ratio, axis=1))
 
     clust_df.to_csv(output_file, index=False)
 

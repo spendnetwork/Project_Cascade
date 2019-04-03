@@ -85,26 +85,23 @@ def main(rootdir, in_args, config_dirs):
                                           'id': np.float, 'priv_name': np.str, 'priv_address': np.str, 'priv_address_adj': np.str,
                                           'priv_name_adj': np.str, 'org_id': np.str, 'pub_name_adj': np.str,
                                           'pub_address': np.str, 'pub_address_adj': np.str,'priv_name_short': np.str, 'pub_name_short': np.str,
-                                          'leven_dist': np.int, 'org_name': np.str}
+                                          'leven_dist_N': np.int,'leven_dist_NA': np.int, 'org_name': np.str, 'privjoinfields': np.str, 'pubjoinfields':np.str}
 
                             # Run dedupe for matching and calculate related stats for comparison
-                            if not os.path.exists(config_dirs['assigned_output_file'].format(rootdir, proc_type)):
+                            if not os.path.exists(config_dirs["cluster_output_file"].format(rootdir, proc_type)):
                                 priv_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
                                 pub_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
 
                                 data_matching.dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, configs, proc_type, proc_num, in_args)
 
-                                clust_df = pd.read_csv(config_dirs["cluster_output_file"].format(rootdir, proc_type),
-                                                       index_col=None, dtype=clustdtype)
-
+                            if not os.path.exists(config_dirs['assigned_output_file'].format(rootdir, proc_type)):
+                                clust_df = pd.read_csv(config_dirs["cluster_output_file"].format(rootdir, proc_type),index_col=None, dtype=clustdtype)
                                 # Copy public data to high-confidence cluster records
-                                clust_df = data_processing.assign_pub_data_to_clusters(clust_df, config_dirs[
-                                    'assigned_output_file'].format(rootdir, proc_type))
-
+                                # clust_df = data_processing.assign_pub_data_to_clusters(clust_df, config_dirs[
+                                #     'assigned_output_file'].format(rootdir, proc_type))
+                                clust_df=clust_df[:20]
                                 # Adds leven_dist column and extract matches based on config process criteria:
-                                clust_df = data_processing.add_lev_dist(clust_df,
-                                                                        config_dirs["assigned_output_file"].format(rootdir,
-                                                                            proc_type))
+                                clust_df = data_processing.add_lev_dist(clust_df, config_dirs["assigned_output_file"].format(rootdir, proc_type))
 
                             else:
 
@@ -113,13 +110,13 @@ def main(rootdir, in_args, config_dirs):
 
                             extracts_file = data_matching.extract_matches(rootdir, clust_df, configs, config_dirs, proc_num,
                                                                           proc_type,
-                                                                          conf_file_num)
+                                                                          conf_file_num, in_args)
                         break
                     else:
                         continue
                 # Output stats file:
                 stat_file = data_analysis.calc_matching_stats(rootdir, clust_df, extracts_file, config_dirs, conf_file_num,
-                                                              proc_type, privdf)
+                                                              proc_type, privdf, in_args)
 
     except StopIteration:
         # Continue if no more config files found
@@ -151,10 +148,10 @@ def main(rootdir, in_args, config_dirs):
             if in_args.convert_training:
                 # Ensure not in recycle mode for training file to be converted
                 assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
-
+                pdb.set_trace()
                 conv_file = pd.read_csv(
                     config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
-                    usecols=['priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address', 'Manual_Match'])
+                    usecols=['priv_name_adj', 'priv_address_adj', 'pub_name_adj', 'pub_address_adj', 'Manual_Match_N','Manual_Match_NA'])
 
                 # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
                 convert_training.convert_to_training(rootdir, config_dirs, conv_file)
@@ -162,16 +159,16 @@ def main(rootdir, in_args, config_dirs):
             if in_args.upload_to_db:
                 upload_file = pd.read_csv(
                     config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
-                    usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match'])
+                    usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match_N','Manual_Match_NA'])
 
                 # Add confirmed matches to relevant proc_type table
                 if not in_args.recycle:
                     db_calls.add_data_to_table(rootdir, "spaziodati.confirmed_nameonly_matches", config_dirs, proc_type,
-                                               upload_file)
+                                               upload_file, in_args)
                     print("Process complete. Run 'python runfile.py --recycle' to begin training against additional fields.")
                 if in_args.recycle:
                     db_calls.add_data_to_table(rootdir, "spaziodati.confirmed_nameaddress_matches", config_dirs, proc_type,
-                                               upload_file)
+                                               upload_file, in_args)
 
 if __name__ == '__main__':
 

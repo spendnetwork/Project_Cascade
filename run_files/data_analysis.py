@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 
-def calc_matching_stats(rootdir, clustdf, extractdf, config_dirs, conf_file_num, proc_type, privdf):
+def calc_matching_stats(rootdir, clustdf, extractdf, config_dirs, conf_file_num, proc_type, privdf, in_args):
     """
 	For each process outlined in the config file, after each process is completed
 	extract the matches that meet the match % criteria into a new file
@@ -20,11 +20,11 @@ def calc_matching_stats(rootdir, clustdf, extractdf, config_dirs, conf_file_num,
     statdf = pd.DataFrame(
         columns=['Config_File', 'Total_Matches', 'Percent_Matches', 'Optim_Matches', 'Percent_Precision',
                  'Percent_Recall', 'Leven_Dist_Avg'])
+
     # Overall matches, including poor quality:
     statdf.at[conf_file_num, 'Config_File'] = conf_file_num
     statdf.at[conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['org_id'])])
-    statdf.at[conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['org_id'])]) / len(privdf) * 100,
-                                                        2)
+    statdf.at[conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['org_id'])]) / len(privdf) * 100,2)
     # Overall optimised matches :
     statdf.at[conf_file_num, 'Optim_Matches'] = len(extractdf)
     # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
@@ -32,7 +32,11 @@ def calc_matching_stats(rootdir, clustdf, extractdf, config_dirs, conf_file_num,
     statdf.at[conf_file_num, 'Percent_Precision'] = round(len(extractdf) / len(clustdf) * 100, 2)
     # Recall - how many relevant items have been selected from the entire original private data (TP/TP+FN)
     statdf.at[conf_file_num, 'Percent_Recall'] = round(len(extractdf) / len(privdf) * 100, 2)
-    statdf.at[conf_file_num, 'Leven_Dist_Avg'] = np.average(extractdf.leven_dist)
+
+    if in_args.recycle:
+        statdf.at[conf_file_num, 'Leven_Dist_Avg'] = np.average(extractdf.leven_dist_NA)
+    else:
+        statdf.at[conf_file_num, 'Leven_Dist_Avg'] = np.average(extractdf.leven_dist_N)
     # if statsfile doesnt exist, create it
     if not os.path.exists(config_dirs['stats_file'].format(rootdir, proc_type)):
         statdf.to_csv(config_dirs['stats_file'].format(rootdir, proc_type))

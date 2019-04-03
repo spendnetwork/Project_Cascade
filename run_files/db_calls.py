@@ -102,7 +102,7 @@ def remove_table_duplicates(table_name, headers):
     return query
 
 
-def add_data_to_table(rootdir, table_name, config_dirs, proc_type, man_matched):
+def add_data_to_table(rootdir, table_name, config_dirs, proc_type, man_matched, in_args):
     '''
     Adds the confirmed_matches data to table
     :param table_name: the database table to which the confirmed matches will be addded
@@ -114,7 +114,11 @@ def add_data_to_table(rootdir, table_name, config_dirs, proc_type, man_matched):
 
     # Filter manual matches file to just confirmed Yes matches and non-blank org id's
     confirmed_matches = man_matched[pd.notnull(man_matched['org_id'])]
-    confirmed_matches = confirmed_matches[(man_matched['Manual_Match'] == 'Y')]
+    if in_args.recycle:
+        confirmed_matches = confirmed_matches[(man_matched['Manual_Match_NA'] == 'Y')]
+    else:
+        confirmed_matches = confirmed_matches[(man_matched['Manual_Match_N'] == 'Y')]
+
     confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(rootdir, proc_type),
                              columns=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address'],
                              index=False)
