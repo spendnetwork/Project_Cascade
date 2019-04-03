@@ -8,7 +8,7 @@ def convert_to_training(rootdir, config_dirs, conv_file):
 	:return : None
 	:output : training.json training file
 	"""
-    pdb.set_trace()
+
     # Filter for matched entries
     conv_file = conv_file[pd.notnull(conv_file['Manual_Match_NA'])]
     manualdict = {}

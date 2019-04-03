@@ -148,7 +148,7 @@ def main(rootdir, in_args, config_dirs):
             if in_args.convert_training:
                 # Ensure not in recycle mode for training file to be converted
                 assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
-                pdb.set_trace()
+
                 conv_file = pd.read_csv(
                     config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
                     usecols=['priv_name_adj', 'priv_address_adj', 'pub_name_adj', 'pub_address_adj', 'Manual_Match_N','Manual_Match_NA'])
