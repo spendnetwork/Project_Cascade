@@ -37,7 +37,7 @@ def companies_house_matching(df,directories,regiondir,proc_type):
     # api states max batch of 600...
     # array_split doesn't have to have equal batch sizes.
     for chunk in np.array_split(org_strings,
-                                math.ceil(len(org_strings) / 100), axis=0):
+                                math.ceil(len(org_strings) / 500), axis=0):
 
         print("\nProcessing companies house batch of size: " + str(len(chunk)))
 
@@ -108,13 +108,12 @@ def companies_house_matching(df,directories,regiondir,proc_type):
     df.to_csv(directories['match_output_file'].format(regiondir, proc_type))
 
 
-def dedupe_match_cluster(priv_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
+def dedupe_match_cluster(regiondir, directories, config_files, proc_type, proc_num, in_args):
     """
 	Deduping - first the public and private data are matched using dedupes csvlink,
 	then the matched file is put into clusters
     :param pub_file:
-    :param priv_file:
-	:param directories: file/folder locations
+    :param 	:param directories: file/folder locations
 	:param  config_files: the main config files
 	:param proc_type: the 'type' of the process (Name, Name & Address)
 	:param proc_num: the individual process within the config file
@@ -141,9 +140,6 @@ def dedupe_match_cluster(priv_file, regiondir, directories, config_files, proc_t
         p = subprocess.Popen(cmd, cwd=os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
         p.wait()  # wait for subprocess to finish
 
-        if not in_args.recycle:
-            # Copy training file to backup, so it can be found and copied into recycle phase clustering
-            copyfile(directories['cluster_training_file'].format(regiondir, proc_type), directories['cluster_training_backup'].format(regiondir))
     else:
         pass
 

@@ -30,16 +30,13 @@ def get_input_args(rootdir, args=None):
     parser.add_argument('--terminal_matching', action='store_true', help='Perform manual matching in terminal')
     parser.add_argument('--convert_training', action='store_true', help='Convert confirmed matches to training file for recycle phase')
     parser.add_argument('--upload_to_db', action='store_true' , help='Add confirmed matches to database')
-
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
     args = parser.parse_args(args)
-
-    # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
-    # Force an error and prompt user to add the training flag
-    if args.training == True and not os.path.exists(os.path.join(rootdir,args.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
+    # If the clustering training file does not exist then switch training arg to force training
+    if not os.path.exists(os.path.join(rootdir,args.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
         print("Dedupe training files do not exist - running with --training flag to initiate training process")
-        args.training == False
-        # parser.error("Dedupe training files do not exist, please try 'python runfile.py --training' to begin training process")
+        parser.add_argument('--training', action='store_true', help='Modify/contribute to the training data')
+    args = parser.parse_args()
 
     return args, parser
 
@@ -79,8 +76,8 @@ def main(regiondir, in_args, directories):
 
                         # Run dedupe for matching and calculate related stats for comparison
                         if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
-                            priv_file = directories['adj_dir'].format(regiondir) + directories['adj_priv_data'].format(in_args.priv_adj_name)
-                            data_matching.dedupe_match_cluster(priv_file, regiondir, directories, configs, proc_type, proc_num, in_args)
+
+                            data_matching.dedupe_match_cluster(regiondir, directories, configs, proc_type, proc_num, in_args)
 
                         if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
                             clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type),index_col=None)
