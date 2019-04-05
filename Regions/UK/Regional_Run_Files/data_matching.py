@@ -10,7 +10,7 @@ import os
 from tqdm import tqdm
 import pandas as pd
 import pdb
-
+from fuzzywuzzy import fuzz
 
 load_dotenv(find_dotenv())
 companieshouse_key = os.environ.get("API_KEY2")
@@ -26,8 +26,11 @@ def companies_house_matching(df,directories,regiondir,proc_type):
     """
 
     s = chwrapper.Search(access_token=companieshouse_key)
+    # Tried matching to priv_name_adj but results were poor. Keeping adj column for clustering...
     org_strings = df['priv_name']
-    ch_org_dict = {}
+    ch_name_dict = {}
+    ch_id_dict = {}
+    ch_addr_dict = {}
     chunk_propn = 0
 
     # Split org_string array into multiple arrays.
@@ -41,28 +44,46 @@ def companies_house_matching(df,directories,regiondir,proc_type):
         # For each org_string in the sub-array of org_strings
         # pull org data from companies house
         for word in tqdm(chunk):
-
+            # if pd.notnull(row.priv_name_short) and pd.notnull(row.pub_name_short):
+            #     return fuzz.ratio(row.priv_name_short, row.pub_name_short), 0
             response = s.search_companies(word)
             if response.status_code == 200:
-                comp_house_dict = response.json()
+                dict = response.json()
                 # response.json() returns a nested dict with complete org info
                 # Below pulls just the company number.
-                pdb.set_trace()
-                ch_org_dict[word] = [comp_house_dict['items'][0]
-                                    ['company_number']]
-                # Pull through address and incorporation date
-                try:
-                    address = comp_house_dict['items'][0]['address_snippet']
-                except:
-                    address = str('None')
+                # pdb.set_trace()
+                name = ''
+                chId = 0
+                dict = dict['items']
+                for i in range(len(dict)):
+                    if fuzz.ratio(word, dict[i]['title']) > fuzz.ratio(word, name):
+                        name = dict[i]['title']
+                        chId = dict[i]['company_number']
+                        chAddr = dict[i]['address_snippet']
+                    else:
+                        continue
 
-                try:
-                    inc_date = comp_house_dict['items'][0]['date_of_creation']
-                except:
-                    inc_date = '1000-01-01'
-
-                ch_org_dict[word].extend([address, inc_date])
-                ch_org_dict.update(ch_org_dict)
+                ch_name_dict[word] = name
+                # ch_org_dict[word]['CH_name'] = name
+                ch_id_dict[name] = chId
+                ch_addr_dict[name] = chAddr
+                # # Gather all search results, calc leven dist, pick highest one:
+                #
+                # # Pull through address and incorporation date
+                # try:
+                #     address = dict['items'][0]['address_snippet']
+                # except:
+                #     address = str('None')
+                #
+                # try:
+                #     inc_date = dict['items'][0]['date_of_creation']
+                # except:
+                #     inc_date = '1000-01-01'
+                #
+                # ch_org_dict[word].extend([address, inc_date])
+                ch_name_dict.update(ch_name_dict)
+                ch_id_dict.update(ch_id_dict)
+                ch_addr_dict.update(ch_addr_dict)
 
             elif response.status_code == 404:
                 logger.debug("Error requesting CH data: %s %s",
@@ -79,12 +100,10 @@ def companies_house_matching(df,directories,regiondir,proc_type):
         chunk_propn += int(len(chunk))
         print("\nProgress: " + str(chunk_propn) + " of " +
               str(len(org_strings)))
-        df['CH_id'] = df['priv_name'].map(ch_org_dict)
-    try:
-        df[['CH_id', 'CH_address', 'CH_incorporation_date']] = \
-            pd.DataFrame(df['CH_id'].values.tolist())
-    except KeyError as e:
-        print(e.message)
+        pdb.set_trace()
+        df['CH_name'] = df['priv_name'].map(ch_name_dict)
+        df['CH_id'] = df['CH_name'].map(ch_id_dict)
+        df['CH_address'] = df['CH_name'].map(ch_addr_dict)
 
     df.to_csv(directories['match_output_file'].format(regiondir, proc_type))
 
