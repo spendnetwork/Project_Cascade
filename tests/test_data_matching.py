@@ -1,9 +1,8 @@
 import ast
 import pandas as pd
 import pytest
-import pdb
-from Config_Files import config_dirs
-from run_files import data_matching
+import directories
+from core_run_files import data_matching
 import os
 
 
@@ -44,7 +43,7 @@ def load_testConfig():
 
 
 def test_extractMatches(load_clusteredData, tmp_root, load_testConfig):
-    data_matching.extract_matches(tmp_root,load_clusteredData , load_testConfig, config_dirs.dirs['dirs'], 1, 'Name_Only', 1)
+    data_matching.extract_matches(tmp_root, load_clusteredData, load_testConfig, directories.dirs['dirs'], 1, 'Name_Only', 1)
     assert 1
 
 def test_manualMatching():

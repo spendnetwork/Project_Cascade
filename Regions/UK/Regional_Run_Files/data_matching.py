@@ -1,70 +1,101 @@
-import pandas as pd
-import os
 import subprocess
-import numpy as np
-import sys
+import time
+import logging
 from shutil import copyfile
-from Config_Files import config_dirs
+import chwrapper
+import math
+import numpy as np
+from dotenv import load_dotenv, find_dotenv
+import os
+from tqdm import tqdm
+import pandas as pd
 import pdb
-import runfile
 
 
-def dedupe_matchTEST(priv_file, pub_file, rootdir, config_dirs, config_files, proc_type, proc_num, in_args):
+load_dotenv(find_dotenv())
+companieshouse_key = os.environ.get("API_KEY2")
+logger = logging.getLogger(__name__)
+logging.getLogger("requests").setLevel(logging.WARNING)
+
+
+def companies_house_matching(df,directories,regiondir,proc_type):
     """
-	Deduping - first the public and private data are matched using dedupes csvlink,
-	then the matched file is put into clusters
-	:param config_dirs: file/folder locations
-	:param  config_files: the main config files
-	:param proc_type: the 'type' of the process (Name, Name & Address)
-	:param proc_num: the individual process within the config file
-	:return None
-	:output : matched output file
-	:output : matched and clustered output file
-	"""
-    priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
-    pub_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
+    Lookup company name via Companies House API and return company number
+    :param df: pandas dataframe containing the organisation name
+    :return df: Amended dataframe containing additional company information
+    """
 
-    train = ['--skip_training' if in_args.training else '']
-    # Matching:
-    if not os.path.exists(config_dirs['match_output_file'].format(rootdir, proc_type)):
-        if in_args.recycle:
-            # Copy manual matching file over to build on for clustering
-            copyfile(config_dirs['manual_matching_train_backup'].format(rootdir), config_dirs['manual_training_file'].format(rootdir, proc_type))
+    s = chwrapper.Search(access_token=companieshouse_key)
+    org_strings = df['priv_name']
+    ch_org_dict = {}
+    chunk_propn = 0
 
-        # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
-        if os.path.exists('./learned_settings'):
-            os.remove('./learned_settings')
-        print("Starting matching...")
+    # Split org_string array into multiple arrays.
+    # api states max batch of 600...
+    # array_split doesn't have to have equal batch sizes.
+    for chunk in np.array_split(org_strings,
+                                math.ceil(len(org_strings) / 100), axis=0):
 
-        cmd = ['csvlink '
-               + str(priv_file) + ' '
-               + str(pub_file)
-               + ' --field_names_1 ' + ' '.join(priv_fields)
-               + ' --field_names_2 ' + ' '.join(pub_fields)
-               + ' --training_file ' + config_dirs['manual_training_file'].format(rootdir, proc_type)
-               + ' --output_file ' + config_dirs['match_output_file'].format(rootdir, proc_type) + ' '
-               + str(train[0])
-               ]
-        p = subprocess.Popen(cmd, shell=True)
+        print("\nProcessing companies house batch of size: " + str(len(chunk)))
 
-        p.wait()
-        df = pd.read_csv(config_dirs['match_output_file'].format(rootdir, proc_type),
-                         usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'priv_address_adj', 'org_id', 'org_name',
-                                  'pub_name_adj','pub_address_adj',
-                                  'pub_address', 'pub_address_adj', 'privjoinfields', 'pubjoinfields'],
-                         dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str, 'priv_address_adj': np.str,
-                                'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str, 'pub_address_adj': np.str, 'privjoinfields':np.str, 'pubjoinfields':np.str})
-        df = df[pd.notnull(df['priv_name'])]
-        df.to_csv(config_dirs['match_output_file'].format(rootdir, proc_type), index=False)
+        # For each org_string in the sub-array of org_strings
+        # pull org data from companies house
+        for word in tqdm(chunk):
+
+            response = s.search_companies(word)
+            if response.status_code == 200:
+                comp_house_dict = response.json()
+                # response.json() returns a nested dict with complete org info
+                # Below pulls just the company number.
+                pdb.set_trace()
+                ch_org_dict[word] = [comp_house_dict['items'][0]
+                                    ['company_number']]
+                # Pull through address and incorporation date
+                try:
+                    address = comp_house_dict['items'][0]['address_snippet']
+                except:
+                    address = str('None')
+
+                try:
+                    inc_date = comp_house_dict['items'][0]['date_of_creation']
+                except:
+                    inc_date = '1000-01-01'
+
+                ch_org_dict[word].extend([address, inc_date])
+                ch_org_dict.update(ch_org_dict)
+
+            elif response.status_code == 404:
+                logger.debug("Error requesting CH data: %s %s",
+                             response.status_code, response.reason)
+            elif response.status_code == 429:
+                logger.debug("Error requesting CH data: %s %s",
+                             response.status_code, response.reason)
+                logger.debug("Waiting...")
+                time.sleep(60)
+                s = chwrapper.Search(access_token=companieshouse_key)
+            else:
+                logger.error("Error requesting CH data: %s %s",
+                             response.status_code, response.reason)
+        chunk_propn += int(len(chunk))
+        print("\nProgress: " + str(chunk_propn) + " of " +
+              str(len(org_strings)))
+        df['CH_id'] = df['priv_name'].map(ch_org_dict)
+    try:
+        df[['CH_id', 'CH_address', 'CH_incorporation_date']] = \
+            pd.DataFrame(df['CH_id'].values.tolist())
+    except KeyError as e:
+        print(e.message)
+
+    df.to_csv(directories['match_output_file'].format(regiondir, proc_type))
 
 
-def dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, config_files, proc_type, proc_num, in_args):
+def dedupe_match_cluster(priv_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
     """
 	Deduping - first the public and private data are matched using dedupes csvlink,
 	then the matched file is put into clusters
     :param pub_file:
     :param priv_file:
-	:param config_dirs: file/folder locations
+	:param directories: file/folder locations
 	:param  config_files: the main config files
 	:param proc_type: the 'type' of the process (Name, Name & Address)
 	:param proc_num: the individual process within the config file
@@ -74,65 +105,31 @@ def dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, config_files
 	"""
 
     priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
-    pub_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
 
     train = ['--skip_training' if in_args.training else '']
-    # Matching:
-    if not os.path.exists(config_dirs['match_output_file'].format(rootdir, proc_type)):
-        if in_args.recycle:
-            # Copy manual matching file over to build on for clustering
-            copyfile(config_dirs['manual_matching_train_backup'].format(rootdir), config_dirs['manual_training_file'].format(rootdir, proc_type))
-
-        # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
-        if os.path.exists('./learned_settings'):
-            os.remove('./learned_settings')
-        print("Starting matching...")
-
-        cmd = ['csvlink '
-               + str(priv_file) + ' '
-               + str(pub_file)
-               + ' --field_names_1 ' + ' '.join(priv_fields)
-               + ' --field_names_2 ' + ' '.join(pub_fields)
-               + ' --training_file ' + config_dirs['manual_training_file'].format(rootdir, proc_type)
-               + ' --output_file ' + config_dirs['match_output_file'].format(rootdir, proc_type) + ' '
-               + str(train[0])
-               ]
-        p = subprocess.Popen(cmd, shell=True)
-
-        p.wait()
-        df = pd.read_csv(config_dirs['match_output_file'].format(rootdir, proc_type),
-                         usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'priv_address_adj', 'org_id', 'org_name',
-                                  'pub_name_adj', 'pub_address_adj',
-                                  'pub_address', 'pub_address_adj', 'privjoinfields', 'pubjoinfields'],
-                         dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str, 'priv_address_adj': np.str,
-                                'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str, 'pub_address_adj': np.str, 'privjoinfields':np.str, 'pubjoinfields':np.str})
-        df = df[pd.notnull(df['priv_name'])]
-        df.to_csv(config_dirs['match_output_file'].format(rootdir, proc_type), index=False)
 
     # Clustering:
-    if not os.path.exists(config_dirs['cluster_output_file'].format(rootdir, proc_type)):
+    if not os.path.exists(directories['cluster_output_file'].format(regiondir, proc_type)):
         # Copy training file from first clustering session if recycle mode
-        if in_args.recycle:
-            copyfile(config_dirs['cluster_training_backup'].format(rootdir), config_dirs['cluster_training_file'].format(rootdir, proc_type))
 
         print("Starting clustering...")
         cmd = ['python csvdedupe.py '
-               + config_dirs['match_output_file'].format(rootdir, proc_type) + ' '
+               + directories['match_output_file'].format(regiondir, proc_type) + ' '
                + ' --field_names ' + ' '.join(priv_fields) + ' '
                + str(train[0])
-               + ' --training_file ' + config_dirs['cluster_training_file'].format(rootdir, proc_type)
-               + ' --output_file ' + config_dirs['cluster_output_file'].format(rootdir, proc_type)]
+               + ' --training_file ' + directories['cluster_training_file'].format(regiondir, proc_type)
+               + ' --output_file ' + directories['cluster_output_file'].format(regiondir, proc_type)]
         p = subprocess.Popen(cmd, cwd=os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
         p.wait()  # wait for subprocess to finish
 
         if not in_args.recycle:
             # Copy training file to backup, so it can be found and copied into recycle phase clustering
-            copyfile(config_dirs['cluster_training_file'].format(rootdir, proc_type), config_dirs['cluster_training_backup'].format(rootdir))
+            copyfile(directories['cluster_training_file'].format(regiondir, proc_type), directories['cluster_training_backup'].format(regiondir))
     else:
         pass
 
 
-def extract_matches(rootdir, clustdf, config_files, config_dirs, proc_num, proc_type, conf_file_num, in_args):
+def extract_matches(regiondir, clustdf, config_files, directories, proc_num, proc_type, conf_file_num, in_args):
     """
 	Import config file containing variable assignments for i.e. char length, match ratio
 	Based on the 'cascading' config details, extract matches to new csv
@@ -167,35 +164,35 @@ def extract_matches(rootdir, clustdf, config_files, config_dirs, proc_num, proc_
             clustdf = clustdf[
                 clustdf.priv_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
     else:
-        if os.path.exists(config_dirs['extract_matches_file'].format(rootdir, proc_type) + '_' + str(conf_file_num) + '.csv'):
+        if os.path.exists(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv'):
             # Clear any previous extraction file for this config:
-            os.remove(config_dirs['extract_matches_file'].format(rootdir, proc_type) + '_' + str(conf_file_num) + '.csv')
+            os.remove(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv')
 
     # Add process number to column for calculating stats purposes:
     clustdf['process_num'] = str(proc_num)
 
-    if not os.path.exists(config_dirs['extract_matches_file'].format(rootdir, proc_type) + '_' + str(conf_file_num) + '.csv'):
-        clustdf.to_csv(config_dirs['extract_matches_file'].format(rootdir, proc_type) + '_' + str(conf_file_num) + '.csv',
+    if not os.path.exists(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv'):
+        clustdf.to_csv(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv',
                        index=False)
         return clustdf
     else:
         extracts_file = pd.read_csv(
-            config_dirs['extract_matches_file'].format(rootdir, proc_type) + '_' + str(conf_file_num) + '.csv', index_col=None)
+            directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv', index_col=None)
         extracts_file = pd.concat([extracts_file, clustdf], ignore_index=True, sort=True)
         extracts_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
-        extracts_file.to_csv(config_dirs['extract_matches_file'].format(rootdir, proc_type) + '_' + str(conf_file_num) + '.csv',
+        extracts_file.to_csv(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv',
                              index=False)
         return extracts_file
 
 
-def manual_matching(rootdir, config_dirs, best_config, proc_type, in_args):
+def manual_matching(regiondir, directories, best_config, proc_type, in_args):
     """
 	Provides user-input functionality for manual matching based on the extracted records
 	:return manual_match_file: extracted file with added column (Y/N/Unsure)
 	"""
 
     manual_match_file = pd.read_csv(
-        config_dirs['extract_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv', index_col=None)
+        directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv', index_col=None)
     manual_match_file['Manual_Match_N'] = ''
     manual_match_file['Manual_Match_NA'] = ''
 
@@ -240,7 +237,7 @@ def manual_matching(rootdir, config_dirs, best_config, proc_type, in_args):
         manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 
         print("Saving...")
-        manual_match_file.to_csv(config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
+        manual_match_file.to_csv(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
                                  # columns=['org_id', 'id', 'org_name',
                                  #          'priv_name','pub_address', 'priv_address', 'leven_dist_N', 'leven_dist_NA','Manual_Match_N','Manual_Match_NA'])
@@ -250,7 +247,7 @@ def manual_matching(rootdir, config_dirs, best_config, proc_type, in_args):
         return manual_match_file
 
     else:
-        manual_match_file.to_csv(config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
+        manual_match_file.to_csv(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
                                  # columns=['org_id', 'id', 'org_name',
                                  #          'priv_name', 'pub_address', 'priv_address', 'leven_dist_N', 'leven_dist_NA',
@@ -260,8 +257,8 @@ def manual_matching(rootdir, config_dirs, best_config, proc_type, in_args):
         if not in_args.recycle:
             if not in_args.upload_to_db:
                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(
-                config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv'))
+                directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv'))
         else:
             if not in_args.upload_to_db:
                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --recycle --upload_to_db".format(
-                    config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv'))
+                    directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv'))

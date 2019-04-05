@@ -4,11 +4,9 @@ import pandas as pd
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
-from Config_Files import config_dirs
-from run_files import setup
+import directories
+from core_run_files import setup
 from runfile import get_input_args
-import pdb
-
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -53,7 +51,7 @@ def connection():
 def tmp_root(tmpdir_factory):
     """tmpdir_factory fixture for the session scope containing the construction of the required working directories"""
     tmp_root =  tmpdir_factory.mktemp('tmproot')
-    setup.setup_dirs(config_dirs.dirs['dirs'], tmp_root)
+    setup.setup_dirs(directories.dirs['dirs'], tmp_root)
     assert 1
 
     print("\n\nTemporary testing directories constructed at {}".format(str(tmp_root)))

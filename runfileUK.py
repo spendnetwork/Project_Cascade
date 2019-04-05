@@ -3,7 +3,8 @@ import pandas as pd
 import os
 import numpy as np
 import ast
-from core_run_files import setup, data_matching, db_calls, convert_training, data_processing, data_analysis
+from core_run_files import setup, db_calls, convert_training, data_analysis
+from Regions.UK.Regional_Run_Files import data_matching,data_processing
 from pathlib import Path
 import directories
 import pdb
@@ -16,7 +17,7 @@ def get_input_args(rootdir, args=None):
 	"""
 
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
-    parser.add_argument('--region', default='Italy', type=str, help='Define the region/country (Italy/UK)')
+    parser.add_argument('--region', default='UK', type=str, help='Define the region/country (Italy/UK)')
     parser.add_argument('--priv_raw_name', default='private_data.csv', type=str,
                         help='Set raw private/source datafile name')
     parser.add_argument('--pub_raw_name', default='public_data.csv', type=str, help='Set raw public datafile name')
@@ -64,55 +65,42 @@ def main(regiondir, in_args, directories):
                 # Clean public and private datasets for linking
                 # private df needed in memory for stats
                 privdf = data_processing.clean_private_data(regiondir, directories, in_args)
-                if not in_args.recycle:
-                    data_processing.clean_public_data(regiondir, directories, in_args)
 
                 # For each process type (eg: Name & Add, Name only) outlined in the configs file:
                 for proc_type in configs['processes']:
-                    if in_args.recycle == configs['processes'][proc_type][min(configs['processes'][proc_type].keys())]['recycle_phase']:
 
-                        # Create working directories if don't exist
-                        setup.setup_dirs(directories, regiondir, proc_type)
+                    # Create working directories if don't exist
+                    setup.setup_dirs(directories, regiondir, proc_type)
 
-                        # Iterate over each process number in the config file
-                        for proc_num in configs['processes'][proc_type]:
-                            # # Get first process from config file
-                            # main_proc = min(configs['processes'][proc_type].keys())
+                    # Iterate over each process number in the config file
+                    for proc_num in configs['processes'][proc_type]:
+                        if not os.path.exists(directories['match_output_file'].format(regiondir, proc_type)):
+                            data_matching.companies_house_matching(privdf,directories,regiondir,proc_type)
 
-                            # Define data types for clustered file. Enables faster loading.
-                            clustdtype = {'Cluster ID': np.float64, 'Confidence Score': np.float,
-                                          'id': np.float, 'priv_name': np.str, 'priv_address': np.str, 'priv_address_adj': np.str,
-                                          'priv_name_adj': np.str, 'org_id': np.str, 'pub_name_adj': np.str,
-                                          'pub_address': np.str, 'pub_address_adj': np.str,'priv_name_short': np.str, 'pub_name_short': np.str,
-                                          'leven_dist_N': np.int,'leven_dist_NA': np.int, 'org_name': np.str, 'privjoinfields': np.str, 'pubjoinfields':np.str}
+                        # Run dedupe for matching and calculate related stats for comparison
+                        if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
+                            priv_file = directories['adj_dir'].format(regiondir) + directories['adj_priv_data'].format(in_args.priv_adj_name)
+                            data_matching.dedupe_match_cluster(priv_file, regiondir, directories, configs, proc_type, proc_num, in_args)
 
-                            # Run dedupe for matching and calculate related stats for comparison
-                            if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
-                                priv_file = directories['adj_dir'].format(regiondir) + directories['adj_priv_data'].format(in_args.priv_adj_name)
-                                pub_file = directories['adj_dir'].format(regiondir) + directories['adj_pub_data'].format(in_args.pub_adj_name)
+                        if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
+                            clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type),index_col=None)
+                            # Copy public data to high-confidence cluster records
+                            # clust_df = data_processing.assign_pub_data_to_clusters(clust_df, directories[
+                            #     'assigned_output_file'].format(regiondir, proc_type))
 
-                                data_matching.dedupe_match_cluster(priv_file, pub_file, regiondir, directories, configs, proc_type, proc_num, in_args)
+                            # Adds leven_dist column and extract matches based on config process criteria:
+                            clust_df = data_processing.add_lev_dist(clust_df, directories["assigned_output_file"].format(regiondir, proc_type))
 
-                            if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
-                                clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type),index_col=None, dtype=clustdtype)
-                                # Copy public data to high-confidence cluster records
-                                # clust_df = data_processing.assign_pub_data_to_clusters(clust_df, directories[
-                                #     'assigned_output_file'].format(regiondir, proc_type))
-                                clust_df=clust_df[:20]
-                                # Adds leven_dist column and extract matches based on config process criteria:
-                                clust_df = data_processing.add_lev_dist(clust_df, directories["assigned_output_file"].format(regiondir, proc_type))
+                        else:
 
-                            else:
+                            clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type),
+                                                   index_col=None)
 
-                                clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type),
-                                                       index_col=None, dtype=clustdtype, usecols=clustdtype.keys())
+                        extracts_file = data_matching.extract_matches(regiondir, clust_df, configs, directories, proc_num,
+                                                                      proc_type,
+                                                                      conf_file_num, in_args)
+                    break
 
-                            extracts_file = data_matching.extract_matches(regiondir, clust_df, configs, directories, proc_num,
-                                                                          proc_type,
-                                                                          conf_file_num, in_args)
-                        break
-                    else:
-                        continue
                 # Output stats file:
                 stat_file = data_analysis.calc_matching_stats(regiondir, clust_df, extracts_file, directories, conf_file_num,
                                                               proc_type, privdf, in_args)
@@ -181,9 +169,5 @@ if __name__ == '__main__':
 
     # Ignores directories - convention is <num>_config.py
     pyfiles = "*_config.py"
-
-    if not in_args.recycle:
-        # If public/registry data file doesn't exist, pull from database
-        db_calls.checkDataExists(regiondir, directories, in_args, "spaziodati.sd_sample")
 
     main(regiondir, in_args, directories)

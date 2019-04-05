@@ -14,24 +14,25 @@ user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
 
 
-def checkDataExists(rootdir, config_dirs, in_args, data_source):
+def checkDataExists(regiondir, directories, in_args, data_source):
     '''
     Checks whether a public/registry datafile exists already, and if not prompts the user to download from remote sources via .env
-    :param rootdir: root directory
-    :param config_dirs: dictionary containing various file/directories
+    :param regiondir: root directory
+    :param directories: dictionary containing various file/directories
     :param in_args: arguments containing variables such as file names and specific options
     :param data_source: database table
     :return: None
     '''
+    # pdb.set_trace()
 
     # If public data doesn't exist:
-    if not os.path.exists(config_dirs['raw_dir'].format(rootdir) + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)):
+    if not os.path.exists(directories['raw_dir'].format(regiondir) + directories['raw_pub_data'].format(in_args.pub_raw_name)):
         # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
         if not in_args.upload_to_db:
             choice = input("Public data not found, load from database? (y/n): ")
             if choice.lower() == 'y':
                 # Check env file exists
-                env_fpath = os.path.join(rootdir,'.env')
+                env_fpath = os.path.join(regiondir,'.env')
                 if not os.path.exists(env_fpath):
                     print("Database credentials not found. Please complete the .env file using the '.env template'")
                     sys.exit()
@@ -39,7 +40,7 @@ def checkDataExists(rootdir, config_dirs, in_args, data_source):
                 # Load public data
                 query = createPublicDataSQLQuery(data_source)
                 df = fetch_data(query)
-                df.to_csv(config_dirs['raw_dir'].format(rootdir) + config_dirs['raw_pub_data'].format(in_args.pub_raw_name))
+                df.to_csv(directories['raw_dir'].format(regiondir) + directories['raw_pub_data'].format(in_args.pub_raw_name))
             else:
                 print("Public/Registry data required - please copy in data csv to Data_Inputs\
                 /Raw_Data or load from database")
@@ -102,11 +103,11 @@ def remove_table_duplicates(table_name, headers):
     return query
 
 
-def add_data_to_table(rootdir, table_name, config_dirs, proc_type, man_matched, in_args):
+def add_data_to_table(regiondir, table_name, directories, proc_type, man_matched, in_args):
     '''
     Adds the confirmed_matches data to table
     :param table_name: the database table to which the confirmed matches will be addded
-    :param config_dirs:  directory variables
+    :param directories:  directory variables
     :param proc_type: Process type, initially name_only
     :param man_matched: the dataframe containing the data
     :return: None
@@ -119,12 +120,12 @@ def add_data_to_table(rootdir, table_name, config_dirs, proc_type, man_matched, 
     else:
         confirmed_matches = confirmed_matches[(man_matched['Manual_Match_N'] == 'Y')]
 
-    confirmed_matches.to_csv(config_dirs['confirmed_matches_file'].format(rootdir, proc_type),
+    confirmed_matches.to_csv(directories['confirmed_matches_file'].format(regiondir, proc_type),
                              columns=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address'],
                              index=False)
 
     conn, cur = create_connection()
-    with open(config_dirs['confirmed_matches_file'].format(rootdir, proc_type), 'r') as f:
+    with open(directories['confirmed_matches_file'].format(regiondir, proc_type), 'r') as f:
         # Get headers dynamically
         reader = csv.reader(f)
         headers = next(reader, None)

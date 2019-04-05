@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import pytest
 from pandas.util.testing import assert_frame_equal
-from run_files import data_processing
+from core_run_files import data_processing
 from tests.conftest import testdir
 
 

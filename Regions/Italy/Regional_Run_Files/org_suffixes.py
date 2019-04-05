@@ -1,4 +1,4 @@
-global org_suffixes_dict
+
 org_suffixes_dict = {
     'società a responsabilità limitata semplificata': 'srls',
     'società\' a responsabilità\' limitata semplificata': 'srls',

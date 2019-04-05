@@ -17,6 +17,7 @@ psycopg2-binary = "*"
 pytest = "*"
 pandas = "*"
 csvdedupe = {editable = true,git = "https://www.github.com/DMells/csvdedupe"}
+chwrapper = "*"
 
 [requires]
 python_version = "3.6"

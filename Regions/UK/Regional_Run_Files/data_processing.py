@@ -2,26 +2,21 @@ import pandas as pd
 import os
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
-import numpy as np
-from run_files import org_suffixes
+from Regions.Italy.Regional_Run_Files import org_suffixes
 import string
-import pdb
 
-
-def clean_private_data(rootdir, config_dirs, in_args):
+def clean_private_data(regiondir, directories, in_args):
     """
 	Takes the private data file as input, org type suffixes are replaced with abbreviated versions
 	and strings reformatted for consistency across the two datasets
 
 	:return df: the amended private datafile
 	"""
-    raw_data = config_dirs['raw_dir'].format(rootdir) + config_dirs['raw_priv_data'].format(in_args.priv_raw_name)
-    adj_data = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
+    raw_data = directories['raw_dir'].format(regiondir) + directories['raw_priv_data'].format(in_args.priv_raw_name)
+    adj_data = directories['adj_dir'].format(regiondir) + directories['adj_priv_data'].format(in_args.priv_adj_name)
 
     if not os.path.exists(adj_data):
-        df = pd.read_csv(raw_data, usecols=['id', 'supplier_name', 'supplier_streetadd'],
-                         dtype={'supplier_name': np.str, 'supplier_streetadd': np.str})
-        df.rename(columns={'supplier_name': 'priv_name', 'supplier_streetadd': 'priv_address'}, inplace=True)
+        df = pd.read_csv(raw_data)
         print("Re-organising private data...")
 
         # Remove punctuation and double spacing in name
@@ -32,90 +27,12 @@ def clean_private_data(rootdir, config_dirs, in_args):
         # Replace organisation suffixes with standardised version
         df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
-        # Remove punctuation and double spacing in address
-        adj_col = str('priv_address_adj')
-        orig_col = str('priv_address')
-
-        df = remvPunct(df, orig_col, adj_col)
-        df = remvStreetNumber(df, adj_col)
-
-        df = joinfields(df, 'priv')
 
         print("...done")
         df.to_csv(adj_data, index=False)
     else:
         # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
-        df = pd.read_csv(adj_data, usecols=['id', 'priv_name', 'priv_name_adj', 'priv_address','priv_address_adj'],
-                         dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str, 'priv_address_adj': np.str, 'privjoinfields':np.str})
-    return df
-
-
-def clean_public_data(rootdir, config_dirs, in_args):
-    """
-	Takes the raw public data file and splits into chunks.
-	Multiple address columns are merged into one column,
-	org type suffixes are replaced with abbreviated versions and strings reformatted for consistency across the two datasets
-
-	:return dffullmerge: the public dataframe adjusted as above
-	"""
-
-    raw_data = config_dirs['raw_dir'].format(rootdir) + config_dirs['raw_pub_data'].format(in_args.pub_raw_name)
-    adj_data = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
-
-    if not os.path.exists(adj_data):
-        print("Re-organising public data...")
-        df = pd.read_csv(raw_data,
-                         usecols={'org_name', 'street_address1', 'street_address2', 'street_address3', 'org_id'},
-                         dtype={'org_name': np.str, 'street_address1': np.str, 'street_address2': np.str,
-                                'street_address3': np.str, 'org_id': np.str},
-                         chunksize=500000)
-
-        dffullmerge = pd.DataFrame([])
-        for chunk in df:
-
-            # Remove punctuation and double spacing
-            adj_col = str('pub_name_adj')
-            orig_col = str('org_name')
-            chunk = remvPunct(chunk, orig_col, adj_col)
-
-            # Replace organisation suffixes with standardised version
-            chunk[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
-
-            ls = []
-            # Merge multiple address columns into one column
-            for idx, row in tqdm(chunk.iterrows()):
-                ls.append(tuple([row['org_id'], row['org_name'], row['pub_name_adj'], row['street_address1']]))
-                for key in ['street_address2', 'street_address3']:
-                    if pd.notnull(row[key]):
-                        ls.append(tuple([row['org_id'], row['org_name'], row['pub_name_adj'], row[key]]))
-            labels = ['org_id', 'org_name', 'pub_name_adj', 'street_address']
-
-            dfmerge = pd.DataFrame.from_records(ls, columns=labels)
-
-            dfmerge.rename(columns={'street_address': 'pub_address'}, inplace=True)
-
-            # Remove punctuation and double spacing in address
-            adj_col = str('pub_address_adj')
-            orig_col = str('pub_address')
-            dfmerge = remvPunct(dfmerge, orig_col, adj_col)
-            dfmerge = remvStreetNumber(dfmerge, adj_col)
-            dfmerge = joinfields(dfmerge, 'pub')
-
-            dffullmerge = pd.concat([dffullmerge, dfmerge], ignore_index=True)
-        dffullmerge.drop_duplicates(inplace=True)
-        print("...done")
-
-        dffullmerge.to_csv(adj_data, index=False)
-
-
-def joinfields(df, dftype):
-    '''
-    Join adjusted name and address strings into single column to be able to calculate levenshtein distance and thereby name and address matches
-    :param df: dataframe (public or private)
-    :return: df
-    '''
-
-    df[''.join([str(dftype),'joinfields'])] = df[''.join([str(dftype),'_name_adj'])] + ' ' + df[''.join([str(dftype),'_address_adj'])]
+        df = pd.read_csv(adj_data)
     return df
 
 
@@ -129,12 +46,6 @@ def remvPunct(df, orig_col, adj_col):
     df[adj_col] = df[orig_col].str.translate(
         str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
     return df
-
-
-def remvStreetNumber(df, adj_col):
-    df[adj_col] = df[adj_col].str.replace('\d+', '').str.strip()
-    return df
-
 
 def shorten_name(row):
     """
@@ -188,10 +99,11 @@ def get_max_id(group):
     for index, row in group.iterrows():
         # If the row is unmatched (has no public org_id):
         if pd.isnull(row.org_id):
-            group.at[index, 'org_id'] = group['org_id'][max_conf_idx]
-            group.at[index, 'pub_name_adj'] = group['pub_name_adj'][max_conf_idx]
-            group.at[index, 'org_name'] = group['org_name'][max_conf_idx]
-            group.at[index, 'pub_address'] = group['pub_address'][max_conf_idx]
+            group.at[index, ''] = group['CH_id'][max_conf_idx]
+            # group.at[index, 'pub_name_adj'] = group['pub_name_adj'][max_conf_idx]
+            # group.at[index, 'org_name'] = group['org_name'][max_conf_idx]
+            group.at[index, 'CH_address'] = group['CH_address'][max_conf_idx]
+            group.at[index, 'CH_incorporation_date'] = group['CH_incorporation_date'][max_conf_idx]
     return group
 
 
@@ -230,4 +142,3 @@ def add_lev_dist(clust_df, output_file=None):
     clust_df.to_csv(output_file, index=False)
 
     return clust_df
-
