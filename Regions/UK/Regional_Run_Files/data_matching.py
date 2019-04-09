@@ -26,7 +26,7 @@ def companies_house_matching(df,directories,regiondir,proc_type):
     """
 
     s = chwrapper.Search(access_token=companieshouse_key)
-    # Tried matching to priv_name_adj but results were poor. Keeping adj column for clustering...
+    # Tried matching to priv_name_adj but results were poor. Keeping adj/short column for clustering...
     org_strings = df['priv_name']
     ch_name_dict = {}
     ch_id_dict = {}
@@ -44,16 +44,14 @@ def companies_house_matching(df,directories,regiondir,proc_type):
         # For each org_string in the sub-array of org_strings
         # pull org data from companies house
         for word in tqdm(chunk):
-            # if pd.notnull(row.priv_name_short) and pd.notnull(row.pub_name_short):
-            #     return fuzz.ratio(row.priv_name_short, row.pub_name_short), 0
             response = s.search_companies(word)
             if response.status_code == 200:
                 dict = response.json()
                 # response.json() returns a nested dict with complete org info
-                # Below pulls just the company number.
                 # pdb.set_trace()
                 name = ''
                 chId = 0
+                chAddr = ''
                 dict = dict['items']
                 for i in range(len(dict)):
                     if fuzz.ratio(word, dict[i]['title']) > fuzz.ratio(word, name):
@@ -64,23 +62,8 @@ def companies_house_matching(df,directories,regiondir,proc_type):
                         continue
 
                 ch_name_dict[word] = name
-                # ch_org_dict[word]['CH_name'] = name
                 ch_id_dict[name] = chId
                 ch_addr_dict[name] = chAddr
-                # # Gather all search results, calc leven dist, pick highest one:
-                #
-                # # Pull through address and incorporation date
-                # try:
-                #     address = dict['items'][0]['address_snippet']
-                # except:
-                #     address = str('None')
-                #
-                # try:
-                #     inc_date = dict['items'][0]['date_of_creation']
-                # except:
-                #     inc_date = '1000-01-01'
-                #
-                # ch_org_dict[word].extend([address, inc_date])
                 ch_name_dict.update(ch_name_dict)
                 ch_id_dict.update(ch_id_dict)
                 ch_addr_dict.update(ch_addr_dict)
@@ -100,12 +83,12 @@ def companies_house_matching(df,directories,regiondir,proc_type):
         chunk_propn += int(len(chunk))
         print("\nProgress: " + str(chunk_propn) + " of " +
               str(len(org_strings)))
-        pdb.set_trace()
+
         df['CH_name'] = df['priv_name'].map(ch_name_dict)
         df['CH_id'] = df['CH_name'].map(ch_id_dict)
         df['CH_address'] = df['CH_name'].map(ch_addr_dict)
 
-    df.to_csv(directories['match_output_file'].format(regiondir, proc_type))
+    df.to_csv(directories['match_output_file'].format(regiondir, proc_type),index=False)
 
 
 def dedupe_match_cluster(regiondir, directories, config_files, proc_type, proc_num, in_args):
@@ -152,11 +135,8 @@ def extract_matches(regiondir, clustdf, config_files, directories, proc_num, pro
 	:return extracts_file: contains dataframe with possible acceptable matches
 	"""
 
-    if in_args.recycle:
-        levendist = str('leven_dist_NA')
-    else:
-        levendist = str('leven_dist_N')
 
+    levendist = str('leven_dist_N')
 
     # Round confidence scores to 2dp :
     # pdb.set_trace()
@@ -209,34 +189,18 @@ def manual_matching(regiondir, directories, best_config, proc_type, in_args):
     manual_match_file = pd.read_csv(
         directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv', index_col=None)
     manual_match_file['Manual_Match_N'] = ''
-    manual_match_file['Manual_Match_NA'] = ''
 
     # Automatically confirm rows with leven dist of 100
     for index, row in manual_match_file.iterrows():
         if row.leven_dist_N == 100:
             manual_match_file.at[index, 'Manual_Match_N'] = str('Y')
-        if row.leven_dist_NA == 100:
-            manual_match_file.at[index, 'Manual_Match_NA'] = str('Y')
 
     if in_args.terminal_matching:
-        choices = ['n', 'na']
-        choice = input("\nMatching name only or name and address? (N / NA):")
-        while choice.lower() not in choices:
-            choice = input("\nMatching name only or name and address? (N / NA):")
-
         # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
         for index, row in manual_match_file.sample(frac=1).iterrows():
-            if choice.lower() == 'n':
-                print("\nPrivate name: " + str(row.priv_name_adj))
-                print("\nPublic name: " + str(row.pub_name_adj))
-                print("\nLevenshtein distance: " + str(row.leven_dist_N))
-            else:
-                print("\nPrivate name: " + str(row.priv_name_adj))
-                print("Private address: " + str(row.priv_address_adj))
-                print("\nPublic name: " + str(row.pub_name_adj))
-                print("Public address: " + str(row.pub_address_adj))
-                print("\nLevenshtein distance : " + str(row.leven_dist_NA))
-
+            print("\nPrivate name: " + str(row.priv_name_adj))
+            print("\nPublic name: " + str(row.pub_name_adj))
+            print("\nLevenshtein distance: " + str(row.leven_dist_N))
             match_options = ["y", "n", "u", "f"]
             match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
             while match.lower() not in match_options:
@@ -244,7 +208,6 @@ def manual_matching(regiondir, directories, best_config, proc_type, in_args):
 
             if str(match).lower() != "f":
                 manual_match_file.at[index, 'Manual_Match_N'] = str(match).capitalize()
-                # Need to add in NA version ? Might just remove terminal matching altogether...
                 continue
             else:
                 break
@@ -253,27 +216,13 @@ def manual_matching(regiondir, directories, best_config, proc_type, in_args):
 
         print("Saving...")
         manual_match_file.to_csv(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-                                 index=False,
-                                 # columns=['org_id', 'id', 'org_name',
-                                 #          'priv_name','pub_address', 'priv_address', 'leven_dist_N', 'leven_dist_NA','Manual_Match_N','Manual_Match_NA'])
-                                columns = ['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'org_id', 'id', 'org_name', 'pub_name_adj',
-                                           'pub_address', 'priv_name', 'priv_name_adj', 'priv_address', 'priv_address_adj', 'pub_address_adj',
-                                           'Manual_Match_N', 'Manual_Match_NA', 'privjoinfields', 'pubjoinfields'])
+                                 index=False,columns=['priv_name','CH_name','Manual_Match_N','about_or_contact_text','company_url','home_page_text','CH_id','CH_address','priv_name_short','CH_name_short','leven_dist_N'])
         return manual_match_file
 
     else:
         manual_match_file.to_csv(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-                                 index=False,
-                                 # columns=['org_id', 'id', 'org_name',
-                                 #          'priv_name', 'pub_address', 'priv_address', 'leven_dist_N', 'leven_dist_NA',
-                                 #          'Manual_Match_N', 'Manual_Match_NA'])
-                                 columns=['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'org_id', 'id', 'org_name', 'pub_name_adj',
-                                          'pub_address','priv_name', 'priv_name_adj', 'priv_address', 'priv_address_adj', 'pub_address_adj', 'Manual_Match_N','Manual_Match_NA', 'privjoinfields', 'pubjoinfields'])
-        if not in_args.recycle:
-            if not in_args.upload_to_db:
-                print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(
-                directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv'))
-        else:
-            if not in_args.upload_to_db:
-                print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --recycle --upload_to_db".format(
-                    directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv'))
+                                 index=False, columns=['priv_name','CH_name','Manual_Match_N','about_or_contact_text','company_url','home_page_text','CH_id','CH_address','priv_name_short','CH_name_short','leven_dist_N'])
+
+        if not in_args.upload_to_db:
+            print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(
+            directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv'))

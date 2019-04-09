@@ -3,8 +3,8 @@ import pandas as pd
 import os
 import numpy as np
 import ast
-from core_run_files import setup, db_calls, convert_training, data_analysis
-from Regions.UK.Regional_Run_Files import data_matching,data_processing
+from core_run_files import setup, db_calls, convert_training
+from Regions.UK.Regional_Run_Files import data_matching,data_processing, data_analysis
 from pathlib import Path
 import directories
 import pdb
@@ -32,6 +32,7 @@ def get_input_args(rootdir, args=None):
     parser.add_argument('--upload_to_db', action='store_true' , help='Add confirmed matches to database')
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
     args = parser.parse_args(args)
+    # pdb.set_trace()
     # If the clustering training file does not exist then switch training arg to force training
     if not os.path.exists(os.path.join(rootdir,args.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
         print("Dedupe training files do not exist - running with --training flag to initiate training process")
@@ -74,6 +75,7 @@ def main(regiondir, in_args, directories):
                         if not os.path.exists(directories['match_output_file'].format(regiondir, proc_type)):
                             data_matching.companies_house_matching(privdf,directories,regiondir,proc_type)
 
+                        data_processing.clean_matched_data(directories, regiondir, proc_type)
                         # Run dedupe for matching and calculate related stats for comparison
                         if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
 
@@ -81,9 +83,6 @@ def main(regiondir, in_args, directories):
 
                         if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
                             clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type),index_col=None)
-                            # Copy public data to high-confidence cluster records
-                            # clust_df = data_processing.assign_pub_data_to_clusters(clust_df, directories[
-                            #     'assigned_output_file'].format(regiondir, proc_type))
 
                             # Adds leven_dist column and extract matches based on config process criteria:
                             clust_df = data_processing.add_lev_dist(clust_df, directories["assigned_output_file"].format(regiondir, proc_type))
@@ -128,30 +127,13 @@ def main(regiondir, in_args, directories):
 
             data_matching.manual_matching(regiondir, directories, best_config, proc_type, in_args)
 
-            if in_args.convert_training:
-                # Ensure not in recycle mode for training file to be converted
-                assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
-
-                conv_file = pd.read_csv(
-                    directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-                    usecols=['priv_name_adj', 'priv_address_adj', 'pub_name_adj', 'pub_address_adj', 'Manual_Match_N','Manual_Match_NA'])
-
-                # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
-                convert_training.convert_to_training(regiondir, directories, conv_file)
-
             if in_args.upload_to_db:
                 upload_file = pd.read_csv(
                     directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-                    usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match_N','Manual_Match_NA'])
+                    usecols=['priv_name','about_or_contact_text','company_url','home_page_text','CH_id', 'CH_name', 'CH_address', 'Manual_Match_N'])
 
-                # Add confirmed matches to relevant proc_type table
-                if not in_args.recycle:
-                    db_calls.add_data_to_table(regiondir, "spaziodati.confirmed_nameonly_matches", directories, proc_type,
-                                               upload_file, in_args)
-                    print("Process complete. Run 'python runfile.py --recycle' to begin training against additional fields.")
-                if in_args.recycle:
-                    db_calls.add_data_to_table(regiondir, "spaziodati.confirmed_nameaddress_matches", directories, proc_type,
-                                               upload_file, in_args)
+                db_calls.add_data_to_table(regiondir, "spaziodati.confirmed_nameonly_matches", directories, proc_type,
+                                               upload_file)
 
 if __name__ == '__main__':
     rootdir = os.path.dirname(os.path.abspath(__file__))

@@ -2,8 +2,9 @@ import pandas as pd
 import os
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
-from Regions.Italy.Regional_Run_Files import org_suffixes
+from Regions.UK.Regional_Run_Files import org_suffixes
 import string
+import pdb
 
 def clean_private_data(regiondir, directories, in_args):
     """
@@ -25,8 +26,10 @@ def clean_private_data(regiondir, directories, in_args):
         df = remvPunct(df, orig_col, adj_col)
 
         # Replace organisation suffixes with standardised version
+        pdb.set_trace()
         df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
-
+        df['priv_name_short'] = df.priv_name_adj.apply(shorten_name)
+        pdb.set_trace()
 
         print("...done")
         df.to_csv(adj_data, index=False)
@@ -34,6 +37,19 @@ def clean_private_data(regiondir, directories, in_args):
         # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
         df = pd.read_csv(adj_data)
     return df
+
+
+def clean_matched_data(directories, regiondir, proc_type):
+    df = pd.read_csv(directories['match_output_file'].format(regiondir, proc_type))
+    adj_col = str('CH_name_adj')
+    orig_col = str('CH_name')
+    df = remvPunct(df, orig_col, adj_col)
+    # pdb.set_trace()
+    # Replace organisation suffixes with standardised version
+    df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
+
+    df['CH_name_short'] = df.CH_name_adj.apply(shorten_name)
+    df.to_csv(directories['match_output_file'].format(regiondir, proc_type),index=False)
 
 
 def remvPunct(df, orig_col, adj_col):
@@ -46,6 +62,7 @@ def remvPunct(df, orig_col, adj_col):
     df[adj_col] = df[orig_col].str.translate(
         str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
     return df
+
 
 def shorten_name(row):
     """
@@ -100,10 +117,8 @@ def get_max_id(group):
         # If the row is unmatched (has no public org_id):
         if pd.isnull(row.org_id):
             group.at[index, ''] = group['CH_id'][max_conf_idx]
-            # group.at[index, 'pub_name_adj'] = group['pub_name_adj'][max_conf_idx]
-            # group.at[index, 'org_name'] = group['org_name'][max_conf_idx]
+            group.at[index, ''] = group['CH_name'][max_conf_idx]
             group.at[index, 'CH_address'] = group['CH_address'][max_conf_idx]
-            group.at[index, 'CH_incorporation_date'] = group['CH_incorporation_date'][max_conf_idx]
     return group
 
 
@@ -113,11 +128,9 @@ def calc_match_ratio(row):
 
 	:return ratio: individual levenshtein distance between the public and private org string
 	"""
-    if pd.notnull(row.priv_name_short) and pd.notnull(row.pub_name_short):
-        if pd.notnull(row.priv_address_adj) and pd.notnull(row.pub_address_adj):
-            return fuzz.ratio(row.priv_name_short, row.pub_name_short), fuzz.ratio(row.privjoinfields, row.pubjoinfields)
-    if pd.notnull(row.priv_name_short) and pd.notnull(row.pub_name_short):
-        return fuzz.ratio(row.priv_name_short, row.pub_name_short), 0
+
+    if pd.notnull(row.priv_name_short) and pd.notnull(row.CH_name_short):
+        return fuzz.ratio(row.priv_name_short, row.CH_name_short)
 
 
 def add_lev_dist(clust_df, output_file=None):
@@ -131,13 +144,10 @@ def add_lev_dist(clust_df, output_file=None):
     '''
     # Remove company suffixes for more relevant levenshtein distance calculation. Otherwise will have exaggerated
     # Distances if i.e. priv name has 'srl' suffix but pub name doesn't.
-    clust_df['priv_name_short'] = clust_df.priv_name_adj.apply(shorten_name)
-
-    clust_df['pub_name_short'] = clust_df.pub_name_adj.apply(shorten_name)
 
     # Add column containing levenshtein distance between the matched public & private org names
     if 'leven_dist_N' not in clust_df.columns:
-        clust_df['leven_dist_N'], clust_df['leven_dist_NA'] = zip(*clust_df.apply(calc_match_ratio, axis=1))
+        clust_df['leven_dist_N'] = clust_df.apply(calc_match_ratio, axis=1)
 
     clust_df.to_csv(output_file, index=False)
 

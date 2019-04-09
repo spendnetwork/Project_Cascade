@@ -17,7 +17,7 @@ def get_input_args(rootdir, args=None):
 
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
     parser.add_argument('--region', default='Italy', type=str, help='Define the region/country (Italy/UK)')
-    parser.add_argument('--priv_raw_name', default='private_data.csv', type=str,
+    parser.add_argument('--priv_raw_name', default='private_data_mini.csv', type=str,
                         help='Set raw private/source datafile name')
     parser.add_argument('--pub_raw_name', default='public_data.csv', type=str, help='Set raw public datafile name')
     parser.add_argument('--priv_adj_name', default='priv_data_adj.csv', type=str,

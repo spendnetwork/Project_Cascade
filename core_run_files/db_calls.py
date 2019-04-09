@@ -40,7 +40,7 @@ def checkDataExists(regiondir, directories, in_args, data_source):
                 # Load public data
                 query = createPublicDataSQLQuery(data_source)
                 df = fetch_data(query)
-                df.to_csv(directories['raw_dir'].format(regiondir) + directories['raw_pub_data'].format(in_args.pub_raw_name))
+                df.to_csv(directories['raw_dir'].format(regiondir) + directories['raw_pub_data'].format(in_args.pub_raw_name), index=False)
             else:
                 print("Public/Registry data required - please copy in data csv to Data_Inputs\
                 /Raw_Data or load from database")

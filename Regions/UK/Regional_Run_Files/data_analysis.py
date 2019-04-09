@@ -23,8 +23,8 @@ def calc_matching_stats(regiondir, clustdf, extractdf, directories, conf_file_nu
 
     # Overall matches, including poor quality:
     statdf.at[conf_file_num, 'Config_File'] = conf_file_num
-    statdf.at[conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['org_id'])])
-    statdf.at[conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['org_id'])]) / len(privdf) * 100,2)
+    statdf.at[conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['CH_id'])])
+    statdf.at[conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['CH_id'])]) / len(privdf) * 100,2)
     # Overall optimised matches :
     statdf.at[conf_file_num, 'Optim_Matches'] = len(extractdf)
     # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
@@ -39,7 +39,7 @@ def calc_matching_stats(regiondir, clustdf, extractdf, directories, conf_file_nu
         statdf.at[conf_file_num, 'Leven_Dist_Avg'] = np.average(extractdf.leven_dist_N)
     # if statsfile doesnt exist, create it
     if not os.path.exists(directories['stats_file'].format(regiondir, proc_type)):
-        statdf.to_csv(directories['stats_file'].format(regiondir, proc_type, index=False))
+        statdf.to_csv(directories['stats_file'].format(regiondir, proc_type), index=False)
     # if it does exist, concat current results with previous
     else:
         main_stat_file = pd.read_csv(directories['stats_file'].format(regiondir, proc_type), index_col=None)
