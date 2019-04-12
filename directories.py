@@ -31,9 +31,9 @@ dirs = {
                   "manual_matching_train_backup": "{0}/Data_Inputs/Training_Files/Manual_&_Backups/manual_matching_training.json",
                   "backups_dir": "{0}/Data_Inputs/Training_Files/Manual_&_Backups",
                   "cluster_training_backup": "{0}/Data_Inputs/Training_Files/Manual_&_Backups/cluster_training_backup.json",
-                  "confirmed_matches_file": "{0}/Outputs/{1}/Manual_Matches/Manual_Matches.csv",
+                  "confirmed_matches_file": "{0}/Outputs/{1}/Manual_Matches/Confirmed_Matches.csv",
                   "confirmed_matches_dir": "{0}/Outputs/{1}/Manual_Matches/",
-                  "upload_matches_dir": "{0}/Outputs/{1}/Upload_Matches/",
+
 
             }}
 

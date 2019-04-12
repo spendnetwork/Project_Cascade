@@ -5,6 +5,7 @@ from tqdm import tqdm
 from Regions.UK.Regional_Run_Files import org_suffixes
 import string
 import pdb
+import numpy as np
 
 def clean_private_data(regiondir, directories, in_args):
     """
@@ -17,7 +18,7 @@ def clean_private_data(regiondir, directories, in_args):
     adj_data = directories['adj_dir'].format(regiondir) + directories['adj_priv_data'].format(in_args.priv_adj_name)
 
     if not os.path.exists(adj_data):
-        df = pd.read_csv(raw_data)
+        df = pd.read_csv(raw_data, dtype={'about_or_contact_text': np.str,'home_page_text': np.str})
         print("Re-organising private data...")
 
         # Remove punctuation and double spacing in name
@@ -26,10 +27,9 @@ def clean_private_data(regiondir, directories, in_args):
         df = remvPunct(df, orig_col, adj_col)
 
         # Replace organisation suffixes with standardised version
-        pdb.set_trace()
+
         df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
         df['priv_name_short'] = df.priv_name_adj.apply(shorten_name)
-        pdb.set_trace()
 
         print("...done")
         df.to_csv(adj_data, index=False)
@@ -44,10 +44,9 @@ def clean_matched_data(directories, regiondir, proc_type):
     adj_col = str('CH_name_adj')
     orig_col = str('CH_name')
     df = remvPunct(df, orig_col, adj_col)
-    # pdb.set_trace()
+
     # Replace organisation suffixes with standardised version
     df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
-
     df['CH_name_short'] = df.CH_name_adj.apply(shorten_name)
     df.to_csv(directories['match_output_file'].format(regiondir, proc_type),index=False)
 

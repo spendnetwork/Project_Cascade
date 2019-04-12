@@ -53,7 +53,7 @@ def remove_table_duplicates(table_name, headers):
     return query
 
 
-def add_data_to_table(regiondir, table_name, directories, proc_type, upload_file):
+def add_data_to_table(regiondir, table_name, directories, proc_type, best_config):
     '''
     Adds the confirmed_matches data to table
     :param table_name: the database table to which the confirmed matches will be addded
@@ -63,19 +63,25 @@ def add_data_to_table(regiondir, table_name, directories, proc_type, upload_file
     :return: None
     '''
 
-    # Filter manual matches file to just confirmed Yes matches and non-blank org id's
+    upload_file = pd.read_csv(
+        directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
+        usecols=['priv_name', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N'])
+
+    # # Filter manual matches file to just confirmed Yes matches and non-blank org id's
     confirmed_matches = upload_file[pd.notnull(upload_file['CH_id'])]
 
-    confirmed_matches = confirmed_matches[(upload_file['Manual_Match_N'] == 'Y')]
+    # confirmed_matches = confirmed_matches[(upload_file['Manual_Match_N'] == 'Y')]
 
     confirmed_matches.to_csv(directories['confirmed_matches_file'].format(regiondir, proc_type),
-                             columns=['priv_name', 'about_or_contact_text','company_url','home_page_text','CH_id', 'CH_name', 'CH_address'],
+                             columns=['priv_name','CH_name', 'Manual_Match_N','company_url','CH_id', 'CH_address', 'leven_dist_N'],
                              index=False)
 
     conn, cur = create_connection()
+
     with open(directories['confirmed_matches_file'].format(regiondir, proc_type), 'r') as f:
         # Get headers dynamically
         reader = csv.reader(f)
+
         headers = next(reader, None)
         headers = ", ".join(headers)
         next(f)  # Skip header row

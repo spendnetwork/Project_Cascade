@@ -3,8 +3,8 @@ import pandas as pd
 import os
 import numpy as np
 import ast
-from core_run_files import setup, db_calls, convert_training
-from Regions.UK.Regional_Run_Files import data_matching,data_processing, data_analysis
+from core_run_files import setup, convert_training
+from Regions.UK.Regional_Run_Files import data_matching,data_processing, data_analysis, db_calls
 from pathlib import Path
 import directories
 import pdb
@@ -77,6 +77,7 @@ def main(regiondir, in_args, directories):
 
                         data_processing.clean_matched_data(directories, regiondir, proc_type)
                         # Run dedupe for matching and calculate related stats for comparison
+                        # pdb.set_trace()
                         if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
 
                             data_matching.dedupe_match_cluster(regiondir, directories, configs, proc_type, proc_num, in_args)
@@ -125,15 +126,11 @@ def main(regiondir, in_args, directories):
                 max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
                 best_config = stat_file.at[max_lev, 'Config_File']
 
-            data_matching.manual_matching(regiondir, directories, best_config, proc_type, in_args)
+            if not os.path.exists(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv'):
+                data_matching.manual_matching(regiondir, directories, best_config, proc_type, in_args)
 
             if in_args.upload_to_db:
-                upload_file = pd.read_csv(
-                    directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-                    usecols=['priv_name','about_or_contact_text','company_url','home_page_text','CH_id', 'CH_name', 'CH_address', 'Manual_Match_N'])
-
-                db_calls.add_data_to_table(regiondir, "spaziodati.confirmed_nameonly_matches", directories, proc_type,
-                                               upload_file)
+                db_calls.add_data_to_table(regiondir, "matching.gb_coh", directories, proc_type, best_config)
 
 if __name__ == '__main__':
     rootdir = os.path.dirname(os.path.abspath(__file__))
