@@ -10,6 +10,7 @@
                         "char_counts": 0,
                         "min_match_score": 100,
                         "recycle_phase": False,
+                        "db_table" : "matching.spaziodati_name_matches",
                     },
                     2:
                         {
@@ -52,6 +53,7 @@
                         "char_counts": 0,
                         "min_match_score": 100,
                         "recycle_phase": True,
+                        "db_table" : "matching.spaziodati_nameaddress_matches",
                     },
                     2:
                         {

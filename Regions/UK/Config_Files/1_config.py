@@ -10,7 +10,7 @@
                         "char_counts": 0,
                         "min_match_score": 100,
                         "recycle_phase": False,
-                        "scheme" : 'GB-COH'
+                        "db_table" : 'matching.GB-COH'
                     },
                     2:
                         {

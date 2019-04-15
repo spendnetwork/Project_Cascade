@@ -1,12 +1,12 @@
 import argparse
 import pandas as pd
 import os
-import numpy as np
 import ast
-from core_run_files import setup, convert_training
+from core_run_files import setup
 from Regions.UK.Regional_Run_Files import data_matching,data_processing, data_analysis, db_calls
 from pathlib import Path
 import directories
+import numpy as np
 import pdb
 
 def get_input_args(rootdir, args=None):
@@ -90,8 +90,7 @@ def main(regiondir, in_args, directories):
 
                         else:
 
-                            clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type),
-                                                   index_col=None)
+                            clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type), dtype={'leven_dist_N': np.int}, index_col=None)
 
                         extracts_file = data_matching.extract_matches(regiondir, clust_df, configs, directories, proc_num,
                                                                       proc_type,
@@ -104,7 +103,6 @@ def main(regiondir, in_args, directories):
 
     except StopIteration:
         # Continue if no more config files found
-
         print("Done")
 
         # For each process type (eg: Name & Add, Name only) outlined in the configs file:
@@ -118,8 +116,7 @@ def main(regiondir, in_args, directories):
             # If user has used --config_review flag, set best_config variable based on manual review of stats file...
             if in_args.config_review:
                 best_config = input(
-                    (
-                        "\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
+                    ( "\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
                         proc_type))
             else:
                 # ...otherwise pick best config_file based on stats file (max leven dist avg):

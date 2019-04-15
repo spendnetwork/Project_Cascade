@@ -3,6 +3,8 @@ import pandas as pd
 import os
 import numpy as np
 import ast
+
+from Regions.Italy.Regional_Run_Files.db_calls import checkDataExists
 from core_run_files import setup, data_matching, db_calls, convert_training, data_processing, data_analysis
 from pathlib import Path
 import directories
@@ -16,7 +18,7 @@ def get_input_args(rootdir, args=None):
 	"""
 
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
-    parser.add_argument('--region', default='Italy', type=str, help='Define the region/country (Italy/UK)')
+    parser.add_argument('--region', default='UK', type=str, help='Define the region/country (Italy/UK)')
     parser.add_argument('--priv_raw_name', default='private_data_mini.csv', type=str,
                         help='Set raw private/source datafile name')
     parser.add_argument('--pub_raw_name', default='public_data.csv', type=str, help='Set raw public datafile name')
@@ -37,8 +39,9 @@ def get_input_args(rootdir, args=None):
     # Force an error and prompt user to add the training flag
     if args.training == True and not os.path.exists(os.path.join(rootdir,args.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
         print("Dedupe training files do not exist - running with --training flag to initiate training process")
-        args.training == False
-        # parser.error("Dedupe training files do not exist, please try 'python runfile.py --training' to begin training process")
+        parser.add_argument('--training', action='store_true', help='Modify/contribute to the training data')
+
+    args = parser.parse_args()
 
     return args, parser
 
@@ -184,6 +187,6 @@ if __name__ == '__main__':
 
     if not in_args.recycle:
         # If public/registry data file doesn't exist, pull from database
-        db_calls.checkDataExists(regiondir, directories, in_args, "spaziodati.sd_sample")
+        checkDataExists(regiondir, directories, in_args, "spaziodati.sd_sample")
 
     main(regiondir, in_args, directories)

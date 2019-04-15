@@ -1,37 +1,9 @@
-import psycopg2 as psy
-from dotenv import load_dotenv, find_dotenv
-import os
+# Contains functions common to only UK matching
+
+from core_run_files.db_calls import create_connection
 import pandas as pd
-import sys
 import csv
 import pdb
-
-# get the remote database details from .env
-load_dotenv(find_dotenv())
-host_remote = os.environ.get("HOST_REMOTE")
-dbname_remote = os.environ.get("DBNAME_REMOTE")
-user_remote = os.environ.get("USER_REMOTE")
-password_remote = os.environ.get("PASSWORD_REMOTE")
-
-
-def create_connection():
-    '''
-    :return connection : the database connection object
-    :return cur : the cursor (temporary storage for retrieved data
-    '''
-    print('Connecting to database...')
-    conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
-    cur = conn.cursor()
-    return conn, cur
-
-
-def fetch_data(query):
-    """ retrieve data from the db using query"""
-    conn, _ = create_connection()
-    print('Importing data...')
-    df = pd.read_sql(query, con=conn)
-    conn.close()
-    return df
 
 
 def remove_table_duplicates(table_name, headers):
@@ -46,14 +18,14 @@ def remove_table_duplicates(table_name, headers):
         """
         WITH dups AS 
             (SELECT DISTINCT ON ({}) * FROM {})
-    
+
         DELETE FROM {} WHERE {}.id NOT IN
         (SELECT id FROM dups);
-        """.format(headers, table_name, table_name,table_name)
+        """.format(headers, table_name, table_name, table_name)
     return query
 
 
-def add_data_to_table(regiondir, table_name, directories, proc_type, best_config):
+def add_data_to_table(regiondir, table_name, directories, proc_type, best_config, dtypesmod):
     '''
     Adds the confirmed_matches data to table
     :param table_name: the database table to which the confirmed matches will be addded
@@ -65,15 +37,13 @@ def add_data_to_table(regiondir, table_name, directories, proc_type, best_config
 
     upload_file = pd.read_csv(
         directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-        usecols=['priv_name', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N'])
+        usecols=dtypesmod.dbUpload_cols)
 
     # # Filter manual matches file to just confirmed Yes matches and non-blank org id's
     confirmed_matches = upload_file[pd.notnull(upload_file['CH_id'])]
 
-    # confirmed_matches = confirmed_matches[(upload_file['Manual_Match_N'] == 'Y')]
-
     confirmed_matches.to_csv(directories['confirmed_matches_file'].format(regiondir, proc_type),
-                             columns=['priv_name','CH_name', 'Manual_Match_N','company_url','CH_id', 'CH_address', 'leven_dist_N'],
+                             columns=dtypesmod.dbUpload_cols,
                              index=False)
 
     conn, cur = create_connection()
@@ -90,7 +60,7 @@ def add_data_to_table(regiondir, table_name, directories, proc_type, best_config
         cur.copy_expert(
             """COPY {}({}) from stdin (format csv)""".format(table_name, headers), f)
         print("Data uploaded succesfully...")
-
+    pdb.set_trace()
     query = remove_table_duplicates(table_name, headers)
     cur.execute(query)
     conn.commit()

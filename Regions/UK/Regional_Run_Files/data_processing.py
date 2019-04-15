@@ -147,7 +147,7 @@ def add_lev_dist(clust_df, output_file=None):
     # Add column containing levenshtein distance between the matched public & private org names
     if 'leven_dist_N' not in clust_df.columns:
         clust_df['leven_dist_N'] = clust_df.apply(calc_match_ratio, axis=1)
-
+        # clust_df['leven_dist_N'] = clust_df['leven_dist_N'].astype('int64')
     clust_df.to_csv(output_file, index=False)
 
     return clust_df
