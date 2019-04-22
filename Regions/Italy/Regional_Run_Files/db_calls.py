@@ -5,6 +5,7 @@ import pandas as pd
 import sys
 import csv
 from core_run_files.db_calls import create_connection, remove_table_duplicates
+import pdb
 
 
 def checkDataExists(regiondir, directories, in_args, data_source):
@@ -16,7 +17,6 @@ def checkDataExists(regiondir, directories, in_args, data_source):
     :param data_source: database table
     :return: None
     '''
-    # pdb.set_trace()
 
     # If public data doesn't exist:
     if not os.path.exists(
@@ -26,7 +26,8 @@ def checkDataExists(regiondir, directories, in_args, data_source):
             choice = input("Public data not found, load from database? (y/n): ")
             if choice.lower() == 'y':
                 # Check env file exists
-                env_fpath = os.path.join(regiondir, '.env')
+                pdb.set_trace()
+                env_fpath = os.path.join('.', '.env')
                 if not os.path.exists(env_fpath):
                     print("Database credentials not found. Please complete the .env file using the '.env template'")
                     sys.exit()

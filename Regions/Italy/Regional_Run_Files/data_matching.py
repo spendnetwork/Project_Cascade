@@ -141,8 +141,9 @@ def extract_matches(regiondir, clustdf, config_files, directories, proc_num, pro
     else:
         levendist = str('leven_dist_N')
 
-    # Round confidence scores to 2dp :
 
+    # Round confidence scores to 2dp :
+    # pdb.set_trace()
     clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
 
     # Filter by current match_score:
