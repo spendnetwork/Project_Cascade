@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 
-def calc_matching_stats(regiondir, clustdf, extractdf, directories, conf_file_num, proc_type, privdf, in_args):
+def calcMatchingStats(regiondir, clustdf, extractdf, directories, conf_file_num, proc_type, privdf, in_args):
     """
 	For each process outlined in the config file, after each process is completed
 	extract the matches that meet the match % criteria into a new file

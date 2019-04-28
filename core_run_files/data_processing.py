@@ -196,7 +196,7 @@ def get_max_id(group):
 
 def calc_match_ratio(row):
     """
-	Used in extract_matches() - use fuzzywuzzy to calculate levenshtein distance
+	Used in extractMatches() - use fuzzywuzzy to calculate levenshtein distance
 
 	:return ratio: individual levenshtein distance between the public and private org string
 	"""

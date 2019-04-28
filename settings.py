@@ -2,6 +2,7 @@ import numpy as np
 import directories
 from Regions.Italy import Regional_Run_Files as ITA_run_files
 from Regions.UK import Regional_Run_Files as UK_run_files
+import pdb
 
 
 class Italy_settings():
@@ -28,14 +29,35 @@ class Italy_settings():
 
 
 
+
 class UK_settings():
+    # pdb.set_trace()
+    # def __init__(self):
+    #     self.configs = None
+    #     self.proc_type = None
+    #     self.directories = directories
+    #     self.regiondir = None
+    #     self.runfilemods = None
+    #     self.in_args = None
+    #
+    # # def matching_args(self):
+    # #     return (self.configs, self.proc_type, self.directories, self.regiondir, self.runfilemods, self.in_args)
+    #
+    # def matching_args(self, configs):
+    #     return configs
+
+
+    # def matching_args():
+    #     return (UK_settings.configs, UK_settings.proc_type, UK_settings.directories, UK_settings.regiondir, UK_settings.runfilemods, UK_settings.in_args)
+
+    # (configs, proc_type, directories, regiondir, runfilemods, in_args)
 
     runfilemods = UK_run_files
 
     df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np.float, 'priv_name': np.str,
-             'priv_name_adj': np.str, 'org_id': np.str, 'pub_name_adj': np.str, 'pub_address': np.str,
-                 'pub_address_adj': np.str, 'priv_name_short': np.str, 'pub_name_short': np.str, 'leven_dist_N': np.int,
-                 'org_name': np.str}
+             'priv_name_adj': np.str, 'CH_id': np.str, 'CH_name_adj': np.str,
+                 'CH_address': np.str, 'priv_name_short': np.str, 'CH_name_short': np.str, 'leven_dist_N': np.int,
+                 'org_name': np.str, 'home_page_text' : np.str, 'about_or_contact_text' : np.str}
 
     training_cols = ['priv_name', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N']
 
@@ -43,6 +65,8 @@ class UK_settings():
      'CH_address', 'priv_name_short', 'CH_name_short', 'leven_dist_N']
 
     publicTableSource = None
+
+    directories = directories.dirs["dirs"]
 
 
 

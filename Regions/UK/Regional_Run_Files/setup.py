@@ -1,7 +1,7 @@
 import pdb
 import os
 
-def setup_dirs(directories, regiondir, proc_type='Name_Only'):
+def setupDirs(directories, regiondir, proc_type='Name_Only'):
     '''
     Establishes the directories required as specified by the config dirs file
     :param directories: filepath dictionary

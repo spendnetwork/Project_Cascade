@@ -7,7 +7,7 @@ from Regions.Italy.Regional_Run_Files import org_suffixes
 import string
 
 
-def clean_private_data(regiondir, directories, in_args):
+def cleanPrivateData(regiondir, directories, in_args):
     """
 	Takes the private data file as input, org type suffixes are replaced with abbreviated versions
 	and strings reformatted for consistency across the two datasets
@@ -38,7 +38,7 @@ def clean_private_data(regiondir, directories, in_args):
         df = remvPunct(df, orig_col, adj_col)
         df = remvStreetNumber(df, adj_col)
 
-        df = joinfields(df, 'priv')
+        df = joinFields(df, 'priv')
 
         print("...done")
         df.to_csv(adj_data, index=False)
@@ -49,7 +49,7 @@ def clean_private_data(regiondir, directories, in_args):
     return df
 
 
-def clean_public_data(regiondir, directories, in_args):
+def cleanPublicData(regiondir, directories, in_args):
     """
 	Takes the raw public data file and splits into chunks.
 	Multiple address columns are merged into one column,
@@ -98,7 +98,7 @@ def clean_public_data(regiondir, directories, in_args):
             orig_col = str('pub_address')
             dfmerge = remvPunct(dfmerge, orig_col, adj_col)
             dfmerge = remvStreetNumber(dfmerge, adj_col)
-            dfmerge = joinfields(dfmerge, 'pub')
+            dfmerge = joinFields(dfmerge, 'pub')
 
             dffullmerge = pd.concat([dffullmerge, dfmerge], ignore_index=True)
         dffullmerge.drop_duplicates(inplace=True)
@@ -107,7 +107,7 @@ def clean_public_data(regiondir, directories, in_args):
         dffullmerge.to_csv(adj_data, index=False)
 
 
-def joinfields(df, dftype):
+def joinFields(df, dftype):
     '''
     Join adjusted name and address strings into single column to be able to calculate levenshtein distance and thereby name and address matches
     :param df: dataframe (public or private)
@@ -135,7 +135,7 @@ def remvStreetNumber(df, adj_col):
     return df
 
 
-def shorten_name(row):
+def shortenName(row):
     """
 	Removes the company suffixes according to the org_suffixes.org_suffixes_dict. This helps with the extraction phase
 	because it improves the relevance of the levenshtein distances.
@@ -154,7 +154,7 @@ def shorten_name(row):
         return row
 
 
-def assign_pub_data_to_clusters(df, assigned_file=None):
+def assignPubDataToClusters(df, assigned_file=None):
     """
 	Unmatched members of a cluster are assigned the public data of the highest-confidence matched
 	row in that cluster. At this stage the amount of confidence is irrelevant as these will be measured
@@ -174,7 +174,7 @@ def assign_pub_data_to_clusters(df, assigned_file=None):
     return df
 
 
-def get_max_id(group):
+def getMaxId(group):
     """
 	Used by assign_pub_data_to_clusters(). Takes one entire cluster,
 	finds the row with the best confidence score and applies the public data of that row
@@ -194,9 +194,9 @@ def get_max_id(group):
     return group
 
 
-def calc_match_ratio(row):
+def calcMatchRatio(row):
     """
-	Used in extract_matches() - use fuzzywuzzy to calculate levenshtein distance
+	Used in extractMatches() - use fuzzywuzzy to calculate levenshtein distance
 
 	:return ratio: individual levenshtein distance between the public and private org string
 	"""
@@ -207,7 +207,7 @@ def calc_match_ratio(row):
         return fuzz.ratio(row.priv_name_short, row.pub_name_short), 0
 
 
-def add_lev_dist(clust_df, output_file=None):
+def addLevDist(clust_df, output_file=None):
     '''
     Adds the levenshtein distance ratio comparing the amount of change required to convert the private org name
     to the public org name and therefore a measure of the quality of the match

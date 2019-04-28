@@ -4,6 +4,36 @@ import subprocess
 import numpy as np
 from shutil import copyfile
 
+def matching(configs, proc_type, df_dtypes, proc_num, directories, in_args, regiondir, runfilemods):
+    # Run dedupe for matching and calculate related stats for comparison
+    if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
+        if in_args.region == 'Italy':
+            priv_file = directories['adj_dir'].format(regiondir) + directories['adj_priv_data'].format(
+                in_args.priv_adj_name)
+            pub_file = directories['adj_dir'].format(regiondir) + directories['adj_pub_data'].format(
+                in_args.pub_adj_name)
+
+            runfilemods.data_matching.dedupe_match_cluster(priv_file, pub_file, regiondir, directories, configs,
+                                                           proc_type, proc_num, in_args)
+
+    if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
+        clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type), index_col=None,
+                               dtype=df_dtypes)
+
+        # Copy public data to high-confidence cluster records
+        clust_df = runfilemods.data_processing.assign_pub_data_to_clusters(clust_df, directories[
+            'assigned_output_file'].format(regiondir, proc_type))
+
+        # Adds leven_dist column and extract matches based on config process criteria:
+        clust_df = runfilemods.data_processing.add_lev_dist(clust_df,
+                                                            directories["assigned_output_file"].format(regiondir,
+                                                                                                       proc_type))
+
+    else:
+        clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type),
+                               index_col=None, dtype=df_dtypes, usecols=df_dtypes.keys())
+
+    return clust_df
 
 def dedupe_matchTEST(priv_file, pub_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
     """
@@ -54,7 +84,7 @@ def dedupe_matchTEST(priv_file, pub_file, regiondir, directories, config_files, 
         df.to_csv(directories['match_output_file'].format(regiondir, proc_type), index=False)
 
 
-def dedupe_match_cluster(priv_file, pub_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
+def dedupeMatchCluster(priv_file, pub_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
     """
 	Deduping - first the public and private data are matched using dedupes csvlink,
 	then the matched file is put into clusters
@@ -128,7 +158,7 @@ def dedupe_match_cluster(priv_file, pub_file, regiondir, directories, config_fil
         pass
 
 
-def extract_matches(regiondir, clustdf, config_files, directories, proc_num, proc_type, conf_file_num, in_args):
+def extractMatches(regiondir, clustdf, config_files, directories, proc_num, proc_type, conf_file_num, in_args):
     """
 	Import config file containing variable assignments for i.e. char length, match ratio
 	Based on the 'cascading' config details, extract matches to new csv
@@ -184,7 +214,7 @@ def extract_matches(regiondir, clustdf, config_files, directories, proc_num, pro
         return extracts_file
 
 
-def manual_matching(regiondir, directories, best_config, proc_type, in_args):
+def manualMatching(regiondir, directories, best_config, proc_type, in_args):
     """
 	Provides user-input functionality for manual matching based on the extracted records
 	:return manual_match_file: extracted file with added column (Y/N/Unsure)

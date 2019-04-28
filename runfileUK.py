@@ -79,8 +79,7 @@ def main(regiondir, in_args, directories):
                         # Run dedupe for matching and calculate related stats for comparison
                         # pdb.set_trace()
                         if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
-
-                            data_matching.dedupe_match_cluster(regiondir, directories, configs, proc_type, proc_num, in_args)
+                            data_matching.dedupeMatchCluster(regiondir, directories, configs, proc_type, proc_num, in_args)
 
                         if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
                             clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type),index_col=None)
@@ -92,9 +91,9 @@ def main(regiondir, in_args, directories):
 
                             clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type), dtype={'leven_dist_N': np.int}, index_col=None)
 
-                        extracts_file = data_matching.extract_matches(regiondir, clust_df, configs, directories, proc_num,
-                                                                      proc_type,
-                                                                      conf_file_num, in_args)
+                        extracts_file = data_matching.extractMatches(regiondir, clust_df, configs, directories, proc_num,
+                                                                     proc_type,
+                                                                     conf_file_num, in_args)
                     break
 
                 # Output stats file:
@@ -127,7 +126,7 @@ def main(regiondir, in_args, directories):
                 data_matching.manual_matching(regiondir, directories, best_config, proc_type, in_args)
 
             if in_args.upload_to_db:
-                db_calls.add_data_to_table(regiondir, "matching.gb_coh", directories, proc_type, best_config)
+                db_calls.addDataToTable(regiondir, "matching.gb_coh", directories, proc_type, best_config)
 
 if __name__ == '__main__':
     rootdir = os.path.dirname(os.path.abspath(__file__))

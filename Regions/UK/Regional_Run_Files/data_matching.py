@@ -17,8 +17,31 @@ companieshouse_key = os.environ.get("API_KEY2")
 logger = logging.getLogger(__name__)
 logging.getLogger("requests").setLevel(logging.WARNING)
 
+def matching(configs, proc_type, directories, regiondir, runfilemods, privdf, in_args, proc_num, df_dtypes):
+    if not os.path.exists(directories['match_output_file'].format(regiondir, proc_type)):
+        runfilemods.data_matching.companies_house_matching(privdf, directories, regiondir, proc_type)
 
-def companies_house_matching(df,directories,regiondir,proc_type):
+
+    runfilemods.data_processing.clean_matched_data(directories, regiondir, proc_type)
+    # Run dedupe for matching and calculate related stats for comparison
+
+    if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
+        runfilemods.data_matching.dedupe_match_cluster(regiondir, directories, configs, proc_type, proc_num, in_args)
+
+    if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
+        clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type), index_col=None)
+
+        # Adds leven_dist column and extract matches based on config process criteria:
+        clust_df = runfilemods.data_processing.add_lev_dist(clust_df, directories["assigned_output_file"].format(regiondir, proc_type))
+
+    else:
+
+        clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type), dtype=df_dtypes, index_col=None)
+    return clust_df
+
+
+
+def companiesHouseMatching(df,directories,regiondir,proc_type):
     """
     Lookup company name via Companies House API and return company number
     :param df: pandas dataframe containing the organisation name
@@ -48,7 +71,7 @@ def companies_house_matching(df,directories,regiondir,proc_type):
             if response.status_code == 200:
                 dict = response.json()
                 # response.json() returns a nested dict with complete org info
-                # pdb.set_trace()
+
                 name = ''
                 chId = 0
                 chAddr = ''
@@ -88,10 +111,13 @@ def companies_house_matching(df,directories,regiondir,proc_type):
         df['CH_id'] = df['CH_name'].map(ch_id_dict)
         df['CH_address'] = df['CH_name'].map(ch_addr_dict)
 
+    # Remove error matches
+    df = df.dropna(axis=0, subset=['CH_name'])
+
     df.to_csv(directories['match_output_file'].format(regiondir, proc_type),index=False)
 
 
-def dedupe_match_cluster(regiondir, directories, config_files, proc_type, proc_num, in_args):
+def dedupeMatchCluster(regiondir, directories, config_files, proc_type, proc_num, in_args):
     """
 	Deduping - first the public and private data are matched using dedupes csvlink,
 	then the matched file is put into clusters
@@ -127,7 +153,7 @@ def dedupe_match_cluster(regiondir, directories, config_files, proc_type, proc_n
         pass
 
 
-def extract_matches(regiondir, clustdf, config_files, directories, proc_num, proc_type, conf_file_num, in_args):
+def extractMatches(regiondir, clustdf, config_files, directories, proc_num, proc_type, conf_file_num, in_args):
     """
 	Import config file containing variable assignments for i.e. char length, match ratio
 	Based on the 'cascading' config details, extract matches to new csv
@@ -139,7 +165,7 @@ def extract_matches(regiondir, clustdf, config_files, directories, proc_num, pro
     levendist = str('leven_dist_N')
 
     # Round confidence scores to 2dp :
-    # pdb.set_trace()
+
     clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
 
     # Filter by current match_score:

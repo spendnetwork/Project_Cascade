@@ -2,7 +2,7 @@ import pandas as pd
 import json
 import pdb
 
-def convert_to_training(regiondir, directories, conv_file):
+def convertToTraining(regiondir, directories, conv_file):
     """
 	Converts the manually matched dataframe into a training file for dedupe
 	:return : None
