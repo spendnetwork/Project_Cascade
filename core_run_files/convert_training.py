@@ -21,12 +21,12 @@ def convert_to_training(regiondir, directories, conv_file):
         new_data = {"__class__": "tuple",
                     "__value__": [
                         {
-                            "priv_name_adj": str(row.priv_name_adj),
-                            "priv_address": str(row.priv_address_adj)
+                            "src_name_adj": str(row.src_name_adj),
+                            "src_address": str(row.src_address_adj)
                         },
                         {
-                            "priv_name_adj": str(row.pub_name_adj),
-                            "priv_address": str(row.pub_address_adj)
+                            "src_name_adj": str(row.reg_name_adj),
+                            "src_address": str(row.reg_address_adj)
                         }
                     ]}
 

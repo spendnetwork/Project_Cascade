@@ -6,7 +6,7 @@ The first set of data will contain poor quality, manually curated data, which pr
 
 The second set contains publicly available information on all registered Italian organisations. 
 
-The purpose is to find as many possible matches between the two datasets, verifying the quality of the manually curated (aka "private") data.
+The purpose is to find as many possible matches between the two datasets, verifying the quality of the manually curated (aka "source") data.
 
 Should the process be stopped at any point, the module has been constructed to check for each file created as it progresses. Therefore you can end the module and resume from where you left off.
 
@@ -50,19 +50,19 @@ pip install -r requirements.txt
 
 6. Run the module
 ```
-python run.py --pub_raw_name 'public_data_sample.csv'
+python run.py --registry_raw_name 'registry_data_sample.csv'
 ```
-Or rename the sample file to public_data.csv, which is the default name used when calling. _If no public datafile is found, the user will be prompted with the option to download it from the remote database._
+Or rename the sample file to registry_data.csv, which is the default name used when calling. _If no registry datafile is found, the user will be prompted with the option to download it from the remote database._
 ```
 python run.py
 ```
 
 The module makes use of argument parsing, with the following arguments:
 ```
---priv_raw_name (default: 'private_data.csv')
---pub_raw_name (default: 'public_data.csv')
---priv_adj_name (default: 'priv_data_adj.csv')
---pub_adj_name (default: 'pub_data_adj.csv')
+--source_raw_name (default: 'source_data.csv')
+--registry_raw_name (default: 'registry_data.csv')
+--source_adj_name (default: 'source_data_adj.csv')
+--registry_adj_name (default: 'registry_data_adj.csv')
 --recycle (No parameters)
 --training (No parameters)
 --config_review (No parameters)
@@ -73,19 +73,19 @@ The module makes use of argument parsing, with the following arguments:
 
 To amend the names if needed :
 ```
-python run.py --priv_raw_name <filename>  # ...etc
+python run.py --source_raw_name <filename>  # ...etc
 ```
 
 The `--recycle` flag is used once the module has been run and trained for the first time. When this flag is used, the module will run for a second time, but will incorporate the training data obtained from the manual matching process created in the first 'round', as  kick-start of sorts. See 5. Recycling Matches below for more info.
 
 The default file formats are :
 
-##### Private Data
-Filename : private_data.csv
+##### Source Data
+Filename : source_data.csv
 Fields : 'id' (int), 'supplier_name' (str), 'supplier_streetadd' (str)
 
-##### Public Data
-Filename : public_data.csv
+##### Registry Data
+Filename : registry_data.csv
 Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'Org_ID'
 
 ##### Directory Structure
@@ -126,20 +126,20 @@ _** Subject to change/ depending on naming conventions chosen in config files._
 ### Data Cleaning 
 1. The module takes both datafiles and creates a new column with the org name cleaned up to help the matching process. For example, all company type suffixes (ltd, llp, srl etc) are standardised.
 2. In the same new column, punctuation is removed.
-3. For the public data set which has several address columns, these are all merged into one, with related row entries duplicated.  
+3. For the registry data set which has several address columns, these are all merged into one, with related row entries duplicated.  
 
 ### Deduplication
-4.  The dedupe module comes into play next in two stages. First is the matching phase, which joins together our manual private data to the public data. It does this using [dedupe](https://github.com/dedupeio/csvdedupe)'s `csvlink` command. Training data has been provided to provide the best quality matches, and so you are required to do nothing here, however if you want to modify the training data just use the `training` flag when calling the module:
+4.  The dedupe module comes into play next in two stages. First is the matching phase, which joins together our manual source data to the registry data. It does this using [dedupe](https://github.com/dedupeio/csvdedupe)'s `csvlink` command. Training data has been provided to provide the best quality matches, and so you are required to do nothing here, however if you want to modify the training data just use the `training` flag when calling the module:
 ```
 python run.py --training
 ```
 It is recommended that you study the dedupe documentation before modifying the training data, as experimentation is required to prevent over or under-fitting of the matching process. I have provided some notes at the end of this readme to explain my methods.
 
-5. Second, the module takes this matched data and assigns rows into groups called clusters, in the event that two rows within the private data actually refer to the same company. This outputs both a cluster_ID and a confidence score of how likely that row belongs to that cluster.
+5. Second, the module takes this matched data and assigns rows into groups called clusters, in the event that two rows within the source data actually refer to the same company. This outputs both a cluster_ID and a confidence score of how likely that row belongs to that cluster.
 
 ### Further Data Manipulation
-6. We now have our matched and clustered dataset, which means that our private data is now linked to registry/public data for verification and it is also grouped into clusters so we don't eg: contact the same company twice.
-If any data **within a cluster** hasn't been matched to public data , then if there is a match anywhere within that cluster, that public data is applied to the rest of the cluster. This is to increase the number of absolute matches. Quality control comes next.
+6. We now have our matched and clustered dataset, which means that our source data is now linked to registry/registry data for verification and it is also grouped into clusters so we don't eg: contact the same company twice.
+If any data **within a cluster** hasn't been matched to registry data , then if there is a match anywhere within that cluster, that registry data is applied to the rest of the cluster. This is to increase the number of absolute matches. Quality control comes next.
 
 ### Extracting the best matches
 7. Because of the many different ways of writing a company name, dedupe's matching/clustering phase can only take us so far.
@@ -168,7 +168,7 @@ This will run the entire process again but will use the new training data and wi
 The best way to train the matching data is to have a strategy of sorts prior to entering the dedupe phase. The best approach I found was to use the 'Unsure' option liberally. For example, if the two strings are the same but one is clearly an abbreviated version of the other, hit 'Unsure'. Each decision will impact the rest of the training data and therefore the outcome of the matches. Dedupe cannot apply context to the data, and so being strict prevents any 'rules' being learnt that make no sense.
 
 #### 2. Clustering
-Clustering here is important because it will affect how much of the matched data will be copied to unmatched, but closely related private data. 
+Clustering here is important because it will affect how much of the matched data will be copied to unmatched, but closely related source data. 
 
 #### 3. Altering the config files
 Once the training has complete, this is where the config files come into play, as we are now attempting to extract the best quality matches factoring in that longer strings can have lower levenshtein ratios and still be good matches compared to shorter strings.

@@ -6,7 +6,7 @@ def isConnected(conn):
 def test_checkDataExists():
     pass
 
-def test_createPublicDataSQLQuery():
+def test_createRegistryDataSQLQuery():
     pass
 
 def test_connection(connection):

@@ -4,28 +4,28 @@ import subprocess
 import numpy as np
 from shutil import copyfile
 
-def matching(configs, proc_type, df_dtypes, proc_num, directories, in_args, regiondir, runfilemods):
+def matching(configs, proc_type, df_dtypes, proc_num, directories, in_args, regiondir, runfile_mods):
     # Run dedupe for matching and calculate related stats for comparison
     if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
         if in_args.region == 'Italy':
-            priv_file = directories['adj_dir'].format(regiondir) + directories['adj_priv_data'].format(
-                in_args.priv_adj_name)
-            pub_file = directories['adj_dir'].format(regiondir) + directories['adj_pub_data'].format(
-                in_args.pub_adj_name)
+            src_file = directories['adj_dir'].format(regiondir) + directories['adj_src_data'].format(
+                in_args.src_adj_name)
+            reg_file = directories['adj_dir'].format(regiondir) + directories['adj_reg_data'].format(
+                in_args.reg_adj_name)
 
-            runfilemods.data_matching.dedupe_match_cluster(priv_file, pub_file, regiondir, directories, configs,
+            runfile_mods.data_matching.dedupe_match_cluster(src_file, reg_file, regiondir, directories, configs,
                                                            proc_type, proc_num, in_args)
 
     if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
         clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type), index_col=None,
                                dtype=df_dtypes)
 
-        # Copy public data to high-confidence cluster records
-        clust_df = runfilemods.data_processing.assign_pub_data_to_clusters(clust_df, directories[
+        # Copy registry data to high-confidence cluster records
+        clust_df = runfile_mods.data_processing.assign_reg_data_to_clusters(clust_df, directories[
             'assigned_output_file'].format(regiondir, proc_type))
 
         # Adds leven_dist column and extract matches based on config process criteria:
-        clust_df = runfilemods.data_processing.add_lev_dist(clust_df,
+        clust_df = runfile_mods.data_processing.add_lev_dist(clust_df,
                                                             directories["assigned_output_file"].format(regiondir,
                                                                                                        proc_type))
 
@@ -35,9 +35,46 @@ def matching(configs, proc_type, df_dtypes, proc_num, directories, in_args, regi
 
     return clust_df
 
-def dedupe_matchTEST(priv_file, pub_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
+def extractionAndUploads(configs, proc_type, in_args,stat_file, region_dir, directories, settings, convert_training, db_calls):
+
+    main_proc = configs['processes'][proc_type][min(configs['processes'][proc_type].keys())]
+
+    # If recycle arg matches the recycle variable in the proc_type config file (want to restrict operations to just
+    # i.e. Name_Only but still have the dynamics to iterate through proc_types
+    if in_args.recycle == main_proc['recycle_phase']:
+
+        # If user has used --config_review flag, set best_config variable based on manual review of stats file...
+        if in_args.config_review:
+            best_config = input(
+                (
+                    "\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
+                    proc_type))
+        else:
+            # ...otherwise pick best config_file based on stats file (max leven dist avg):
+            max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
+            best_config = stat_file.at[max_lev, 'Config_File']
+
+        manualMatching(region_dir, directories, best_config, proc_type, in_args)
+
+        if in_args.convert_training:
+            # Ensure not in recycle mode for training file to be converted
+            assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
+
+            conv_file = pd.read_csv(
+                directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
+                usecols=settings.training_cols)
+
+            # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
+            convert_training.convertToTraining(region_dir, directories, conv_file)
+
+        if in_args.upload_to_db:
+            # Add confirmed matches to relevant table
+            db_calls.addDataToTable(region_dir, main_proc['db_table'], directories, proc_type, in_args, settings)
+
+
+def dedupe_matchTEST(src_file, reg_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
     """
-	Deduping - first the public and private data are matched using dedupes csvlink,
+	Deduping - first the registry and source data are matched using dedupes csvlink,
 	then the matched file is put into clusters
 	:param directories: file/folder locations
 	:param  config_files: the main config files
@@ -47,8 +84,8 @@ def dedupe_matchTEST(priv_file, pub_file, regiondir, directories, config_files, 
 	:output : matched output file
 	:output : matched and clustered output file
 	"""
-    priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
-    pub_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
+    src_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['source_data']
+    reg_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['registry_data']
 
     train = ['--skip_training' if in_args.training else '']
     # Matching:
@@ -63,10 +100,10 @@ def dedupe_matchTEST(priv_file, pub_file, regiondir, directories, config_files, 
         print("Starting matching...")
 
         cmd = ['csvlink '
-               + str(priv_file) + ' '
-               + str(pub_file)
-               + ' --field_names_1 ' + ' '.join(priv_fields)
-               + ' --field_names_2 ' + ' '.join(pub_fields)
+               + str(src_file) + ' '
+               + str(reg_file)
+               + ' --field_names_1 ' + ' '.join(src_fields)
+               + ' --field_names_2 ' + ' '.join(reg_fields)
                + ' --training_file ' + directories['manual_training_file'].format(regiondir, proc_type)
                + ' --output_file ' + directories['match_output_file'].format(regiondir, proc_type) + ' '
                + str(train[0])
@@ -75,21 +112,21 @@ def dedupe_matchTEST(priv_file, pub_file, regiondir, directories, config_files, 
 
         p.wait()
         df = pd.read_csv(directories['match_output_file'].format(regiondir, proc_type),
-                         usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'priv_address_adj', 'org_id', 'org_name',
-                                  'pub_name_adj','pub_address_adj',
-                                  'pub_address', 'pub_address_adj', 'privjoinfields', 'pubjoinfields'],
-                         dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str, 'priv_address_adj': np.str,
-                                'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str, 'pub_address_adj': np.str, 'privjoinfields':np.str, 'pubjoinfields':np.str})
-        df = df[pd.notnull(df['priv_name'])]
+                         usecols=['id', 'src_name', 'src_address', 'src_name_adj', 'src_address_adj', 'reg_id', 'reg_name',
+                                  'reg_name_adj','reg_address_adj',
+                                  'reg_address', 'reg_address_adj', 'srcjoinfields', 'regjoinfields'],
+                         dtype={'id': np.str, 'src_name': np.str, 'src_address': np.str, 'src_name_adj': np.str, 'src_address_adj': np.str,
+                                'reg_id': np.str, 'reg_name': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str, 'srcjoinfields':np.str, 'regjoinfields':np.str})
+        df = df[pd.notnull(df['src_name'])]
         df.to_csv(directories['match_output_file'].format(regiondir, proc_type), index=False)
 
 
-def dedupeMatchCluster(priv_file, pub_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
+def dedupeMatchCluster(src_file, reg_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
     """
-	Deduping - first the public and private data are matched using dedupes csvlink,
+	Deduping - first the registry and source data are matched using dedupes csvlink,
 	then the matched file is put into clusters
-    :param pub_file:
-    :param priv_file:
+    :param reg_file:
+    :param src_file:
 	:param directories: file/folder locations
 	:param  config_files: the main config files
 	:param proc_type: the 'type' of the process (Name, Name & Address)
@@ -99,8 +136,8 @@ def dedupeMatchCluster(priv_file, pub_file, regiondir, directories, config_files
 	:output : matched and clustered output file
 	"""
 
-    priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
-    pub_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['public_data']
+    src_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['source_data']
+    reg_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['registry_data']
 
     train = ['--skip_training' if in_args.training else '']
     # Matching:
@@ -115,10 +152,10 @@ def dedupeMatchCluster(priv_file, pub_file, regiondir, directories, config_files
         print("Starting matching...")
 
         cmd = ['csvlink '
-               + str(priv_file) + ' '
-               + str(pub_file)
-               + ' --field_names_1 ' + ' '.join(priv_fields)
-               + ' --field_names_2 ' + ' '.join(pub_fields)
+               + str(src_file) + ' '
+               + str(reg_file)
+               + ' --field_names_1 ' + ' '.join(src_fields)
+               + ' --field_names_2 ' + ' '.join(reg_fields)
                + ' --training_file ' + directories['manual_training_file'].format(regiondir, proc_type)
                + ' --output_file ' + directories['match_output_file'].format(regiondir, proc_type) + ' '
                + str(train[0])
@@ -127,12 +164,12 @@ def dedupeMatchCluster(priv_file, pub_file, regiondir, directories, config_files
 
         p.wait()
         df = pd.read_csv(directories['match_output_file'].format(regiondir, proc_type),
-                         usecols=['id', 'priv_name', 'priv_address', 'priv_name_adj', 'priv_address_adj', 'org_id', 'org_name',
-                                  'pub_name_adj', 'pub_address_adj',
-                                  'pub_address', 'pub_address_adj', 'privjoinfields', 'pubjoinfields'],
-                         dtype={'id': np.str, 'priv_name': np.str, 'priv_address': np.str, 'priv_name_adj': np.str, 'priv_address_adj': np.str,
-                                'org_id': np.str, 'org_name': np.str, 'pub_name_adj': np.str, 'pub_address': np.str, 'pub_address_adj': np.str, 'privjoinfields':np.str, 'pubjoinfields':np.str})
-        df = df[pd.notnull(df['priv_name'])]
+                         usecols=['id', 'src_name', 'src_address', 'src_name_adj', 'src_address_adj', 'reg_id', 'reg_name',
+                                  'reg_name_adj', 'reg_address_adj',
+                                  'reg_address', 'reg_address_adj', 'srcjoinfields', 'regjoinfields'],
+                         dtype={'id': np.str, 'src_name': np.str, 'src_address': np.str, 'src_name_adj': np.str, 'src_address_adj': np.str,
+                                'reg_id': np.str, 'reg_name': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str, 'srcjoinfields':np.str, 'regjoinfields':np.str})
+        df = df[pd.notnull(df['src_name'])]
         df.to_csv(directories['match_output_file'].format(regiondir, proc_type), index=False)
 
     # Clustering:
@@ -144,7 +181,7 @@ def dedupeMatchCluster(priv_file, pub_file, regiondir, directories, config_files
         print("Starting clustering...")
         cmd = ['python csvdedupe.py '
                + directories['match_output_file'].format(regiondir, proc_type) + ' '
-               + ' --field_names ' + ' '.join(priv_fields) + ' '
+               + ' --field_names ' + ' '.join(src_fields) + ' '
                + str(train[0])
                + ' --training_file ' + directories['cluster_training_file'].format(regiondir, proc_type)
                + ' --output_file ' + directories['cluster_output_file'].format(regiondir, proc_type)]
@@ -184,14 +221,14 @@ def extractMatches(regiondir, clustdf, config_files, directories, proc_num, proc
         try:
             # Filter by char count and previous count (if exists):
             clustdf = clustdf[
-                clustdf.priv_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
+                clustdf.src_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
             clustdf = clustdf[
-                clustdf.priv_name_short.str.len() > config_files['processes'][proc_type][proc_num - 1]['char_counts']]
+                clustdf.src_name_short.str.len() > config_files['processes'][proc_type][proc_num - 1]['char_counts']]
             # Filter by < 99 as first proc_num includes all lengths leading to duplicates
             clustdf = clustdf[clustdf[levendist] <= 99]
         except:
             clustdf = clustdf[
-                clustdf.priv_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
+                clustdf.src_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
     else:
         if os.path.exists(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv'):
             # Clear any previous extraction file for this config:
@@ -241,14 +278,14 @@ def manualMatching(regiondir, directories, best_config, proc_type, in_args):
         # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
         for index, row in manual_match_file.sample(frac=1).iterrows():
             if choice.lower() == 'n':
-                print("\nPrivate name: " + str(row.priv_name_adj))
-                print("\nPublic name: " + str(row.pub_name_adj))
+                print("\nsource name: " + str(row.src_name_adj))
+                print("\nRegistry name: " + str(row.reg_name_adj))
                 print("\nLevenshtein distance: " + str(row.leven_dist_N))
             else:
-                print("\nPrivate name: " + str(row.priv_name_adj))
-                print("Private address: " + str(row.priv_address_adj))
-                print("\nPublic name: " + str(row.pub_name_adj))
-                print("Public address: " + str(row.pub_address_adj))
+                print("\nsource name: " + str(row.src_name_adj))
+                print("source address: " + str(row.src_address_adj))
+                print("\nRegistry name: " + str(row.reg_name_adj))
+                print("Registry address: " + str(row.reg_address_adj))
                 print("\nLevenshtein distance : " + str(row.leven_dist_NA))
 
             match_options = ["y", "n", "u", "f"]
@@ -268,21 +305,21 @@ def manualMatching(regiondir, directories, best_config, proc_type, in_args):
         print("Saving...")
         manual_match_file.to_csv(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
-                                 # columns=['org_id', 'id', 'org_name',
-                                 #          'priv_name','pub_address', 'priv_address', 'leven_dist_N', 'leven_dist_NA','Manual_Match_N','Manual_Match_NA'])
-                                columns = ['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'org_id', 'id', 'org_name', 'pub_name_adj',
-                                           'pub_address', 'priv_name', 'priv_name_adj', 'priv_address', 'priv_address_adj', 'pub_address_adj',
-                                           'Manual_Match_N', 'Manual_Match_NA', 'privjoinfields', 'pubjoinfields'])
+                                 # columns=['reg_id', 'id', 'reg_name',
+                                 #          'src_name','reg_address', 'src_address', 'leven_dist_N', 'leven_dist_NA','Manual_Match_N','Manual_Match_NA'])
+                                columns = ['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
+                                           'reg_address', 'src_name', 'src_name_adj', 'src_address', 'src_address_adj', 'reg_address_adj',
+                                           'Manual_Match_N', 'Manual_Match_NA', 'srcjoinfields', 'regjoinfields'])
         return manual_match_file
 
     else:
         manual_match_file.to_csv(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
-                                 # columns=['org_id', 'id', 'org_name',
-                                 #          'priv_name', 'pub_address', 'priv_address', 'leven_dist_N', 'leven_dist_NA',
+                                 # columns=['reg_id', 'id', 'reg_name',
+                                 #          'src_name', 'reg_address', 'src_address', 'leven_dist_N', 'leven_dist_NA',
                                  #          'Manual_Match_N', 'Manual_Match_NA'])
-                                 columns=['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'org_id', 'id', 'org_name', 'pub_name_adj',
-                                          'pub_address','priv_name', 'priv_name_adj', 'priv_address', 'priv_address_adj', 'pub_address_adj', 'Manual_Match_N','Manual_Match_NA', 'privjoinfields', 'pubjoinfields'])
+                                 columns=['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
+                                          'reg_address','src_name', 'src_name_adj', 'src_address', 'src_address_adj', 'reg_address_adj', 'Manual_Match_N','Manual_Match_NA', 'srcjoinfields', 'regjoinfields'])
         if not in_args.recycle:
             if not in_args.upload_to_db:
                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(

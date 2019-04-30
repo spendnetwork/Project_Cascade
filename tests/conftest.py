@@ -22,10 +22,10 @@ testdir = os.path.dirname(os.path.abspath(__file__))
 @pytest.fixture(scope="session")
 def in_args(tmp_root):
     args, parser = get_input_args(tmp_root,[])
-    parser.add_argument('--priv_raw_name', default='Data_Inputs/Raw_Data/priv_data_raw_test.csv', type=str)
-    parser.add_argument('--pub_raw_name', default='Data_Inputs/Raw_Data/pub_data_raw_test.csv', type=str)
-    parser.add_argument('--priv_adj_name', default='Data_Inputs/Adj_Data/priv_data_adj_test.csv', type=str)
-    parser.add_argument('--pub_adj_name', default='Data_Inputs/Adj_Data/pub_data_adj_test.csv', type=str)
+    parser.add_argument('--src_raw_name', default='Data_Inputs/Raw_Data/src_data_raw_test.csv', type=str)
+    parser.add_argument('--reg_raw_name', default='Data_Inputs/Raw_Data/reg_data_raw_test.csv', type=str)
+    parser.add_argument('--src_adj_name', default='Data_Inputs/Adj_Data/src_data_adj_test.csv', type=str)
+    parser.add_argument('--reg_adj_name', default='Data_Inputs/Adj_Data/reg_data_adj_test.csv', type=str)
     parser.add_argument('--assigned_file', default='Outputs/Name_Only/Deduped_Data/Name_Only_matched_clust_assigned.csv', type=str)
     parser.add_argument('--assigned_file', default='Outputs/Name_Only/Deduped_Data/Name_Only_matched_clust_assigned.csv', type=str)
     args = parser.parse_args([])
@@ -33,10 +33,10 @@ def in_args(tmp_root):
 
 
 @pytest.fixture()
-def test_priv_df():
+def test_src_df():
     df = pd.DataFrame()
-    df['priv_name'] = pd.Series(["Ditta ABBOTT VASCULAR Knoll-Ravizza S.p.A."])
-    df['priv_address'] = pd.Series(["3 Lala Street"])
+    df['src_name'] = pd.Series(["Ditta ABBOTT VASCULAR Knoll-Ravizza S.p.A."])
+    df['src_address'] = pd.Series(["3 Lala Street"])
     return df
 
 
@@ -58,11 +58,11 @@ def tmp_root(tmpdir_factory):
 
     print("\n Copying over raw sample files/training files.")
 
-    copyfile(str(testdir) + '/test_data/priv_data_raw_test.csv', str(tmp_root) + '/Data_Inputs/Raw_Data/priv_data_raw_test.csv')
-    copyfile(str(testdir) + '/test_data/pub_data_raw_test.csv', str(tmp_root) + '/Data_Inputs/Raw_Data/pub_data_raw_test.csv')
+    copyfile(str(testdir) + '/test_data/src_data_raw_test.csv', str(tmp_root) + '/Data_Inputs/Raw_Data/src_data_raw_test.csv')
+    copyfile(str(testdir) + '/test_data/reg_data_raw_test.csv', str(tmp_root) + '/Data_Inputs/Raw_Data/reg_data_raw_test.csv')
 
-    copyfile(str(testdir) + '/test_data/priv_data_adj_test.csv',str(tmp_root) + '/Data_Inputs/Adj_Data/priv_data_adj_test.csv')
-    copyfile(str(testdir) + '/test_data/pub_data_adj_test.csv', str(tmp_root) + '/Data_Inputs/Adj_Data/pub_data_adj_test.csv')
+    copyfile(str(testdir) + '/test_data/src_data_adj_test.csv',str(tmp_root) + '/Data_Inputs/Adj_Data/src_data_adj_test.csv')
+    copyfile(str(testdir) + '/test_data/reg_data_adj_test.csv', str(tmp_root) + '/Data_Inputs/Adj_Data/reg_data_adj_test.csv')
 
     copyfile(str(testdir) + '/test_data/cluster_training.json', str(tmp_root) + '/Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json')
     copyfile(str(testdir) + '/test_data/matching_training.json', str(tmp_root) + '/Data_Inputs/Training_Files/Name_Only/Matching/matching_training.json')

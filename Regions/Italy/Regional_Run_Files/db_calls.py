@@ -45,8 +45,9 @@ def removeTableDuplicates(table_name, headers):
 
 
 def checkDataExists(regiondir, directories, in_args, data_source):
+
     '''
-    Checks whether a public/registry datafile exists already, and if not prompts the user to download from remote sources via .env
+    Checks whether a registry/registry datafile exists already, and if not prompts the user to download from remote sources via .env
     :param regiondir: root directory
     :param directories: dictionary containing various file/directories
     :param in_args: arguments containing variables such as file names and specific options
@@ -54,12 +55,12 @@ def checkDataExists(regiondir, directories, in_args, data_source):
     :return: None
     '''
 
-    # If public data doesn't exist:
+    # If registry data doesn't exist:
     if not os.path.exists(
-            directories['raw_dir'].format(regiondir) + directories['raw_pub_data'].format(in_args.pub_raw_name)):
+            directories['raw_dir'].format(regiondir) + directories['raw_reg_data'].format(in_args.reg_raw_name)):
         # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
         if not in_args.upload_to_db:
-            choice = input("Public data not found, load from database? (y/n): ")
+            choice = input("Registry data not found, load from database? (y/n): ")
             if choice.lower() == 'y':
                 # Check env file exists
                 pdb.set_trace()
@@ -68,29 +69,29 @@ def checkDataExists(regiondir, directories, in_args, data_source):
                     print("Database credentials not found. Please complete the .env file using the '.env template'")
                     sys.exit()
 
-                # Load public data
-                query = createPublicDataSQLQuery(data_source)
-                df = fetch_data(query)
+                # Load registry data
+                query = createRegistryDataSQLQuery(data_source)
+                df = fetchData(query)
                 df.to_csv(
-                    directories['raw_dir'].format(regiondir) + directories['raw_pub_data'].format(in_args.pub_raw_name),
+                    directories['raw_dir'].format(regiondir) + directories['raw_reg_data'].format(in_args.reg_raw_name),
                     index=False)
             else:
-                print("Public/Registry data required - please copy in data csv to Data_Inputs\
+                print("Registry/Registry data required - please copy in data csv to Data_Inputs\
                 /Raw_Data or load from database")
                 sys.exit()
 
 
-def createPublicDataSQLQuery(source):
+def createRegistryDataSQLQuery(source):
     """create query for pulling data from db"""
 
     query = \
         """
         SELECT
-        json_doc::json->>'name'as org_name,
+        json_doc::json->>'name'as reg_name,
         json_doc::json->'locations'->'items'-> 0 ->'address'->>'streetName' as street_address1,
         json_doc::json->'locations'->'items'-> 1 ->'address'->>'streetName' as street_address2,
         json_doc::json->'locations'->'items'-> 2 ->'address'->>'streetName' as street_address3,
-        json_doc::json->'id' as org_id
+        json_doc::json->'id' as reg_id
         from {}
         LIMIT 5000
         """.format(source)
@@ -118,7 +119,7 @@ def addDataToTable(regiondir, table_name, directories, proc_type, man_matched, i
     '''
 
     # Filter manual matches file to just confirmed Yes matches and non-blank org id's
-    confirmed_matches = man_matched[pd.notnull(man_matched['org_id'])]
+    confirmed_matches = man_matched[pd.notnull(man_matched['reg_id'])]
     if in_args.recycle:
         confirmed_matches = confirmed_matches[(man_matched['Manual_Match_NA'] == 'Y')]
     else:

@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 
-def calcMatchingStats(regiondir, clustdf, extractdf, directories, conf_file_num, proc_type, privdf, in_args):
+def calcMatchingStats(regiondir, clustdf, extractdf, directories, conf_file_num, proc_type, srcdf, in_args):
     """
 	For each process outlined in the config file, after each process is completed
 	extract the matches that meet the match % criteria into a new file
@@ -23,15 +23,15 @@ def calcMatchingStats(regiondir, clustdf, extractdf, directories, conf_file_num,
 
     # Overall matches, including poor quality:
     statdf.at[conf_file_num, 'Config_File'] = conf_file_num
-    statdf.at[conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['org_id'])])
-    statdf.at[conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['org_id'])]) / len(privdf) * 100,2)
+    statdf.at[conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['reg_id'])])
+    statdf.at[conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['reg_id'])]) / len(srcdf) * 100,2)
     # Overall optimised matches :
     statdf.at[conf_file_num, 'Optim_Matches'] = len(extractdf)
     # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
     # This is the size of the extracted matches divided by the total number of
     statdf.at[conf_file_num, 'Percent_Precision'] = round(len(extractdf) / len(clustdf) * 100, 2)
-    # Recall - how many relevant items have been selected from the entire original private data (TP/TP+FN)
-    statdf.at[conf_file_num, 'Percent_Recall'] = round(len(extractdf) / len(privdf) * 100, 2)
+    # Recall - how many relevant items have been selected from the entire original source data (TP/TP+FN)
+    statdf.at[conf_file_num, 'Percent_Recall'] = round(len(extractdf) / len(srcdf) * 100, 2)
 
     if in_args.recycle:
         statdf.at[conf_file_num, 'Leven_Dist_Avg'] = np.average(extractdf.leven_dist_NA)

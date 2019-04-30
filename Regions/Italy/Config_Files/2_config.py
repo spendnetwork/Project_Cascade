@@ -4,8 +4,8 @@
       "Name_Only":
         {1 :
               {"dedupe_field_names": {
-                                      "private_data": ["priv_name_adj"],
-                                      "public_data" : ["pub_name_adj"]
+                                      "source_data": ["src_name_adj"],
+                                      "registry_data" : ["reg_name_adj"]
                                       },
                 "char_counts" : 0,
                 "min_match_score" : 100,
@@ -46,8 +46,8 @@
             "Name_Address":
                 {1:
                     {"dedupe_field_names": {
-                        "private_data": ["priv_name_adj", "priv_address"],
-                        "public_data": ["pub_name_adj", "pub_address"]
+                        "source_data": ["src_name_adj", "src_address"],
+                        "registry_data": ["reg_name_adj", "reg_address"]
                     },
                         "char_counts": 0,
                         "min_match_score": 100,

@@ -10,8 +10,8 @@
 #
 # test imported data matches usecols format
 #
-# def test_if_private_file_exists_movetopublicdata():
-#     # Test that if private adj file exists then skip to cleaning the public data file
+# def test_if_source_file_exists_movetoregistrydata():
+#     # Test that if source adj file exists then skip to cleaning the registry data file
 #     # Could expand to checking that if each file exists then it moves on to the next section without
 #     # duplicating or re-doing the process on the file that already exists.
 #     pass

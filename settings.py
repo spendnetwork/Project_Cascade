@@ -7,23 +7,23 @@ import pdb
 
 class Italy_settings():
 
-    runfilemods = ITA_run_files
+    runfile_mods = ITA_run_files
 
-    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np.float, 'priv_name': np.str,
-                 'priv_address': np.str,
-                 'priv_address_adj': np.str, 'priv_name_adj': np.str, 'org_id': np.str, 'pub_name_adj': np.str,
-                 'pub_address': np.str,
-                 'pub_address_adj': np.str, 'priv_name_short': np.str, 'pub_name_short': np.str, 'leven_dist_N': np.int,
+    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np.float, 'src_name': np.str,
+                 'src_address': np.str,
+                 'src_address_adj': np.str, 'src_name_adj': np.str, 'reg_id': np.str, 'reg_name_adj': np.str,
+                 'reg_address': np.str,
+                 'reg_address_adj': np.str, 'src_name_short': np.str, 'reg_name_short': np.str, 'leven_dist_N': np.int,
                  'leven_dist_NA': np.int,
-                 'org_name': np.str, 'privjoinfields': np.str, 'pubjoinfields': np.str}
+                 'reg_name': np.str, 'srcjoinfields': np.str, 'regjoinfields': np.str}
 
-    training_cols = ['priv_name_adj', 'priv_address_adj', 'pub_name_adj', 'pub_address_adj', 'Manual_Match_N',
+    training_cols = ['src_name_adj', 'src_address_adj', 'reg_name_adj', 'reg_address_adj', 'Manual_Match_N',
                      'Manual_Match_NA']
 
-    dbUpload_cols = ['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match_N',
+    dbUpload_cols = ['src_name', 'src_address', 'reg_id', 'reg_name', 'reg_address', 'Manual_Match_N',
                      'Manual_Match_NA']
 
-    publicTableSource = "spaziodati.sd_sample"
+    registryTableSource = "spaziodati.sd_sample"
 
     directories = directories.dirs["dirs"]
 
@@ -37,34 +37,24 @@ class UK_settings():
     #     self.proc_type = None
     #     self.directories = directories
     #     self.regiondir = None
-    #     self.runfilemods = None
+    #     self.runfile_mods = None
     #     self.in_args = None
     #
-    # # def matching_args(self):
-    # #     return (self.configs, self.proc_type, self.directories, self.regiondir, self.runfilemods, self.in_args)
-    #
-    # def matching_args(self, configs):
-    #     return configs
 
 
-    # def matching_args():
-    #     return (UK_settings.configs, UK_settings.proc_type, UK_settings.directories, UK_settings.regiondir, UK_settings.runfilemods, UK_settings.in_args)
+    runfile_mods = UK_run_files
 
-    # (configs, proc_type, directories, regiondir, runfilemods, in_args)
+    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np.float, 'src_name': np.str,
+             'src_name_adj': np.str, 'CH_id': np.str, 'CH_name_adj': np.str,
+                 'CH_address': np.str, 'src_name_short': np.str, 'CH_name_short': np.str, 'leven_dist_N': np.int,
+                 'reg_name': np.str, 'home_page_text' : np.str, 'about_or_contact_text' : np.str}
 
-    runfilemods = UK_run_files
+    training_cols = ['src_name', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N']
 
-    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np.float, 'priv_name': np.str,
-             'priv_name_adj': np.str, 'CH_id': np.str, 'CH_name_adj': np.str,
-                 'CH_address': np.str, 'priv_name_short': np.str, 'CH_name_short': np.str, 'leven_dist_N': np.int,
-                 'org_name': np.str, 'home_page_text' : np.str, 'about_or_contact_text' : np.str}
+    manual_matches_cols = ['src_name', 'CH_name', 'Manual_Match_N', 'about_or_contact_text', 'company_url', 'home_page_text', 'CH_id',
+     'CH_address', 'src_name_short', 'CH_name_short', 'leven_dist_N']
 
-    training_cols = ['priv_name', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N']
-
-    manual_matches_cols = ['priv_name', 'CH_name', 'Manual_Match_N', 'about_or_contact_text', 'company_url', 'home_page_text', 'CH_id',
-     'CH_address', 'priv_name_short', 'CH_name_short', 'leven_dist_N']
-
-    publicTableSource = None
+    registryTableSource = None
 
     directories = directories.dirs["dirs"]
 

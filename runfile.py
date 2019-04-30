@@ -19,12 +19,12 @@ def get_input_args(rootdir, args=None):
 
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
     parser.add_argument('--region', default='UK', type=str, help='Define the region/country (Italy/UK)')
-    parser.add_argument('--priv_raw_name', default='private_data_mini.csv', type=str,
-                        help='Set raw private/source datafile name')
-    parser.add_argument('--pub_raw_name', default='public_data.csv', type=str, help='Set raw public datafile name')
-    parser.add_argument('--priv_adj_name', default='priv_data_adj.csv', type=str,
-                        help='Set cleaned private/source datafile name')
-    parser.add_argument('--pub_adj_name', default='pub_data_adj.csv', type=str, help='Set cleaned public datafile name')
+    parser.add_argument('--src_raw_name', default='source_data_mini.csv', type=str,
+                        help='Set raw source/source datafile name')
+    parser.add_argument('--reg_raw_name', default='registry_data.csv', type=str, help='Set raw registry datafile name')
+    parser.add_argument('--src_adj_name', default='src_data_adj.csv', type=str,
+                        help='Set cleaned source/source datafile name')
+    parser.add_argument('--reg_adj_name', default='reg_data_adj.csv', type=str, help='Set cleaned registry datafile name')
     parser.add_argument('--recycle', action='store_true', help='Recycle the manual training data')
     parser.add_argument('--training', action='store_false', help='Modify/contribute to the training data')
     parser.add_argument('--config_review', action='store_true', help='Manually review/choose best config file results')
@@ -64,11 +64,11 @@ def main(regiondir, in_args, directories):
 
                 conf_file_num = int(conf_file.name[0])
 
-                # Clean public and private datasets for linking
-                # private df needed in memory for stats
-                privdf = data_processing.clean_private_data(regiondir, directories, in_args)
+                # Clean registry and source datasets for linking
+                # source df needed in memory for stats
+                srcdf = data_processing.clean_source_data(regiondir, directories, in_args)
                 if not in_args.recycle:
-                    data_processing.clean_public_data(regiondir, directories, in_args)
+                    data_processing.clean_registry_data(regiondir, directories, in_args)
 
                 # For each process type (eg: Name & Add, Name only) outlined in the configs file:
                 for proc_type in configs['processes']:
@@ -84,22 +84,22 @@ def main(regiondir, in_args, directories):
 
                             # Define data types for clustered file. Enables faster loading.
                             clustdtype = {'Cluster ID': np.float64, 'Confidence Score': np.float,
-                                          'id': np.float, 'priv_name': np.str, 'priv_address': np.str, 'priv_address_adj': np.str,
-                                          'priv_name_adj': np.str, 'org_id': np.str, 'pub_name_adj': np.str,
-                                          'pub_address': np.str, 'pub_address_adj': np.str,'priv_name_short': np.str, 'pub_name_short': np.str,
-                                          'leven_dist_N': np.int,'leven_dist_NA': np.int, 'org_name': np.str, 'privjoinfields': np.str, 'pubjoinfields':np.str}
+                                          'id': np.float, 'src_name': np.str, 'src_address': np.str, 'src_address_adj': np.str,
+                                          'src_name_adj': np.str, 'reg_id': np.str, 'reg_name_adj': np.str,
+                                          'reg_address': np.str, 'reg_address_adj': np.str,'src_name_short': np.str, 'reg_name_short': np.str,
+                                          'leven_dist_N': np.int,'leven_dist_NA': np.int, 'reg_name': np.str, 'srcjoinfields': np.str, 'regjoinfields':np.str}
 
                             # Run dedupe for matching and calculate related stats for comparison
                             if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
-                                priv_file = directories['adj_dir'].format(regiondir) + directories['adj_priv_data'].format(in_args.priv_adj_name)
-                                pub_file = directories['adj_dir'].format(regiondir) + directories['adj_pub_data'].format(in_args.pub_adj_name)
+                                src_file = directories['adj_dir'].format(regiondir) + directories['adj_src_data'].format(in_args.src_adj_name)
+                                reg_file = directories['adj_dir'].format(regiondir) + directories['adj_reg_data'].format(in_args.reg_adj_name)
 
-                                data_matching.dedupe_match_cluster(priv_file, pub_file, regiondir, directories, configs, proc_type, proc_num, in_args)
+                                data_matching.dedupe_match_cluster(src_file, reg_file, regiondir, directories, configs, proc_type, proc_num, in_args)
 
                             if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
                                 clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type),index_col=None, dtype=clustdtype)
-                                # Copy public data to high-confidence cluster records
-                                # clust_df = data_processing.assign_pub_data_to_clusters(clust_df, directories[
+                                # Copy registry data to high-confidence cluster records
+                                # clust_df = data_processing.assign_reg_data_to_clusters(clust_df, directories[
                                 #     'assigned_output_file'].format(regiondir, proc_type))
                                 clust_df=clust_df[:20]
                                 # Adds leven_dist column and extract matches based on config process criteria:
@@ -118,7 +118,7 @@ def main(regiondir, in_args, directories):
                         continue
                 # Output stats file:
                 stat_file = data_analysis.calc_matching_stats(regiondir, clust_df, extracts_file, directories, conf_file_num,
-                                                              proc_type, privdf, in_args)
+                                                              proc_type, srcdf, in_args)
 
     except StopIteration:
         # Continue if no more config files found
@@ -152,7 +152,7 @@ def main(regiondir, in_args, directories):
 
                 conv_file = pd.read_csv(
                     directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-                    usecols=['priv_name_adj', 'priv_address_adj', 'pub_name_adj', 'pub_address_adj', 'Manual_Match_N','Manual_Match_NA'])
+                    usecols=['src_name_adj', 'src_address_adj', 'reg_name_adj', 'reg_address_adj', 'Manual_Match_N','Manual_Match_NA'])
 
                 # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
                 convert_training.convert_to_training(regiondir, directories, conv_file)
@@ -160,7 +160,7 @@ def main(regiondir, in_args, directories):
             if in_args.upload_to_db:
                 upload_file = pd.read_csv(
                     directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-                    usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match_N','Manual_Match_NA'])
+                    usecols=['src_name', 'src_address', 'reg_id', 'reg_name', 'reg_address', 'Manual_Match_N','Manual_Match_NA'])
 
                 # Add confirmed matches to relevant proc_type table
                 if not in_args.recycle:
@@ -186,7 +186,7 @@ if __name__ == '__main__':
     pyfiles = "*_config.py"
 
     if not in_args.recycle:
-        # If public/registry data file doesn't exist, pull from database
+        # If registry/registry data file doesn't exist, pull from database
         checkDataExists(regiondir, directories, in_args, "spaziodati.sd_sample")
 
     main(regiondir, in_args, directories)

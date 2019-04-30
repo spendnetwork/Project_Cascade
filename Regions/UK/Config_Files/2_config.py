@@ -4,8 +4,8 @@
       "Name_Only":
         {1 :
               {"dedupe_field_names": {
-                                      "private_data": ["priv_name_adj"],
-                                      "public_data" : ["CH_name_adj"]
+                                      "source_data": ["src_name_adj"],
+                                      "registry_data" : ["CH_name_adj"]
                                       },
                 "char_counts" : 0,
                 "min_match_score" : 100,

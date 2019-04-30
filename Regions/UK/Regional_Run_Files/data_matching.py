@@ -12,32 +12,77 @@ import pandas as pd
 import pdb
 from fuzzywuzzy import fuzz
 
+
+
+
 load_dotenv(find_dotenv())
 companieshouse_key = os.environ.get("API_KEY2")
 logger = logging.getLogger(__name__)
 logging.getLogger("requests").setLevel(logging.WARNING)
 
-def matching(configs, proc_type, directories, regiondir, runfilemods, privdf, in_args, proc_num, df_dtypes):
+
+def matching(configs, proc_type, directories, regiondir, runfile_mods, srcdf, in_args, proc_num, df_dtypes):
     if not os.path.exists(directories['match_output_file'].format(regiondir, proc_type)):
-        runfilemods.data_matching.companies_house_matching(privdf, directories, regiondir, proc_type)
+        runfile_mods.data_matching.companies_house_matching(srcdf, directories, regiondir, proc_type)
 
 
-    runfilemods.data_processing.clean_matched_data(directories, regiondir, proc_type)
+    runfile_mods.data_processing.clean_matched_data(directories, regiondir, proc_type)
     # Run dedupe for matching and calculate related stats for comparison
 
     if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
-        runfilemods.data_matching.dedupe_match_cluster(regiondir, directories, configs, proc_type, proc_num, in_args)
+        runfile_mods.data_matching.dedupe_match_cluster(regiondir, directories, configs, proc_type, proc_num, in_args)
 
     if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
         clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type), index_col=None)
 
         # Adds leven_dist column and extract matches based on config process criteria:
-        clust_df = runfilemods.data_processing.add_lev_dist(clust_df, directories["assigned_output_file"].format(regiondir, proc_type))
+        clust_df = runfile_mods.data_processing.LevDist(clust_df, directories["assigned_output_file"].format(regiondir, proc_type)).addLevDist()
 
     else:
 
         clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type), dtype=df_dtypes, index_col=None)
     return clust_df
+
+
+def extractionAndUploads(configs, proc_type, in_args,stat_file, region_dir, directories, settings, runfile_mods, db_calls):
+
+    main_proc = configs['processes'][proc_type][min(configs['processes'][proc_type].keys())]
+
+    # If recycle arg matches the recycle variable in the proc_type config file (want to restrict operations to just
+    # i.e. Name_Only but still have the dynamics to iterate through proc_types
+    if in_args.recycle == main_proc['recycle_phase']:
+
+        # If user has used --config_review flag, set best_config variable based on manual review of stats file...
+        if in_args.config_review:
+            best_config = input(
+                (
+                    "\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
+                    proc_type))
+        else:
+            # ...otherwise pick best config_file based on stats file (max leven dist avg):
+            max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
+            best_config = stat_file.at[max_lev, 'Config_File']
+
+        manualMatching(region_dir, directories, best_config, proc_type, in_args, settings)
+
+        if in_args.convert_training:
+            # Ensure not in recycle mode for training file to be converted
+            assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
+
+            conv_file = pd.read_csv(
+                directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
+                usecols=settings.training_cols)
+
+            try :
+                # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
+                runfile_mods.convert_training.convertToTraining(region_dir, directories, conv_file)
+            except AttributeError:
+                # An AttributeError will be raised if the region does not require/have a convert_training module
+                next
+
+        if in_args.upload_to_db:
+            # Add confirmed matches to relevant table
+            db_calls.addDataToTable(region_dir, main_proc['db_table'], directories, proc_type, in_args, settings)
 
 
 
@@ -49,8 +94,8 @@ def companiesHouseMatching(df,directories,regiondir,proc_type):
     """
 
     s = chwrapper.Search(access_token=companieshouse_key)
-    # Tried matching to priv_name_adj but results were poor. Keeping adj/short column for clustering...
-    org_strings = df['priv_name']
+    # Tried matching to src_name_adj but results were poor. Keeping adj/short column for clustering...
+    org_strings = df['src_name']
     ch_name_dict = {}
     ch_id_dict = {}
     ch_addr_dict = {}
@@ -107,7 +152,7 @@ def companiesHouseMatching(df,directories,regiondir,proc_type):
         print("\nProgress: " + str(chunk_propn) + " of " +
               str(len(org_strings)))
 
-        df['CH_name'] = df['priv_name'].map(ch_name_dict)
+        df['CH_name'] = df['src_name'].map(ch_name_dict)
         df['CH_id'] = df['CH_name'].map(ch_id_dict)
         df['CH_address'] = df['CH_name'].map(ch_addr_dict)
 
@@ -119,9 +164,9 @@ def companiesHouseMatching(df,directories,regiondir,proc_type):
 
 def dedupeMatchCluster(regiondir, directories, config_files, proc_type, proc_num, in_args):
     """
-	Deduping - first the public and private data are matched using dedupes csvlink,
+	Deduping - first the registry and source data are matched using dedupes csvlink,
 	then the matched file is put into clusters
-    :param pub_file:
+    :param reg_file:
     :param 	:param directories: file/folder locations
 	:param  config_files: the main config files
 	:param proc_type: the 'type' of the process (Name, Name & Address)
@@ -131,7 +176,7 @@ def dedupeMatchCluster(regiondir, directories, config_files, proc_type, proc_num
 	:output : matched and clustered output file
 	"""
 
-    priv_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['private_data']
+    src_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['source_data']
 
     train = ['--skip_training' if in_args.training else '']
 
@@ -142,7 +187,7 @@ def dedupeMatchCluster(regiondir, directories, config_files, proc_type, proc_num
         print("Starting clustering...")
         cmd = ['python csvdedupe.py '
                + directories['match_output_file'].format(regiondir, proc_type) + ' '
-               + ' --field_names ' + ' '.join(priv_fields) + ' '
+               + ' --field_names ' + ' '.join(src_fields) + ' '
                + str(train[0])
                + ' --training_file ' + directories['cluster_training_file'].format(regiondir, proc_type)
                + ' --output_file ' + directories['cluster_output_file'].format(regiondir, proc_type)]
@@ -176,14 +221,14 @@ def extractMatches(regiondir, clustdf, config_files, directories, proc_num, proc
         try:
             # Filter by char count and previous count (if exists):
             clustdf = clustdf[
-                clustdf.priv_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
+                clustdf.src_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
             clustdf = clustdf[
-                clustdf.priv_name_short.str.len() > config_files['processes'][proc_type][proc_num - 1]['char_counts']]
+                clustdf.src_name_short.str.len() > config_files['processes'][proc_type][proc_num - 1]['char_counts']]
             # Filter by < 99 as first proc_num includes all lengths leading to duplicates
             clustdf = clustdf[clustdf[levendist] <= 99]
         except:
             clustdf = clustdf[
-                clustdf.priv_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
+                clustdf.src_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
     else:
         if os.path.exists(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv'):
             # Clear any previous extraction file for this config:
@@ -206,7 +251,7 @@ def extractMatches(regiondir, clustdf, config_files, directories, proc_num, proc
         return extracts_file
 
 
-def manual_matching(regiondir, directories, best_config, proc_type, in_args):
+def manualMatching(regiondir, directories, best_config, proc_type, in_args,settings):
     """
 	Provides user-input functionality for manual matching based on the extracted records
 	:return manual_match_file: extracted file with added column (Y/N/Unsure)
@@ -224,8 +269,8 @@ def manual_matching(regiondir, directories, best_config, proc_type, in_args):
     if in_args.terminal_matching:
         # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
         for index, row in manual_match_file.sample(frac=1).iterrows():
-            print("\nPrivate name: " + str(row.priv_name_adj))
-            print("\nPublic name: " + str(row.pub_name_adj))
+            print("\nsource name: " + str(row.src_name_adj))
+            print("\nRegistry name: " + str(row.reg_name_adj))
             print("\nLevenshtein distance: " + str(row.leven_dist_N))
             match_options = ["y", "n", "u", "f"]
             match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
@@ -242,12 +287,12 @@ def manual_matching(regiondir, directories, best_config, proc_type, in_args):
 
         print("Saving...")
         manual_match_file.to_csv(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-                                 index=False,columns=['priv_name','CH_name','Manual_Match_N','about_or_contact_text','company_url','home_page_text','CH_id','CH_address','priv_name_short','CH_name_short','leven_dist_N'])
+                                 index=False,columns=settings.manual_matches_cols)
         return manual_match_file
 
     else:
         manual_match_file.to_csv(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-                                 index=False, columns=['priv_name','CH_name','Manual_Match_N','about_or_contact_text','company_url','home_page_text','CH_id','CH_address','priv_name_short','CH_name_short','leven_dist_N'])
+                                 index=False, columns=settings.manual_matches_cols)
 
         if not in_args.upload_to_db:
             print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(

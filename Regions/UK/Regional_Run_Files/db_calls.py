@@ -11,6 +11,30 @@ host_remote = os.environ.get("HOST_REMOTE")
 dbname_remote = os.environ.get("DBNAME_REMOTE")
 user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
+#
+# class dbCalls:
+#     def __init__(self, data_table, headers, regiondir, upload_table, proc_type, best_config, settings):
+#         self.data_table = data_table
+#         self.headers = headers
+#         self.regiondir = regiondir
+#         self.upload_table = upload_table
+#         self.proc_type = proc_type
+#         self.best_config = best_config
+#         self.settings = settings
+#
+#     def createConnection():
+#         '''
+#         :return connection : the database connection object
+#         :return cur : the cursor (temporary storage for retrieved data
+#         '''
+#         print('Connecting to database...')
+#         conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
+#         cur = conn.cursor()
+#         return conn, cur
+
+
+
+
 
 
 def createConnection():
@@ -43,7 +67,7 @@ def removeTableDuplicates(table_name, headers):
     return query
 
 
-def addDataToTable(regiondir, table_name, directories, proc_type, best_config, dtypesmod):
+def addDataToTable(regiondir, upload_table, directories, proc_type, best_config, settings):
     '''
     Adds the confirmed_matches data to table
     :param table_name: the database table to which the confirmed matches will be addded
@@ -55,13 +79,13 @@ def addDataToTable(regiondir, table_name, directories, proc_type, best_config, d
 
     upload_file = pd.read_csv(
         directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
-        usecols=dtypesmod.dbUpload_cols)
+        usecols=settings.dbUpload_cols)
 
     # # Filter manual matches file to just confirmed Yes matches and non-blank org id's
     confirmed_matches = upload_file[pd.notnull(upload_file['CH_id'])]
 
     confirmed_matches.to_csv(directories['confirmed_matches_file'].format(regiondir, proc_type),
-                             columns=dtypesmod.dbUpload_cols,
+                             columns=settings.dbUpload_cols,
                              index=False)
 
     conn, cur = createConnection()
@@ -76,9 +100,9 @@ def addDataToTable(regiondir, table_name, directories, proc_type, best_config, d
         # Input the data into the dedupe table
         # copy_expert allows access to csv methods (i.e. char escaping)
         cur.copy_expert(
-            """COPY {}({}) from stdin (format csv)""".format(table_name, headers), f)
+            """COPY {}({}) from stdin (format csv)""".format(upload_table, headers), f)
         print("Data uploaded succesfully...")
     pdb.set_trace()
-    query = removeTableDuplicates(table_name, headers)
+    query = removeTableDuplicates(upload_table, headers)
     cur.execute(query)
     conn.commit()

@@ -12,8 +12,8 @@ org_suffixes_dict = {
     'l l p': 'llp',
     ' l l p': 'llp',
     ' l l p ': 'llp',
-    'public limited company' : 'plc',
-    ' public limited company' : 'plc',
-    ' public limited company ' : 'plc',
+    'registry limited company' : 'plc',
+    ' registry limited company' : 'plc',
+    ' registry limited company ' : 'plc',
 
     }

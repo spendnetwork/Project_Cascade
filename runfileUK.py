@@ -18,12 +18,12 @@ def get_input_args(rootdir, args=None):
 
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
     parser.add_argument('--region', default='UK', type=str, help='Define the region/country (Italy/UK)')
-    parser.add_argument('--priv_raw_name', default='private_data.csv', type=str,
-                        help='Set raw private/source datafile name')
-    parser.add_argument('--pub_raw_name', default='public_data.csv', type=str, help='Set raw public datafile name')
-    parser.add_argument('--priv_adj_name', default='priv_data_adj.csv', type=str,
-                        help='Set cleaned private/source datafile name')
-    parser.add_argument('--pub_adj_name', default='pub_data_adj.csv', type=str, help='Set cleaned public datafile name')
+    parser.add_argument('--src_raw_name', default='source_data.csv', type=str,
+                        help='Set raw source/source datafile name')
+    parser.add_argument('--reg_raw_name', default='registry_data.csv', type=str, help='Set raw registry datafile name')
+    parser.add_argument('--src_adj_name', default='src_data_adj.csv', type=str,
+                        help='Set cleaned source/source datafile name')
+    parser.add_argument('--reg_adj_name', default='reg_data_adj.csv', type=str, help='Set cleaned registry datafile name')
     parser.add_argument('--recycle', action='store_true', help='Recycle the manual training data')
     parser.add_argument('--training', action='store_false', help='Modify/contribute to the training data')
     parser.add_argument('--config_review', action='store_true', help='Manually review/choose best config file results')
@@ -60,9 +60,9 @@ def main(regiondir, in_args, directories):
 
                 conf_file_num = int(conf_file.name[0])
 
-                # Clean public and private datasets for linking
-                # private df needed in memory for stats
-                privdf = data_processing.clean_private_data(regiondir, directories, in_args)
+                # Clean registry and source datasets for linking
+                # source df needed in memory for stats
+                srcdf = data_processing.clean_source_data(regiondir, directories, in_args)
 
                 # For each process type (eg: Name & Add, Name only) outlined in the configs file:
                 for proc_type in configs['processes']:
@@ -73,7 +73,7 @@ def main(regiondir, in_args, directories):
                     # Iterate over each process number in the config file
                     for proc_num in configs['processes'][proc_type]:
                         if not os.path.exists(directories['match_output_file'].format(regiondir, proc_type)):
-                            data_matching.companies_house_matching(privdf,directories,regiondir,proc_type)
+                            data_matching.companies_house_matching(srcdf,directories,regiondir,proc_type)
 
                         data_processing.clean_matched_data(directories, regiondir, proc_type)
                         # Run dedupe for matching and calculate related stats for comparison
@@ -98,7 +98,7 @@ def main(regiondir, in_args, directories):
 
                 # Output stats file:
                 stat_file = data_analysis.calc_matching_stats(regiondir, clust_df, extracts_file, directories, conf_file_num,
-                                                              proc_type, privdf, in_args)
+                                                              proc_type, srcdf, in_args)
 
     except StopIteration:
         # Continue if no more config files found

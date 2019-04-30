@@ -5,12 +5,12 @@
       "__class__": "tuple",
       "__value__": [
         {
-          "priv_name_adj": "mc engineering srl",
-          "priv_address": "nan"
+          "src_name_adj": "mc engineering srl",
+          "src_address": "nan"
         },
         {
-          "priv_name_adj": "mg engineering srl",
-          "priv_address": "nan"
+          "src_name_adj": "mg engineering srl",
+          "src_address": "nan"
         }
       ]
     },
@@ -18,12 +18,12 @@
       "__class__": "tuple",
       "__value__": [
         {
-          "priv_name_adj": "esanastri srl",
-          "priv_address": "Via A. Barducci 18/a"
+          "src_name_adj": "esanastri srl",
+          "src_address": "Via A. Barducci 18/a"
         },
         {
-          "priv_name_adj": "esanastri srl",
-          "priv_address": "Giovanni Pascoli"
+          "src_name_adj": "esanastri srl",
+          "src_address": "Giovanni Pascoli"
         }
       ]
     },
@@ -31,12 +31,12 @@
       "__class__": "tuple",
       "__value__": [
         {
-          "priv_name_adj": "vico srl",
-          "priv_address": "Corso Stalingrado 50"
+          "src_name_adj": "vico srl",
+          "src_address": "Corso Stalingrado 50"
         },
         {
-          "priv_name_adj": "vico srl",
-          "priv_address": "nan"
+          "src_name_adj": "vico srl",
+          "src_address": "nan"
         }
       ]
     },
@@ -44,12 +44,12 @@
       "__class__": "tuple",
       "__value__": [
         {
-          "priv_name_adj": "sorge srl",
-          "priv_address": "via Gubbio 10"
+          "src_name_adj": "sorge srl",
+          "src_address": "via Gubbio 10"
         },
         {
-          "priv_name_adj": "sorge srl",
-          "priv_address": "nan"
+          "src_name_adj": "sorge srl",
+          "src_address": "nan"
         }
       ]
     },
@@ -57,12 +57,12 @@
       "__class__": "tuple",
       "__value__": [
         {
-          "priv_name_adj": "mp service srl",
-          "priv_address": "via Lama di Cervo, 165"
+          "src_name_adj": "mp service srl",
+          "src_address": "via Lama di Cervo, 165"
         },
         {
-          "priv_name_adj": "mp service srl",
-          "priv_address": "nan"
+          "src_name_adj": "mp service srl",
+          "src_address": "nan"
         }
       ]
     },
@@ -70,12 +70,12 @@
       "__class__": "tuple",
       "__value__": [
         {
-          "priv_name_adj": "volcan srl",
-          "priv_address": "Via Max Valier 5"
+          "src_name_adj": "volcan srl",
+          "src_address": "Via Max Valier 5"
         },
         {
-          "priv_name_adj": "volcan srls",
-          "priv_address": "Cuccubello"
+          "src_name_adj": "volcan srls",
+          "src_address": "Cuccubello"
         }
       ]
     }

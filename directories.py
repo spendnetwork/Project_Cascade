@@ -5,11 +5,11 @@ dirs = {
             {
                   "raw_dir": "{0}/Data_Inputs/Raw_Data/",
                   "adj_dir": "{0}/Data_Inputs/Adj_Data/",
-                  "raw_priv_data": "{0}",
-                  "raw_pub_data": "{0}",
+                  "raw_src_data": "{0}",
+                  "raw_reg_data": "{0}",
 
-                  "adj_priv_data": "{0}",
-                  "adj_pub_data": "{0}",
+                  "adj_src_data": "{0}",
+                  "adj_reg_data": "{0}",
                   "proc_type_dir": '{0}/Outputs/{1}',
                   "proc_type_matches_dir": '{0}/Outputs/{1}/Extracted_Matches',
                   "proc_type_train_dir": '{0}/Data_Inputs/Training_Files/{1}',

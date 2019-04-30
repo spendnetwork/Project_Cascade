@@ -8,22 +8,22 @@ import os
 
 @pytest.fixture()
 def load_samplerawdata(in_args, tmp_root):
-    privrawPath = os.path.join(tmp_root, in_args.priv_raw_name)
-    privraw = pd.read_csv(privrawPath)
+    srcrawPath = os.path.join(tmp_root, in_args.src_raw_name)
+    srcraw = pd.read_csv(srcrawPath)
 
-    pubrawPath = os.path.join(tmp_root, in_args.pub_raw_name)
-    pubraw = pd.read_csv(pubrawPath)
-    return privrawPath, privraw, pubrawPath, pubraw
+    regrawPath = os.path.join(tmp_root, in_args.reg_raw_name)
+    regraw = pd.read_csv(regrawPath)
+    return srcrawPath, srcraw, regrawPath, regraw
                             
 
 @pytest.fixture()
 def load_sampleadjdata(in_args, tmp_root):
-    privadjPath = os.path.join(tmp_root, in_args.priv_adj_name)
-    privadj = pd.read_csv(privadjPath)
+    srcadjPath = os.path.join(tmp_root, in_args.src_adj_name)
+    srcadj = pd.read_csv(srcadjPath)
 
-    pubadjPath = os.path.join(tmp_root,in_args.pub_adj_name)
-    pubadj = pd.read_csv(pubadjPath)
-    return privadjPath, privadj, pubadjPath, pubadj
+    regadjPath = os.path.join(tmp_root,in_args.reg_adj_name)
+    regadj = pd.read_csv(regadjPath)
+    return srcadjPath, srcadj, regadjPath, regadj
 
 @pytest.fixture()
 def load_clusteredData(in_args, tmp_root):
