@@ -3,7 +3,8 @@ import os
 import numpy as np
 
 
-def calcMatchingStats(regiondir, clustdf, extractdf, directories, conf_file_num, proc_type, srcdf, in_args):
+class StatsCalculations:
+
     """
 	For each process outlined in the config file, after each process is completed
 	extract the matches that meet the match % criteria into a new file
@@ -12,39 +13,56 @@ def calcMatchingStats(regiondir, clustdf, extractdf, directories, conf_file_num,
 	:return : None
 	:output : a short stats file for each config file for manual comparison to see which is better
 	"""
-    # Remove old stats file if exists and if first iteration over config files:
-    if os.path.exists(directories['stats_file'].format(regiondir, proc_type)):
-        if conf_file_num == 1:
-            os.remove(directories['stats_file'].format(regiondir, proc_type))
+    def __init__(self, settings, clustdf, extractdf, srcdf):
+        self.directories = settings.directories
+        self.in_args = settings.in_args
+        self.proc_type = settings.proc_type
+        self.region_dir = settings.region_dir
+        self.configs = settings.configs
+        self.df_dtypes = settings.df_dtypes
+        self.runfile_mods = settings.runfile_mods
+        self.proc_num = settings.proc.num
+        self.conf_file_num = settings.conf_file_num
+        self.clustdf = clustdf
+        self.extractdf = extractdf
+        self.srcdf = srcdf
+        self.stats_cols = settings.stats_cols
 
-    statdf = pd.DataFrame(
-        columns=['Config_File', 'Total_Matches', 'Percent_Matches', 'Optim_Matches', 'Percent_Precision',
-                 'Percent_Recall', 'Leven_Dist_Avg'])
 
-    # Overall matches, including poor quality:
-    statdf.at[conf_file_num, 'Config_File'] = conf_file_num
-    statdf.at[conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['reg_id'])])
-    statdf.at[conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['reg_id'])]) / len(srcdf) * 100,2)
-    # Overall optimised matches :
-    statdf.at[conf_file_num, 'Optim_Matches'] = len(extractdf)
-    # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
-    # This is the size of the extracted matches divided by the total number of
-    statdf.at[conf_file_num, 'Percent_Precision'] = round(len(extractdf) / len(clustdf) * 100, 2)
-    # Recall - how many relevant items have been selected from the entire original source data (TP/TP+FN)
-    statdf.at[conf_file_num, 'Percent_Recall'] = round(len(extractdf) / len(srcdf) * 100, 2)
+    def calculate(self):
+        # Remove old stats file if exists and if first iteration over config files:
+        if os.path.exists(self.directories['stats_file'].format(self.region_dir, self.proc_type)):
+            if self.conf_file_num == 1:
+                os.remove(self.directories['stats_file'].format(self.region_dir, self.proc_type))
 
-    if in_args.recycle:
-        statdf.at[conf_file_num, 'Leven_Dist_Avg'] = np.average(extractdf.leven_dist_NA)
-    else:
-        statdf.at[conf_file_num, 'Leven_Dist_Avg'] = np.average(extractdf.leven_dist_N)
-    # if statsfile doesnt exist, create it
-    if not os.path.exists(directories['stats_file'].format(regiondir, proc_type)):
-        statdf.to_csv(directories['stats_file'].format(regiondir, proc_type, index=False))
-    # if it does exist, concat current results with previous
-    else:
-        main_stat_file = pd.read_csv(directories['stats_file'].format(regiondir, proc_type), index_col=None)
-        main_stat_file = pd.concat([main_stat_file, statdf], ignore_index=True, sort=True)
-        main_stat_file.to_csv(directories['stats_file'].format(regiondir, proc_type), index=False,
-                              columns=['Config_File', 'Leven_Dist_Avg', 'Optim_Matches', 'Percent_Matches',
-                                       'Percent_Precision', 'Percent_Recall', 'Total_Matches'])
-        return main_stat_file
+        statdf = pd.DataFrame(columns=self.stats_cols)
+
+        # Overall matches, including poor quality:
+        statdf.at[self.conf_file_num, 'Config_File'] = self.conf_file_num
+        statdf.at[self.conf_file_num, 'Total_Matches'] = len(self.clustdf[pd.notnull(self.clustdf['reg_id'])])
+        statdf.at[self.conf_file_num, 'Percent_Matches'] = round(len(self.clustdf[pd.notnull(self.clustdf['reg_id'])]) / len(self.srcdf) * 100,2)
+        # Overall optimised matches :
+        statdf.at[self.conf_file_num, 'Optim_Matches'] = len(self.extractdf)
+        # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
+        # This is the size of the extracted matches divided by the total number of
+        statdf.at[self.conf_file_num, 'Percent_Precision'] = round(len(self.extractdf) / len(self.clustdf) * 100, 2)
+        # Recall - how many relevant items have been selected from the entire original source data (TP/TP+FN)
+        statdf.at[self.conf_file_num, 'Percent_Recall'] = round(len(self.extractdf) / len(self.srcdf) * 100, 2)
+
+        if self.in_args.recycle:
+            statdf.at[self.conf_file_num, 'Leven_Dist_Avg'] = np.average(self.extractdf.leven_dist_NA)
+        else:
+            statdf.at[self.conf_file_num, 'Leven_Dist_Avg'] = np.average(self.extractdf.leven_dist_N)
+        # if statsfile doesnt exist, create it
+        if not os.path.exists(self.directories['stats_file'].format(self.region_dir, self.proc_type)):
+            statdf.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type, index=False))
+        # if it does exist, concat current results with previous
+        else:
+            main_stat_file = pd.read_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index_col=None)
+            main_stat_file = pd.concat([main_stat_file, statdf], ignore_index=True, sort=True)
+            # main_stat_file.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index=False,
+            #                       columns=['Config_File', 'Leven_Dist_Avg', 'Optim_Matches', 'Percent_Matches',
+            #                                'Percent_Precision', 'Percent_Recall', 'Total_Matches'])
+            main_stat_file.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index=False,
+                                  columns=self.stats_cols)
+            return main_stat_file

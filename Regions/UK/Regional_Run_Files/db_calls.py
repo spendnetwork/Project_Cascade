@@ -13,10 +13,10 @@ user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
 #
 # class dbCalls:
-#     def __init__(self, data_table, headers, regiondir, upload_table, proc_type, best_config, settings):
+#     def __init__(self, data_table, headers, region_dir, upload_table, proc_type, best_config, settings):
 #         self.data_table = data_table
 #         self.headers = headers
-#         self.regiondir = regiondir
+#         self.region_dir = region_dir
 #         self.upload_table = upload_table
 #         self.proc_type = proc_type
 #         self.best_config = best_config
@@ -67,7 +67,7 @@ def removeTableDuplicates(table_name, headers):
     return query
 
 
-def addDataToTable(regiondir, upload_table, directories, proc_type, best_config, settings):
+def addDataToTable(region_dir, upload_table, directories, proc_type, best_config, settings):
     '''
     Adds the confirmed_matches data to table
     :param table_name: the database table to which the confirmed matches will be addded
@@ -78,19 +78,19 @@ def addDataToTable(regiondir, upload_table, directories, proc_type, best_config,
     '''
 
     upload_file = pd.read_csv(
-        directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
+        directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
         usecols=settings.dbUpload_cols)
 
     # # Filter manual matches file to just confirmed Yes matches and non-blank org id's
     confirmed_matches = upload_file[pd.notnull(upload_file['CH_id'])]
 
-    confirmed_matches.to_csv(directories['confirmed_matches_file'].format(regiondir, proc_type),
+    confirmed_matches.to_csv(directories['confirmed_matches_file'].format(region_dir, proc_type),
                              columns=settings.dbUpload_cols,
                              index=False)
 
     conn, cur = createConnection()
 
-    with open(directories['confirmed_matches_file'].format(regiondir, proc_type), 'r') as f:
+    with open(directories['confirmed_matches_file'].format(region_dir, proc_type), 'r') as f:
         # Get headers dynamically
         reader = csv.reader(f)
 

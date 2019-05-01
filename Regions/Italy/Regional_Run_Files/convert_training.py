@@ -2,7 +2,7 @@ import pandas as pd
 import json
 import pdb
 
-def convertToTraining(regiondir, directories, conv_file):
+def convertToTraining(region_dir, directories, conv_file):
     """
 	Converts the manually matched dataframe into a training file for dedupe
 	:return : None
@@ -41,5 +41,5 @@ def convertToTraining(regiondir, directories, conv_file):
             continue
     # Write dict to training file backup.
     # 'w+' allows writing, and + creates if doesn't exist.
-    with open(directories['manual_matching_train_backup'].format(regiondir), 'w+') as outfile:
+    with open(directories['manual_matching_train_backup'].format(region_dir), 'w+') as outfile:
         json.dump(manualdict, outfile)

@@ -46,9 +46,9 @@ def get_input_args(rootdir, args=None):
     return args, parser
 
 
-def main(regiondir, in_args, directories):
+def main(region_dir, in_args, directories):
 
-    setup.setupRawDirs(regiondir, directories)
+    setup.setupRawDirs(region_dir, directories)
     # Ignores directories - convention is <num>_config.py
     pyfiles = "*_config.py"
 
@@ -66,16 +66,16 @@ def main(regiondir, in_args, directories):
 
                 # Clean registry and source datasets for linking
                 # source df needed in memory for stats
-                srcdf = data_processing.clean_source_data(regiondir, directories, in_args)
+                srcdf = data_processing.clean_source_data(region_dir, directories, in_args)
                 if not in_args.recycle:
-                    data_processing.clean_registry_data(regiondir, directories, in_args)
+                    data_processing.clean_registry_data(region_dir, directories, in_args)
 
                 # For each process type (eg: Name & Add, Name only) outlined in the configs file:
                 for proc_type in configs['processes']:
                     if in_args.recycle == configs['processes'][proc_type][min(configs['processes'][proc_type].keys())]['recycle_phase']:
 
                         # Create working directories if don't exist
-                        setup.setup_dirs(directories, regiondir, proc_type)
+                        setup.setup_dirs(directories, region_dir, proc_type)
 
                         # Iterate over each process number in the config file
                         for proc_num in configs['processes'][proc_type]:
@@ -90,34 +90,34 @@ def main(regiondir, in_args, directories):
                                           'leven_dist_N': np.int,'leven_dist_NA': np.int, 'reg_name': np.str, 'srcjoinfields': np.str, 'regjoinfields':np.str}
 
                             # Run dedupe for matching and calculate related stats for comparison
-                            if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
-                                src_file = directories['adj_dir'].format(regiondir) + directories['adj_src_data'].format(in_args.src_adj_name)
-                                reg_file = directories['adj_dir'].format(regiondir) + directories['adj_reg_data'].format(in_args.reg_adj_name)
+                            if not os.path.exists(directories["cluster_output_file"].format(region_dir, proc_type)):
+                                src_file = directories['adj_dir'].format(region_dir) + directories['adj_src_data'].format(in_args.src_adj_name)
+                                reg_file = directories['adj_dir'].format(region_dir) + directories['adj_reg_data'].format(in_args.reg_adj_name)
 
-                                data_matching.dedupe_match_cluster(src_file, reg_file, regiondir, directories, configs, proc_type, proc_num, in_args)
+                                data_matching.dedupe_match_cluster(src_file, reg_file, region_dir, directories, configs, proc_type, proc_num, in_args)
 
-                            if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
-                                clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type),index_col=None, dtype=clustdtype)
+                            if not os.path.exists(directories['assigned_output_file'].format(region_dir, proc_type)):
+                                clust_df = pd.read_csv(directories["cluster_output_file"].format(region_dir, proc_type),index_col=None, dtype=clustdtype)
                                 # Copy registry data to high-confidence cluster records
                                 # clust_df = data_processing.assign_reg_data_to_clusters(clust_df, directories[
-                                #     'assigned_output_file'].format(regiondir, proc_type))
+                                #     'assigned_output_file'].format(region_dir, proc_type))
                                 clust_df=clust_df[:20]
                                 # Adds leven_dist column and extract matches based on config process criteria:
-                                clust_df = data_processing.add_lev_dist(clust_df, directories["assigned_output_file"].format(regiondir, proc_type))
+                                clust_df = data_processing.add_lev_dist(clust_df, directories["assigned_output_file"].format(region_dir, proc_type))
 
                             else:
 
-                                clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type),
+                                clust_df = pd.read_csv(directories["assigned_output_file"].format(region_dir, proc_type),
                                                        index_col=None, dtype=clustdtype, usecols=clustdtype.keys())
 
-                            extracts_file = data_matching.extract_matches(regiondir, clust_df, configs, directories, proc_num,
+                            extracts_file = data_matching.extract_matches(region_dir, clust_df, configs, directories, proc_num,
                                                                           proc_type,
                                                                           conf_file_num, in_args)
                         break
                     else:
                         continue
                 # Output stats file:
-                stat_file = data_analysis.calc_matching_stats(regiondir, clust_df, extracts_file, directories, conf_file_num,
+                stat_file = data_analysis.calc_matching_stats(region_dir, clust_df, extracts_file, directories, conf_file_num,
                                                               proc_type, srcdf, in_args)
 
     except StopIteration:
@@ -144,41 +144,41 @@ def main(regiondir, in_args, directories):
                 max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
                 best_config = stat_file.at[max_lev, 'Config_File']
 
-            data_matching.manual_matching(regiondir, directories, best_config, proc_type, in_args)
+            data_matching.manual_matching(region_dir, directories, best_config, proc_type, in_args)
 
             if in_args.convert_training:
                 # Ensure not in recycle mode for training file to be converted
                 assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
 
                 conv_file = pd.read_csv(
-                    directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
+                    directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
                     usecols=['src_name_adj', 'src_address_adj', 'reg_name_adj', 'reg_address_adj', 'Manual_Match_N','Manual_Match_NA'])
 
                 # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
-                convert_training.convert_to_training(regiondir, directories, conv_file)
+                convert_training.convert_to_training(region_dir, directories, conv_file)
 
             if in_args.upload_to_db:
                 upload_file = pd.read_csv(
-                    directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
+                    directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
                     usecols=['src_name', 'src_address', 'reg_id', 'reg_name', 'reg_address', 'Manual_Match_N','Manual_Match_NA'])
 
                 # Add confirmed matches to relevant proc_type table
                 if not in_args.recycle:
-                    db_calls.add_data_to_table(regiondir, "spaziodati.confirmed_nameonly_matches", directories, proc_type,
+                    db_calls.add_data_to_table(region_dir, "spaziodati.confirmed_nameonly_matches", directories, proc_type,
                                                upload_file, in_args)
                     print("Process complete. Run 'python runfile.py --recycle' to begin training against additional fields.")
                 if in_args.recycle:
-                    db_calls.add_data_to_table(regiondir, "spaziodati.confirmed_nameaddress_matches", directories, proc_type,
+                    db_calls.add_data_to_table(region_dir, "spaziodati.confirmed_nameaddress_matches", directories, proc_type,
                                                upload_file, in_args)
 
 if __name__ == '__main__':
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = get_input_args(rootdir)
-    regiondir = os.path.join(rootdir, 'Regions', in_args.region)
+    region_dir = os.path.join(rootdir, 'Regions', in_args.region)
     # Silence warning for df['process_num'] = str(proc_num)
     pd.options.mode.chained_assignment = None
     # Define config file variables and related arguments
-    config_path = Path(os.path.join(regiondir, 'Config_Files'))
+    config_path = Path(os.path.join(region_dir, 'Config_Files'))
     directories = directories.dirs["dirs"]
 
 
@@ -187,6 +187,6 @@ if __name__ == '__main__':
 
     if not in_args.recycle:
         # If registry/registry data file doesn't exist, pull from database
-        checkDataExists(regiondir, directories, in_args, "spaziodati.sd_sample")
+        checkDataExists(region_dir, directories, in_args, "spaziodati.sd_sample")
 
-    main(regiondir, in_args, directories)
+    main(region_dir, in_args, directories)

@@ -42,9 +42,9 @@ def get_input_args(rootdir, args=None):
     return args, parser
 
 
-def main(regiondir, in_args, directories):
+def main(region_dir, in_args, directories):
 
-    setup.setupRawDirs(regiondir, directories)
+    setup.setupRawDirs(region_dir, directories)
     # Ignores directories - convention is <num>_config.py
     pyfiles = "*_config.py"
 
@@ -62,42 +62,42 @@ def main(regiondir, in_args, directories):
 
                 # Clean registry and source datasets for linking
                 # source df needed in memory for stats
-                srcdf = data_processing.clean_source_data(regiondir, directories, in_args)
+                srcdf = data_processing.clean_source_data(region_dir, directories, in_args)
 
                 # For each process type (eg: Name & Add, Name only) outlined in the configs file:
                 for proc_type in configs['processes']:
 
                     # Create working directories if don't exist
-                    setup.setup_dirs(directories, regiondir, proc_type)
+                    setup.setup_dirs(directories, region_dir, proc_type)
 
                     # Iterate over each process number in the config file
                     for proc_num in configs['processes'][proc_type]:
-                        if not os.path.exists(directories['match_output_file'].format(regiondir, proc_type)):
-                            data_matching.companies_house_matching(srcdf,directories,regiondir,proc_type)
+                        if not os.path.exists(directories['match_output_file'].format(region_dir, proc_type)):
+                            data_matching.companies_house_matching(srcdf,directories,region_dir,proc_type)
 
-                        data_processing.clean_matched_data(directories, regiondir, proc_type)
+                        data_processing.clean_matched_data(directories, region_dir, proc_type)
                         # Run dedupe for matching and calculate related stats for comparison
                         # pdb.set_trace()
-                        if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
-                            data_matching.dedupeMatchCluster(regiondir, directories, configs, proc_type, proc_num, in_args)
+                        if not os.path.exists(directories["cluster_output_file"].format(region_dir, proc_type)):
+                            data_matching.dedupeMatchCluster(region_dir, directories, configs, proc_type, proc_num, in_args)
 
-                        if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
-                            clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type),index_col=None)
+                        if not os.path.exists(directories['assigned_output_file'].format(region_dir, proc_type)):
+                            clust_df = pd.read_csv(directories["cluster_output_file"].format(region_dir, proc_type),index_col=None)
 
                             # Adds leven_dist column and extract matches based on config process criteria:
-                            clust_df = data_processing.add_lev_dist(clust_df, directories["assigned_output_file"].format(regiondir, proc_type))
+                            clust_df = data_processing.add_lev_dist(clust_df, directories["assigned_output_file"].format(region_dir, proc_type))
 
                         else:
 
-                            clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type), dtype={'leven_dist_N': np.int}, index_col=None)
+                            clust_df = pd.read_csv(directories["assigned_output_file"].format(region_dir, proc_type), dtype={'leven_dist_N': np.int}, index_col=None)
 
-                        extracts_file = data_matching.extractMatches(regiondir, clust_df, configs, directories, proc_num,
+                        extracts_file = data_matching.extractMatches(region_dir, clust_df, configs, directories, proc_num,
                                                                      proc_type,
                                                                      conf_file_num, in_args)
                     break
 
                 # Output stats file:
-                stat_file = data_analysis.calc_matching_stats(regiondir, clust_df, extracts_file, directories, conf_file_num,
+                stat_file = data_analysis.calc_matching_stats(region_dir, clust_df, extracts_file, directories, conf_file_num,
                                                               proc_type, srcdf, in_args)
 
     except StopIteration:
@@ -122,24 +122,24 @@ def main(regiondir, in_args, directories):
                 max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
                 best_config = stat_file.at[max_lev, 'Config_File']
 
-            if not os.path.exists(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv'):
-                data_matching.manual_matching(regiondir, directories, best_config, proc_type, in_args)
+            if not os.path.exists(directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'):
+                data_matching.manual_matching(region_dir, directories, best_config, proc_type, in_args)
 
             if in_args.upload_to_db:
-                db_calls.addDataToTable(regiondir, "matching.gb_coh", directories, proc_type, best_config)
+                db_calls.addDataToTable(region_dir, "matching.gb_coh", directories, proc_type, best_config)
 
 if __name__ == '__main__':
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = get_input_args(rootdir)
-    regiondir = os.path.join(rootdir, 'Regions', in_args.region)
+    region_dir = os.path.join(rootdir, 'Regions', in_args.region)
     # Silence warning for df['process_num'] = str(proc_num)
     pd.options.mode.chained_assignment = None
     # Define config file variables and related arguments
-    config_path = Path(os.path.join(regiondir, 'Config_Files'))
+    config_path = Path(os.path.join(region_dir, 'Config_Files'))
     directories = directories.dirs["dirs"]
 
 
     # Ignores directories - convention is <num>_config.py
     pyfiles = "*_config.py"
 
-    main(regiondir, in_args, directories)
+    main(region_dir, in_args, directories)

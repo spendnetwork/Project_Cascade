@@ -10,10 +10,10 @@ import numpy as np
 
 class DataProcessing:
 
-    def __init__(self, region_dir, directories, in_args):
-        self.region_dir = region_dir
-        self.directories = directories
-        self.in_args = in_args
+    def __init__(self, settings):
+        self.region_dir = settings.region_dir
+        self.directories = settings.directories
+        self.in_args = settings.in_args
 
     def shortenName(self, row):
         """
@@ -165,9 +165,9 @@ class ProcessSourceData(DataProcessing):
 
 class ProcessRegistryData(DataProcessing):
 
-    def __init__(self, region_dir, directories, in_args, proc_type):
+    def __init__(self, proc_type):
         # To add proc_type to the init, must also rebuild the parent init as it will be overridden with nothing otherwise:
-        DataProcessing.__init__(self, region_dir, directories, in_args)
+        DataProcessing.__init__(self)
         self.proc_type = proc_type
 
     def clean(self):

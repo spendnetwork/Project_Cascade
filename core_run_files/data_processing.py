@@ -7,15 +7,15 @@ from Regions.Italy.Regional_Run_Files import org_suffixes
 import string
 
 
-def clean_source_data(regiondir, directories, in_args):
+def clean_source_data(region_dir, directories, in_args):
     """
 	Takes the source data file as input, org type suffixes are replaced with abbreviated versions
 	and strings reformatted for consistency across the two datasets
 
 	:return df: the amended source datafile
 	"""
-    raw_data = directories['raw_dir'].format(regiondir) + directories['raw_src_data'].format(in_args.src_raw_name)
-    adj_data = directories['adj_dir'].format(regiondir) + directories['adj_src_data'].format(in_args.src_adj_name)
+    raw_data = directories['raw_dir'].format(region_dir) + directories['raw_src_data'].format(in_args.src_raw_name)
+    adj_data = directories['adj_dir'].format(region_dir) + directories['adj_src_data'].format(in_args.src_adj_name)
 
     if not os.path.exists(adj_data):
         df = pd.read_csv(raw_data, usecols=['id', 'source_name', 'source_streetadd'],
@@ -49,7 +49,7 @@ def clean_source_data(regiondir, directories, in_args):
     return df
 
 
-def clean_registry_data(regiondir, directories, in_args):
+def clean_registry_data(region_dir, directories, in_args):
     """
 	Takes the raw registry data file and splits into chunks.
 	Multiple address columns are merged into one column,
@@ -58,8 +58,8 @@ def clean_registry_data(regiondir, directories, in_args):
 	:return dffullmerge: the registry dataframe adjusted as above
 	"""
 
-    raw_data = directories['raw_dir'].format(regiondir) + directories['raw_reg_data'].format(in_args.reg_raw_name)
-    adj_data = directories['adj_dir'].format(regiondir) + directories['adj_reg_data'].format(in_args.reg_adj_name)
+    raw_data = directories['raw_dir'].format(region_dir) + directories['raw_reg_data'].format(in_args.reg_raw_name)
+    adj_data = directories['adj_dir'].format(region_dir) + directories['adj_reg_data'].format(in_args.reg_adj_name)
 
     if not os.path.exists(adj_data):
         print("Re-organising registry data...")

@@ -14,7 +14,7 @@ def getInputArgs(rootdir, args=None):
 	"""
 
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
-    parser.add_argument('--region', default='Italy', type=str, help='Define the region/country (Italy/UK)')
+    parser.add_argument('--region', default='UK', type=str, help='Define the region/country (Italy/UK)')
     parser.add_argument('--src_raw_name', default='source_data.csv', type=str,
                         help='Set raw source/source datafile name')
     parser.add_argument('--reg_raw_name', default='registry_data.csv', type=str, help='Set raw registry datafile name')
@@ -73,18 +73,22 @@ def main(region_dir, in_args, directories, config_path, settings):
 
                 # Convert list to dictionary
                 configs = ast.literal_eval(file_contents[0])
+                settings.configs = configs
 
                 conf_file_num = int(conf_file.name[0])
+                settings.conf_file_num = conf_file_num
 
                 # Clean registry and source datasets for linking
                 # source df needed in memory for stats
                 pdb.set_trace()
 
-                src_df = data_processing.ProcessSourceData(region_dir, directories, in_args).clean()
+                # src_df = data_processing.ProcessSourceData(region_dir, directories, in_args).clean()
+                src_df = data_processing.ProcessSourceData(settings).clean()
 
                 if not in_args.recycle:
                     try:
-                        data_processing.ProcessRegistryData(region_dir, directories, in_args).clean()
+                        # data_processing.ProcessRegistryData(region_dir, directories, in_args).clean()
+                        data_processing.ProcessRegistryData(settings).clean()
                     except AttributeError:
                         # Skip if registry data not downloaded yet (i.e. UK)
                         next
@@ -96,33 +100,33 @@ def main(region_dir, in_args, directories, config_path, settings):
                     # # Get first process from config file
                     main_proc = min(configs['processes'][proc_type].keys())
 
+                    # If args.recycle matches the recycle setting for the first process type
                     if in_args.recycle == configs['processes'][proc_type][main_proc]['recycle_phase']:
 
                         # Create working directories if don't exist
-                        setup.setupDirs(directories, region_dir, proc_type)
+                        setup.Setup(settings).setupDirs()
 
                         # Iterate over each process number in the config file
                         for proc_num in configs['processes'][proc_type]:
+                            settings.proc_num = proc_num
 
-                            # Define data types for clustered file. Enables faster loading.
-                            df_dtypes = settings.df_dtypes
+                            # # Define data types for clustered file. Enables faster loading.
+                            # df_dtypes = settings.df_dtypes
 
                             # Run dedupe for matching and calculate related stats for comparison
                             if in_args.region == 'Italy':
-                                clust_df = data_matching.matching(configs, settings, df_dtypes, proc_num, directories, in_args, region_dir, runfile_mods)
+                                # clust_df = data_matching.matching(configs, settings, df_dtypes, proc_num, directories, in_args, region_dir, runfile_mods)
+                                clust_df = data_matching.Matching(settings)
 
                             if in_args.region == 'UK':
-                                clust_df = data_matching.matching(configs, settings, directories, region_dir, runfile_mods, src_df, in_args, proc_num, df_dtypes)
+                                clust_df = data_matching.Matching(settings).dedupe(src_df)
 
-                            extracts_file = data_matching.extractMatches(region_dir, clust_df, configs, directories, proc_num,
-                                                                          proc_type,
-                                                                          conf_file_num, in_args)
+                            extracts_file = data_matching.extractMatches(settings, clust_df)
                         break
                     else:
                         continue
                 # Output stats file:
-                stat_file = data_analysis.calcMatchingStats(region_dir, clust_df, extracts_file, directories, conf_file_num,
-                                                              proc_type, src_df, in_args)
+                stat_file = data_analysis.StatsCalculations(settings, clust_df, extracts_file, src_df).calculate()
 
     except StopIteration:
         # Continue if no more config files found
@@ -131,7 +135,8 @@ def main(region_dir, in_args, directories, config_path, settings):
         # For each process type (eg: Name & Add, Name only) outlined in the configs file:
     for proc_type in configs['processes']:
 
-        data_matching.extractionAndUploads(configs, proc_type, in_args,stat_file, data_matching, region_dir, directories, settings, runfile_mods, db_calls)
+        # data_matching.ExtractionAndUploads(configs, proc_type, in_args,stat_file, data_matching, region_dir, directories, settings, runfile_mods, db_calls)
+        data_matching.ExtractionAndUploads(configs, proc_type, in_args, stat_file, data_matching, region_dir, directories, settings, runfile_mods, db_calls)
 
 
 if __name__ == '__main__':
@@ -143,10 +148,10 @@ if __name__ == '__main__':
     pd.options.mode.chained_assignment = None
 
     if in_args.region == 'Italy':
-        settings = settings.Italy_settings
+        settings = settings.Italy_Settings
 
     if in_args.region == 'UK':
-        settings = settings.UK_settings
+        settings = settings.UK_Settings
 
     settings.in_args = in_args
     settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)

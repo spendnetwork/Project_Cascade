@@ -44,11 +44,11 @@ def removeTableDuplicates(table_name, headers):
     return query
 
 
-def checkDataExists(regiondir, directories, in_args, data_source):
+def checkDataExists(region_dir, directories, in_args, data_source):
 
     '''
     Checks whether a registry/registry datafile exists already, and if not prompts the user to download from remote sources via .env
-    :param regiondir: root directory
+    :param region_dir: root directory
     :param directories: dictionary containing various file/directories
     :param in_args: arguments containing variables such as file names and specific options
     :param data_source: database table
@@ -57,7 +57,7 @@ def checkDataExists(regiondir, directories, in_args, data_source):
 
     # If registry data doesn't exist:
     if not os.path.exists(
-            directories['raw_dir'].format(regiondir) + directories['raw_reg_data'].format(in_args.reg_raw_name)):
+            directories['raw_dir'].format(region_dir) + directories['raw_reg_data'].format(in_args.reg_raw_name)):
         # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
         if not in_args.upload_to_db:
             choice = input("Registry data not found, load from database? (y/n): ")
@@ -73,7 +73,7 @@ def checkDataExists(regiondir, directories, in_args, data_source):
                 query = createRegistryDataSQLQuery(data_source)
                 df = fetchData(query)
                 df.to_csv(
-                    directories['raw_dir'].format(regiondir) + directories['raw_reg_data'].format(in_args.reg_raw_name),
+                    directories['raw_dir'].format(region_dir) + directories['raw_reg_data'].format(in_args.reg_raw_name),
                     index=False)
             else:
                 print("Registry/Registry data required - please copy in data csv to Data_Inputs\
@@ -108,7 +108,7 @@ def fetchData(query):
     return df
 
 
-def addDataToTable(regiondir, table_name, directories, proc_type, man_matched, in_args, dtypesmod):
+def addDataToTable(region_dir, table_name, directories, proc_type, man_matched, in_args, dtypesmod):
     '''
     Adds the confirmed_matches data to table
     :param table_name: the database table to which the confirmed matches will be addded
@@ -125,12 +125,12 @@ def addDataToTable(regiondir, table_name, directories, proc_type, man_matched, i
     else:
         confirmed_matches = confirmed_matches[(man_matched['Manual_Match_N'] == 'Y')]
 
-    confirmed_matches.to_csv(directories['confirmed_matches_file'].format(regiondir, proc_type),
+    confirmed_matches.to_csv(directories['confirmed_matches_file'].format(region_dir, proc_type),
                              columns=dtypesmod.dbUpload_cols,
                              index=False)
 
     conn, cur = createConnection()
-    with open(directories['confirmed_matches_file'].format(regiondir, proc_type), 'r') as f:
+    with open(directories['confirmed_matches_file'].format(region_dir, proc_type), 'r') as f:
         # Get headers dynamically
         reader = csv.reader(f)
         headers = next(reader, None)

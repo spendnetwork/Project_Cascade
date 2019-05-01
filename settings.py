@@ -2,14 +2,13 @@ import numpy as np
 import directories
 from Regions.Italy import Regional_Run_Files as ITA_run_files
 from Regions.UK import Regional_Run_Files as UK_run_files
-import pdb
 
 
-class Italy_settings():
+class Italy_Settings:
 
     runfile_mods = ITA_run_files
 
-    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np.float, 'src_name': np.str,
+    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np., 'src_name': np.str,
                  'src_address': np.str,
                  'src_address_adj': np.str, 'src_name_adj': np.str, 'reg_id': np.str, 'reg_name_adj': np.str,
                  'reg_address': np.str,
@@ -27,16 +26,27 @@ class Italy_settings():
 
     directories = directories.dirs["dirs"]
 
+    # Needed to kick start the setup dirs function
+    proc_type = 'Name_Only'
+
+    dedupe_cols = ['id', 'src_name', 'src_address', 'src_name_adj', 'src_address_adj', 'reg_id',
+                    'reg_name',
+                    'reg_name_adj', 'reg_address_adj',
+                    'reg_address', 'reg_address_adj', 'srcjoinfields', 'regjoinfields']
+
+    stats_cols = ['Config_File', 'Total_Matches', 'Percent_Matches', 'Optim_Matches', 'Percent_Precision',
+                     'Percent_Recall', 'Leven_Dist_Avg']
 
 
 
-class UK_settings():
+
+class UK_Settings:
     # pdb.set_trace()
     # def __init__(self):
     #     self.configs = None
     #     self.proc_type = None
     #     self.directories = directories
-    #     self.regiondir = None
+    #     self.region_dir = None
     #     self.runfile_mods = None
     #     self.in_args = None
     #
@@ -57,6 +67,10 @@ class UK_settings():
     registryTableSource = None
 
     directories = directories.dirs["dirs"]
+
+    # Needed to kick start the setup dirs function as proc_type usually
+    # defined after the directories are setup (which doesnt make sense - fix this)
+    proc_type = 'Name_Only'
 
 
 

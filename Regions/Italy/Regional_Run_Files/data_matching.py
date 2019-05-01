@@ -4,36 +4,155 @@ import subprocess
 import numpy as np
 from shutil import copyfile
 
-def matching(configs, proc_type, df_dtypes, proc_num, directories, in_args, regiondir, runfile_mods):
-    # Run dedupe for matching and calculate related stats for comparison
-    if not os.path.exists(directories["cluster_output_file"].format(regiondir, proc_type)):
-        if in_args.region == 'Italy':
-            src_file = directories['adj_dir'].format(regiondir) + directories['adj_src_data'].format(
-                in_args.src_adj_name)
-            reg_file = directories['adj_dir'].format(regiondir) + directories['adj_reg_data'].format(
-                in_args.reg_adj_name)
 
-            runfile_mods.data_matching.dedupe_match_cluster(src_file, reg_file, regiondir, directories, configs,
-                                                           proc_type, proc_num, in_args)
+class Matching:
+    def __init__(self, settings):
+        self.directories = settings.directories
+        self.in_args = settings.in_args
+        self.proc_type = settings.proc_type
+        self.region_dir = settings.region_dir
+        self.configs = settings.configs
+        self.df_dtypes = settings.df_dtypes
+        self.runfile_mods = settings.runfile_mods
+        self.proc_num = settings.proc.num
 
-    if not os.path.exists(directories['assigned_output_file'].format(regiondir, proc_type)):
-        clust_df = pd.read_csv(directories["cluster_output_file"].format(regiondir, proc_type), index_col=None,
-                               dtype=df_dtypes)
+    def dedupe(self):
+        # Run dedupe for matching and clustering
+        if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
+            if self.in_args.region == 'Italy':
 
-        # Copy registry data to high-confidence cluster records
-        clust_df = runfile_mods.data_processing.assign_reg_data_to_clusters(clust_df, directories[
-            'assigned_output_file'].format(regiondir, proc_type))
+                src_file = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
+                    self.in_args.src_adj_name)
 
-        # Adds leven_dist column and extract matches based on config process criteria:
-        clust_df = runfile_mods.data_processing.add_lev_dist(clust_df,
-                                                            directories["assigned_output_file"].format(regiondir,
-                                                                                                       proc_type))
+                reg_file = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_reg_data'].format(
+                    self.in_args.reg_adj_name)
 
-    else:
-        clust_df = pd.read_csv(directories["assigned_output_file"].format(regiondir, proc_type),
-                               index_col=None, dtype=df_dtypes, usecols=df_dtypes.keys())
+                self.dedupeMatchCluster(src_file, reg_file)
 
-    return clust_df
+        if not os.path.exists(self.directories['assigned_output_file'].format(self.region_dir, self.proc_type)):
+
+            clust_df = pd.read_csv(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type), index_col=None,
+                                   dtype=self.df_dtypes)
+
+            # Copy registry data to high-confidence cluster records
+            clust_df = self.runfile_mods.data_processing.AssignRegDataToClusters(clust_df, self.directories[
+                'assigned_output_file'].format(self.region_dir, self.proc_type)).assign()
+
+            # Adds leven_dist column and extract matches based on config process criteria:
+            clust_df = self.runfile_mods.data_processing.LevDist(clust_df, self.directories["assigned_output_file"].
+                                                                 format(self.region_dir,self.proc_type)).addLevDist()
+
+        else:
+            clust_df = pd.read_csv(self.directories["assigned_output_file"].format(self.region_dir, self.proc_type),
+                                   index_col=None, dtype=self.df_dtypes, usecols=self.df_dtypes.keys())
+
+        return clust_df
+
+    def dedupeMatchCluster(self, src_file, reg_file):
+        """
+    	Deduping - first the registry and source data are matched using dedupes csvlink,
+    	then the matched file is put into clusters
+        :param reg_file:
+        :param src_file:
+    	:param directories: file/folder locations
+    	:param  config_files: the main config files
+    	:param proc_type: the 'type' of the process (Name, Name & Address)
+    	:param proc_num: the individual process within the config file
+    	:return None
+    	:output : matched output file
+    	:output : matched and clustered output file
+    	"""
+
+        src_fields = self.configs['processes'][self.proc_type][self.proc_num]['dedupe_field_names']['source_data']
+        reg_fields = self.configs['processes'][self.proc_type][self.proc_num]['dedupe_field_names']['registry_data']
+
+        train = ['--skip_training' if self.in_args.training else '']
+        # Matching:
+        if not os.path.exists(self.directories['match_output_file'].format(self.region_dir, self.proc_type)):
+            if self.in_args.recycle:
+
+                # Copy manual matching file over to build on for clustering
+                copyfile(self.directories['manual_matching_train_backup'].format(self.region_dir),
+                         self.directories['manual_training_file'].format(self.region_dir, self.proc_type))
+
+            # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
+            if os.path.exists('./learned_settings'):
+                os.remove('./learned_settings')
+            print("Starting matching...")
+
+            cmd = ['csvlink '
+                   + str(src_file) + ' '
+                   + str(reg_file)
+                   + ' --field_names_1 ' + ' '.join(src_fields)
+                   + ' --field_names_2 ' + ' '.join(reg_fields)
+                   + ' --training_file ' + self.directories['manual_training_file'].format(self.region_dir, self.proc_type)
+                   + ' --output_file ' + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
+                   + str(train[0])
+                   ]
+
+            p = subprocess.Popen(cmd, shell=True)
+
+            p.wait()
+            df = pd.read_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type),
+                             usecols=self.settings.dedupe_cols,
+                             dtype=self.settings.df_dtypes)
+            df = df[pd.notnull(df['src_name'])]
+            df.to_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type), index=False)
+
+        # Clustering:
+        if not os.path.exists(self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)):
+            # Copy training file from first clustering session if recycle mode
+            if self.in_args.recycle:
+                copyfile(self.directories['cluster_training_backup'].format(self.region_dir),
+                         self.directories['cluster_training_file'].format(self.region_dir, self.proc_type))
+
+            print("Starting clustering...")
+            cmd = ['python csvdedupe.py '
+                   + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
+                   + ' --field_names ' + ' '.join(src_fields) + ' '
+                   + str(train[0])
+                   + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir, self.proc_type)
+                   + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)]
+            p = subprocess.Popen(cmd, cwd=os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
+            p.wait()  # wait for subprocess to finish
+
+            if not self.in_args.recycle:
+                # Copy training file to backup, so it can be found and copied into recycle phase clustering
+                copyfile(self.directories['cluster_training_file'].format(self.region_dir, self.proc_type),
+                         self.directories['cluster_training_backup'].format(self.region_dir))
+        else:
+            pass
+
+# def matching(configs, proc_type, df_dtypes, proc_num, directories, in_args, region_dir, runfile_mods):
+#     # Run dedupe for matching and calculate related stats for comparison
+#     if not os.path.exists(directories["cluster_output_file"].format(region_dir, proc_type)):
+#         if in_args.region == 'Italy':
+#             src_file = directories['adj_dir'].format(region_dir) + directories['adj_src_data'].format(
+#                 in_args.src_adj_name)
+#             reg_file = directories['adj_dir'].format(region_dir) + directories['adj_reg_data'].format(
+#                 in_args.reg_adj_name)
+#
+#             runfile_mods.data_matching.dedupe_match_cluster(src_file, reg_file, region_dir, directories, configs,
+#                                                            proc_type, proc_num, in_args)
+#
+#     if not os.path.exists(directories['assigned_output_file'].format(region_dir, proc_type)):
+#         clust_df = pd.read_csv(directories["cluster_output_file"].format(region_dir, proc_type), index_col=None,
+#                                dtype=df_dtypes)
+#
+#         # Copy registry data to high-confidence cluster records
+#         clust_df = runfile_mods.data_processing.assign_reg_data_to_clusters(clust_df, directories[
+#             'assigned_output_file'].format(region_dir, proc_type))
+#
+#         # Adds leven_dist column and extract matches based on config process criteria:
+#         clust_df = runfile_mods.data_processing.add_lev_dist(clust_df,
+#                                                             directories["assigned_output_file"].format(region_dir,
+#                                                                                                        proc_type))
+#
+#     else:
+#         clust_df = pd.read_csv(directories["assigned_output_file"].format(region_dir, proc_type),
+#                                index_col=None, dtype=df_dtypes, usecols=df_dtypes.keys())
+#
+#     return clust_df
 
 def extractionAndUploads(configs, proc_type, in_args,stat_file, region_dir, directories, settings, convert_training, db_calls):
 
@@ -72,7 +191,7 @@ def extractionAndUploads(configs, proc_type, in_args,stat_file, region_dir, dire
             db_calls.addDataToTable(region_dir, main_proc['db_table'], directories, proc_type, in_args, settings)
 
 
-def dedupe_matchTEST(src_file, reg_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
+def dedupe_matchTEST(src_file, reg_file, region_dir, directories, config_files, proc_type, proc_num, in_args):
     """
 	Deduping - first the registry and source data are matched using dedupes csvlink,
 	then the matched file is put into clusters
@@ -89,10 +208,10 @@ def dedupe_matchTEST(src_file, reg_file, regiondir, directories, config_files, p
 
     train = ['--skip_training' if in_args.training else '']
     # Matching:
-    if not os.path.exists(directories['match_output_file'].format(regiondir, proc_type)):
+    if not os.path.exists(directories['match_output_file'].format(region_dir, proc_type)):
         if in_args.recycle:
             # Copy manual matching file over to build on for clustering
-            copyfile(directories['manual_matching_train_backup'].format(regiondir), directories['manual_training_file'].format(regiondir, proc_type))
+            copyfile(directories['manual_matching_train_backup'].format(region_dir), directories['manual_training_file'].format(region_dir, proc_type))
 
         # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
         if os.path.exists('./learned_settings'):
@@ -104,98 +223,98 @@ def dedupe_matchTEST(src_file, reg_file, regiondir, directories, config_files, p
                + str(reg_file)
                + ' --field_names_1 ' + ' '.join(src_fields)
                + ' --field_names_2 ' + ' '.join(reg_fields)
-               + ' --training_file ' + directories['manual_training_file'].format(regiondir, proc_type)
-               + ' --output_file ' + directories['match_output_file'].format(regiondir, proc_type) + ' '
+               + ' --training_file ' + directories['manual_training_file'].format(region_dir, proc_type)
+               + ' --output_file ' + directories['match_output_file'].format(region_dir, proc_type) + ' '
                + str(train[0])
                ]
         p = subprocess.Popen(cmd, shell=True)
 
         p.wait()
-        df = pd.read_csv(directories['match_output_file'].format(regiondir, proc_type),
+        df = pd.read_csv(directories['match_output_file'].format(region_dir, proc_type),
                          usecols=['id', 'src_name', 'src_address', 'src_name_adj', 'src_address_adj', 'reg_id', 'reg_name',
                                   'reg_name_adj','reg_address_adj',
                                   'reg_address', 'reg_address_adj', 'srcjoinfields', 'regjoinfields'],
                          dtype={'id': np.str, 'src_name': np.str, 'src_address': np.str, 'src_name_adj': np.str, 'src_address_adj': np.str,
                                 'reg_id': np.str, 'reg_name': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str, 'srcjoinfields':np.str, 'regjoinfields':np.str})
         df = df[pd.notnull(df['src_name'])]
-        df.to_csv(directories['match_output_file'].format(regiondir, proc_type), index=False)
+        df.to_csv(directories['match_output_file'].format(region_dir, proc_type), index=False)
 
 
-def dedupeMatchCluster(src_file, reg_file, regiondir, directories, config_files, proc_type, proc_num, in_args):
-    """
-	Deduping - first the registry and source data are matched using dedupes csvlink,
-	then the matched file is put into clusters
-    :param reg_file:
-    :param src_file:
-	:param directories: file/folder locations
-	:param  config_files: the main config files
-	:param proc_type: the 'type' of the process (Name, Name & Address)
-	:param proc_num: the individual process within the config file
-	:return None
-	:output : matched output file
-	:output : matched and clustered output file
-	"""
+# def dedupeMatchCluster(src_file, reg_file, region_dir, directories, config_files, proc_type, proc_num, in_args):
+#     """
+# 	Deduping - first the registry and source data are matched using dedupes csvlink,
+# 	then the matched file is put into clusters
+#     :param reg_file:
+#     :param src_file:
+# 	:param directories: file/folder locations
+# 	:param  config_files: the main config files
+# 	:param proc_type: the 'type' of the process (Name, Name & Address)
+# 	:param proc_num: the individual process within the config file
+# 	:return None
+# 	:output : matched output file
+# 	:output : matched and clustered output file
+# 	"""
+#
+#     src_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['source_data']
+#     reg_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['registry_data']
+#
+#     train = ['--skip_training' if in_args.training else '']
+#     # Matching:
+#     if not os.path.exists(directories['match_output_file'].format(region_dir, proc_type)):
+#         if in_args.recycle:
+#             # Copy manual matching file over to build on for clustering
+#             copyfile(directories['manual_matching_train_backup'].format(region_dir), directories['manual_training_file'].format(region_dir, proc_type))
+#
+#         # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
+#         if os.path.exists('./learned_settings'):
+#             os.remove('./learned_settings')
+#         print("Starting matching...")
+#
+#         cmd = ['csvlink '
+#                + str(src_file) + ' '
+#                + str(reg_file)
+#                + ' --field_names_1 ' + ' '.join(src_fields)
+#                + ' --field_names_2 ' + ' '.join(reg_fields)
+#                + ' --training_file ' + directories['manual_training_file'].format(region_dir, proc_type)
+#                + ' --output_file ' + directories['match_output_file'].format(region_dir, proc_type) + ' '
+#                + str(train[0])
+#                ]
+#         p = subprocess.Popen(cmd, shell=True)
+#
+#         p.wait()
+#         df = pd.read_csv(directories['match_output_file'].format(region_dir, proc_type),
+#                          usecols=['id', 'src_name', 'src_address', 'src_name_adj', 'src_address_adj', 'reg_id', 'reg_name',
+#                                   'reg_name_adj', 'reg_address_adj',
+#                                   'reg_address', 'reg_address_adj', 'srcjoinfields', 'regjoinfields'],
+#                          dtype={'id': np.str, 'src_name': np.str, 'src_address': np.str, 'src_name_adj': np.str, 'src_address_adj': np.str,
+#                                 'reg_id': np.str, 'reg_name': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str, 'srcjoinfields':np.str, 'regjoinfields':np.str})
+#         df = df[pd.notnull(df['src_name'])]
+#         df.to_csv(directories['match_output_file'].format(region_dir, proc_type), index=False)
+#
+#     # Clustering:
+#     if not os.path.exists(directories['cluster_output_file'].format(region_dir, proc_type)):
+#         # Copy training file from first clustering session if recycle mode
+#         if in_args.recycle:
+#             copyfile(directories['cluster_training_backup'].format(region_dir), directories['cluster_training_file'].format(region_dir, proc_type))
+#
+#         print("Starting clustering...")
+#         cmd = ['python csvdedupe.py '
+#                + directories['match_output_file'].format(region_dir, proc_type) + ' '
+#                + ' --field_names ' + ' '.join(src_fields) + ' '
+#                + str(train[0])
+#                + ' --training_file ' + directories['cluster_training_file'].format(region_dir, proc_type)
+#                + ' --output_file ' + directories['cluster_output_file'].format(region_dir, proc_type)]
+#         p = subprocess.Popen(cmd, cwd=os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
+#         p.wait()  # wait for subprocess to finish
+#
+#         if not in_args.recycle:
+#             # Copy training file to backup, so it can be found and copied into recycle phase clustering
+#             copyfile(directories['cluster_training_file'].format(region_dir, proc_type), directories['cluster_training_backup'].format(region_dir))
+#     else:
+#         pass
 
-    src_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['source_data']
-    reg_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['registry_data']
 
-    train = ['--skip_training' if in_args.training else '']
-    # Matching:
-    if not os.path.exists(directories['match_output_file'].format(regiondir, proc_type)):
-        if in_args.recycle:
-            # Copy manual matching file over to build on for clustering
-            copyfile(directories['manual_matching_train_backup'].format(regiondir), directories['manual_training_file'].format(regiondir, proc_type))
-
-        # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
-        if os.path.exists('./learned_settings'):
-            os.remove('./learned_settings')
-        print("Starting matching...")
-
-        cmd = ['csvlink '
-               + str(src_file) + ' '
-               + str(reg_file)
-               + ' --field_names_1 ' + ' '.join(src_fields)
-               + ' --field_names_2 ' + ' '.join(reg_fields)
-               + ' --training_file ' + directories['manual_training_file'].format(regiondir, proc_type)
-               + ' --output_file ' + directories['match_output_file'].format(regiondir, proc_type) + ' '
-               + str(train[0])
-               ]
-        p = subprocess.Popen(cmd, shell=True)
-
-        p.wait()
-        df = pd.read_csv(directories['match_output_file'].format(regiondir, proc_type),
-                         usecols=['id', 'src_name', 'src_address', 'src_name_adj', 'src_address_adj', 'reg_id', 'reg_name',
-                                  'reg_name_adj', 'reg_address_adj',
-                                  'reg_address', 'reg_address_adj', 'srcjoinfields', 'regjoinfields'],
-                         dtype={'id': np.str, 'src_name': np.str, 'src_address': np.str, 'src_name_adj': np.str, 'src_address_adj': np.str,
-                                'reg_id': np.str, 'reg_name': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str, 'srcjoinfields':np.str, 'regjoinfields':np.str})
-        df = df[pd.notnull(df['src_name'])]
-        df.to_csv(directories['match_output_file'].format(regiondir, proc_type), index=False)
-
-    # Clustering:
-    if not os.path.exists(directories['cluster_output_file'].format(regiondir, proc_type)):
-        # Copy training file from first clustering session if recycle mode
-        if in_args.recycle:
-            copyfile(directories['cluster_training_backup'].format(regiondir), directories['cluster_training_file'].format(regiondir, proc_type))
-
-        print("Starting clustering...")
-        cmd = ['python csvdedupe.py '
-               + directories['match_output_file'].format(regiondir, proc_type) + ' '
-               + ' --field_names ' + ' '.join(src_fields) + ' '
-               + str(train[0])
-               + ' --training_file ' + directories['cluster_training_file'].format(regiondir, proc_type)
-               + ' --output_file ' + directories['cluster_output_file'].format(regiondir, proc_type)]
-        p = subprocess.Popen(cmd, cwd=os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
-        p.wait()  # wait for subprocess to finish
-
-        if not in_args.recycle:
-            # Copy training file to backup, so it can be found and copied into recycle phase clustering
-            copyfile(directories['cluster_training_file'].format(regiondir, proc_type), directories['cluster_training_backup'].format(regiondir))
-    else:
-        pass
-
-
-def extractMatches(regiondir, clustdf, config_files, directories, proc_num, proc_type, conf_file_num, in_args):
+def extractMatches(region_dir, clustdf, config_files, directories, proc_num, proc_type, conf_file_num, in_args):
     """
 	Import config file containing variable assignments for i.e. char length, match ratio
 	Based on the 'cascading' config details, extract matches to new csv
@@ -230,35 +349,35 @@ def extractMatches(regiondir, clustdf, config_files, directories, proc_num, proc
             clustdf = clustdf[
                 clustdf.src_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
     else:
-        if os.path.exists(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv'):
+        if os.path.exists(directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv'):
             # Clear any previous extraction file for this config:
-            os.remove(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv')
+            os.remove(directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv')
 
     # Add process number to column for calculating stats purposes:
     clustdf['process_num'] = str(proc_num)
 
-    if not os.path.exists(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv'):
-        clustdf.to_csv(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv',
+    if not os.path.exists(directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv'):
+        clustdf.to_csv(directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv',
                        index=False)
         return clustdf
     else:
         extracts_file = pd.read_csv(
-            directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv', index_col=None)
+            directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv', index_col=None)
         extracts_file = pd.concat([extracts_file, clustdf], ignore_index=True, sort=True)
         extracts_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
-        extracts_file.to_csv(directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(conf_file_num) + '.csv',
+        extracts_file.to_csv(directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv',
                              index=False)
         return extracts_file
 
 
-def manualMatching(regiondir, directories, best_config, proc_type, in_args):
+def manualMatching(region_dir, directories, best_config, proc_type, in_args):
     """
 	Provides user-input functionality for manual matching based on the extracted records
 	:return manual_match_file: extracted file with added column (Y/N/Unsure)
 	"""
 
     manual_match_file = pd.read_csv(
-        directories['extract_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv', index_col=None)
+        directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv', index_col=None)
     manual_match_file['Manual_Match_N'] = ''
     manual_match_file['Manual_Match_NA'] = ''
 
@@ -303,7 +422,7 @@ def manualMatching(regiondir, directories, best_config, proc_type, in_args):
         manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 
         print("Saving...")
-        manual_match_file.to_csv(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
+        manual_match_file.to_csv(directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
                                  # columns=['reg_id', 'id', 'reg_name',
                                  #          'src_name','reg_address', 'src_address', 'leven_dist_N', 'leven_dist_NA','Manual_Match_N','Manual_Match_NA'])
@@ -313,7 +432,7 @@ def manualMatching(regiondir, directories, best_config, proc_type, in_args):
         return manual_match_file
 
     else:
-        manual_match_file.to_csv(directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv',
+        manual_match_file.to_csv(directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
                                  index=False,
                                  # columns=['reg_id', 'id', 'reg_name',
                                  #          'src_name', 'reg_address', 'src_address', 'leven_dist_N', 'leven_dist_NA',
@@ -323,8 +442,8 @@ def manualMatching(regiondir, directories, best_config, proc_type, in_args):
         if not in_args.recycle:
             if not in_args.upload_to_db:
                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(
-                directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv'))
+                directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'))
         else:
             if not in_args.upload_to_db:
                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --recycle --upload_to_db".format(
-                    directories['manual_matches_file'].format(regiondir, proc_type) + '_' + str(best_config) + '.csv'))
+                    directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'))
