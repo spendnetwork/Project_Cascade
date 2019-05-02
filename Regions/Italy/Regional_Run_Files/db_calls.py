@@ -13,35 +13,126 @@ dbname_remote = os.environ.get("DBNAME_REMOTE")
 user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
 
+class Db_Calls:
+    def __init__(self, settings):
+        self.directories = settings.directories
+        self.in_args = settings.in_args
+        self.proc_type = settings.proc_type
+        self.region_dir = settings.region_dir
+        self.configs = settings.configs
+        self.df_dtypes = settings.df_dtypes
+        self.runfile_mods = settings.runfile_mods
+        self.proc_num = settings.proc.num
+        self.runfile_mods = settings.runfile_mods
+        self.training_cols = settings.training_cols
+        self.manual_matches_cols = settings.manual_matches_cols
+        self.dbUpload_cols = settings.dbUpload_cols
+        self.best_config = settings.best_config
 
-def createConnection():
-    '''
-    :return connection : the database connection object
-    :return cur : the cursor (temporary storage for retrieved data
-    '''
-    print('Connecting to database...')
-    conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
-    cur = conn.cursor()
-    return conn, cur
 
 
-def removeTableDuplicates(table_name, headers):
-    """
-    :param table_name: the database table containing duplicates
-    :param headers: the csv headers
-    :return: the sql query to be executed
-    """
+    # def addDataToTable(region_dir, table_name, directories, proc_type, man_matched, in_args, dtypesmod):
+    def addDataToTable(self, table_name):
 
-    print("Removing duplicates from table...")
-    query = \
+        '''
+        Adds the confirmed_matches data to table
+        :param table_name: the database table to which the confirmed matches will be addded
+        :param directories:  directory variables
+        :param proc_type: Process type, initially name_only
+        :param man_matched: the dataframe containing the data
+        :return: None
+        '''
+
+        upload_file = pd.read_csv(
+            self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+            usecols=['src_name', 'src_address', 'reg_id', 'reg_name', 'reg_address', 'Manual_Match_N',
+                     'Manual_Match_NA'])
+
+        # Filter manual matches file to just confirmed Yes matches and non-blank org id's
+        confirmed_matches = upload_file[pd.notnull(upload_file['reg_id'])]
+        if self.in_args.recycle:
+            confirmed_matches = confirmed_matches[(upload_file['Manual_Match_NA'] == 'Y')]
+        else:
+            confirmed_matches = confirmed_matches[(upload_file['Manual_Match_N'] == 'Y')]
+
+        confirmed_matches.to_csv(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type),
+                                 columns=self.dbUpload_cols,
+                                 index=False)
+
+        conn, cur = self.createConnection()
+
+        with open(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type), 'r') as f:
+            # Get headers dynamically
+            reader = csv.reader(f)
+            headers = next(reader, None)
+            headers = ", ".join(headers)
+            next(f)  # Skip header row
+            # Input the data into the dedupe table
+            # copy_expert allows access to csv methods (i.e. char escaping)
+            cur.copy_expert(
+                """COPY {}({}) from stdin (format csv)""".format(table_name, headers), f)
+            print("Data uploaded succesfully...")
+
+        query = self.removeTableDuplicates(table_name, headers)
+        cur.execute(query)
+        conn.commit()
+
+    def createConnection(self):
+        '''
+        :return connection : the database connection object
+        :return cur : the cursor (temporary storage for retrieved data
+        '''
+        print('Connecting to database...')
+        conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
+        cur = conn.cursor()
+        return conn, cur
+
+    def removeTableDuplicates(self, table_name, headers):
         """
-        WITH dups AS 
-            (SELECT DISTINCT ON ({}) * FROM {})
+        :param table_name: the database table containing duplicates
+        :param headers: the csv headers
+        :return: the sql query to be executed
+        """
 
-        DELETE FROM {} WHERE {}.id NOT IN
-        (SELECT id FROM dups);
-        """.format(headers, table_name, table_name, table_name)
-    return query
+        print("Removing duplicates from table...")
+        query = \
+            """
+            WITH dups AS 
+                (SELECT DISTINCT ON ({}) * FROM {})
+
+            DELETE FROM {} WHERE {}.id NOT IN
+            (SELECT id FROM dups);
+            """.format(headers, table_name, table_name, table_name)
+        return query
+
+# def createConnection():
+#     '''
+#     :return connection : the database connection object
+#     :return cur : the cursor (temporary storage for retrieved data
+#     '''
+#     print('Connecting to database...')
+#     conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
+#     cur = conn.cursor()
+#     return conn, cur
+
+
+# def removeTableDuplicates(table_name, headers):
+#     """
+#     :param table_name: the database table containing duplicates
+#     :param headers: the csv headers
+#     :return: the sql query to be executed
+#     """
+#
+#     print("Removing duplicates from table...")
+#     query = \
+#         """
+#         WITH dups AS
+#             (SELECT DISTINCT ON ({}) * FROM {})
+#
+#         DELETE FROM {} WHERE {}.id NOT IN
+#         (SELECT id FROM dups);
+#         """.format(headers, table_name, table_name, table_name)
+#     return query
 
 
 def checkDataExists(region_dir, directories, in_args, data_source):
@@ -101,47 +192,47 @@ def createRegistryDataSQLQuery(source):
 
 def fetchData(query):
     """ retrieve data from the db using query"""
-    conn, _ = createConnection()
+    conn, _ = Db_Calls.createConnection()
     print('Importing data...')
     df = pd.read_sql(query, con=conn)
     conn.close()
     return df
 
 
-def addDataToTable(region_dir, table_name, directories, proc_type, man_matched, in_args, dtypesmod):
-    '''
-    Adds the confirmed_matches data to table
-    :param table_name: the database table to which the confirmed matches will be addded
-    :param directories:  directory variables
-    :param proc_type: Process type, initially name_only
-    :param man_matched: the dataframe containing the data
-    :return: None
-    '''
-
-    # Filter manual matches file to just confirmed Yes matches and non-blank org id's
-    confirmed_matches = man_matched[pd.notnull(man_matched['reg_id'])]
-    if in_args.recycle:
-        confirmed_matches = confirmed_matches[(man_matched['Manual_Match_NA'] == 'Y')]
-    else:
-        confirmed_matches = confirmed_matches[(man_matched['Manual_Match_N'] == 'Y')]
-
-    confirmed_matches.to_csv(directories['confirmed_matches_file'].format(region_dir, proc_type),
-                             columns=dtypesmod.dbUpload_cols,
-                             index=False)
-
-    conn, cur = createConnection()
-    with open(directories['confirmed_matches_file'].format(region_dir, proc_type), 'r') as f:
-        # Get headers dynamically
-        reader = csv.reader(f)
-        headers = next(reader, None)
-        headers = ", ".join(headers)
-        next(f)  # Skip header row
-        # Input the data into the dedupe table
-        # copy_expert allows access to csv methods (i.e. char escaping)
-        cur.copy_expert(
-            """COPY {}({}) from stdin (format csv)""".format(table_name, headers), f)
-        print("Data uploaded succesfully...")
-
-    query = removeTableDuplicates(table_name, headers)
-    cur.execute(query)
-    conn.commit()
+# def addDataToTable(region_dir, table_name, directories, proc_type, man_matched, in_args, dtypesmod):
+#     '''
+#     Adds the confirmed_matches data to table
+#     :param table_name: the database table to which the confirmed matches will be addded
+#     :param directories:  directory variables
+#     :param proc_type: Process type, initially name_only
+#     :param man_matched: the dataframe containing the data
+#     :return: None
+#     '''
+#
+#     # Filter manual matches file to just confirmed Yes matches and non-blank org id's
+#     confirmed_matches = man_matched[pd.notnull(man_matched['reg_id'])]
+#     if in_args.recycle:
+#         confirmed_matches = confirmed_matches[(man_matched['Manual_Match_NA'] == 'Y')]
+#     else:
+#         confirmed_matches = confirmed_matches[(man_matched['Manual_Match_N'] == 'Y')]
+#
+#     confirmed_matches.to_csv(directories['confirmed_matches_file'].format(region_dir, proc_type),
+#                              columns=dtypesmod.dbUpload_cols,
+#                              index=False)
+#
+#     conn, cur = createConnection()
+#     with open(directories['confirmed_matches_file'].format(region_dir, proc_type), 'r') as f:
+#         # Get headers dynamically
+#         reader = csv.reader(f)
+#         headers = next(reader, None)
+#         headers = ", ".join(headers)
+#         next(f)  # Skip header row
+#         # Input the data into the dedupe table
+#         # copy_expert allows access to csv methods (i.e. char escaping)
+#         cur.copy_expert(
+#             """COPY {}({}) from stdin (format csv)""".format(table_name, headers), f)
+#         print("Data uploaded succesfully...")
+#
+#     query = removeTableDuplicates(table_name, headers)
+#     cur.execute(query)
+#     conn.commit()

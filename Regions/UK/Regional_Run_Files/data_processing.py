@@ -167,7 +167,7 @@ class ProcessRegistryData(DataProcessing):
 
     def __init__(self, proc_type):
         # To add proc_type to the init, must also rebuild the parent init as it will be overridden with nothing otherwise:
-        DataProcessing.__init__(self)
+        DataProcessing.__init__(self, self.settings)
         self.proc_type = proc_type
 
     def clean(self):

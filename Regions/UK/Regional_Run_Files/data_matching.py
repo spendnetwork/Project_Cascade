@@ -32,6 +32,7 @@ class Matching:
         self.runfile_mods = settings.runfile_mods
         self.training_cols = settings.training_cols
         self.manual_matches_cols = settings.manual_matches_cols
+        self.main_proc = settings.main_proc
 
     def dedupe(self, srcdf):
         if not os.path.exists(self.directories['match_output_file'].format(self.region_dir, self.proc_type)):
@@ -42,7 +43,7 @@ class Matching:
         # Run dedupe for matching and calculate related stats for comparison
 
         if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
-            self.dedupeCluster(self)
+            self.dedupeCluster()
 
         if not os.path.exists(self.directories['assigned_output_file'].format(self.region_dir, self.proc_type)):
             clust_df = pd.read_csv(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type), index_col=None)
@@ -174,13 +175,14 @@ class ExtractionAndUploads(Matching):
         Matching.__init__(self)
         self.stat_file = stat_file
 
+
     def extract(self):
 
         main_proc = self.configs['processes'][self.proc_type][min(self.configs['processes'][self.proc_type].keys())]
 
         # If recycle arg matches the recycle variable in the self.proc_type config file (want to restrict operations to just
         # i.e. Name_Only but still have the dynamics to iterate through proc_types
-        if self.in_args.recycle == main_proc['recycle_phase']:
+        if self.in_args.recycle == self.main_proc['recycle_phase']:
 
             # If user has used --config_review flag, set best_config variable based on manual review of stats file...
             if self.in_args.config_review:
@@ -205,14 +207,14 @@ class ExtractionAndUploads(Matching):
 
                 try :
                     # Convert manual matches file to training json file for use in --recycle (next self.proc_type i.e. name & address)
-                    self.runfile_mods.convert_training.convertToTraining(self, conv_file)
+                    self.runfile_mods.convert_training.ConvertToTraining(self, conv_file).convert()
                 except AttributeError:
                     # An AttributeError will be raised if the region does not require/have a convert_training module
                     next
 
             if self.in_args.upload_to_db:
                 # Add confirmed matches to relevant table
-                self.runfile_mods.db_calls.addDataToTable(self.region_dir, main_proc['db_table'], self.directories, self.proc_type, self.in_args, settings)
+                self.runfile_mods.db_calls.Db_Calls.addDataToTable(self, main_proc['db_table'])
 
     def manualMatching(self, best_config):
         """
@@ -259,6 +261,8 @@ class ExtractionAndUploads(Matching):
             manual_match_file.to_csv(
                 self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
+
+            yield manual_match_file
 
             if not self.in_args.upload_to_db:
                 print(

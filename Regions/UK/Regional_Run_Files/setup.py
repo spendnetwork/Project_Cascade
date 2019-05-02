@@ -1,8 +1,11 @@
 import pdb
 import os
+from runfile2 import Main
 
+# class Setup(Main):
 class Setup:
     def __init__(self, settings):
+        # Main.__init__(self)
         self.directories = settings.directories
         self.region_dir = settings.region_dir
         self.proc_type = settings.proc_type

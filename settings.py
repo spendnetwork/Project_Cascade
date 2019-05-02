@@ -8,7 +8,7 @@ class Italy_Settings:
 
     runfile_mods = ITA_run_files
 
-    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np., 'src_name': np.str,
+    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np.str, 'src_name': np.str,
                  'src_address': np.str,
                  'src_address_adj': np.str, 'src_name_adj': np.str, 'reg_id': np.str, 'reg_name_adj': np.str,
                  'reg_address': np.str,

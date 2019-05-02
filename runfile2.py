@@ -42,101 +42,210 @@ def getInputArgs(rootdir, args=None):
     return args, parser
 
 
-def main(region_dir, in_args, directories, config_path, settings):
+# def main(region_dir, in_args, directories, config_path, settings):
+#
+#     runfile_mods = settings.runfile_mods
+#     data_processing = runfile_mods.data_processing
+#     data_analysis = runfile_mods.data_analysis
+#     db_calls = runfile_mods.db_calls
+#     setup = runfile_mods.setup
+#     data_matching = runfile_mods.data_matching
+#
+#     if not in_args.recycle:
+#         try:
+#             # If registry/registry data file doesn't exist, pull from database
+#             # db_calls.checkDataExists(region_dir, directories, in_args, settings.registryTableSource)
+#             # FIX THIS OR USE ABOVE
+#             db_calls.checkDataExists(settings)
+#         except:
+#             # Will fail if checkDataExists function doesn't exist (i.e. registry data sourced externally (not from db))
+#             pass
+#
+#     setup.setupRawDirs(region_dir, directories)
+#
+#     try:
+#         # For each config file read it and convert to dictionary for accessing
+#         pyfiles = "*_config.py"
+#         for conf_file in config_path.glob(pyfiles):
+#             with open(conf_file) as config_file:
+#                 file_contents = []
+#                 file_contents.append(config_file.read())
+#
+#                 # Convert list to dictionary
+#                 configs = ast.literal_eval(file_contents[0])
+#                 settings.configs = configs
+#
+#                 conf_file_num = int(conf_file.name[0])
+#                 settings.conf_file_num = conf_file_num
+#
+#                 # Clean registry and source datasets for linking
+#                 # source df needed in memory for stats
+#                 # src_df = data_processing.ProcessSourceData(region_dir, directories, in_args).clean()
+#                 src_df = data_processing.ProcessSourceData(settings).clean()
+#
+#                 if not in_args.recycle:
+#                     try:
+#                         # data_processing.ProcessRegistryData(region_dir, directories, in_args).clean()
+#                         data_processing.ProcessRegistryData(settings).clean()
+#                     except AttributeError:
+#                         # Skip if registry data not downloaded yet (i.e. UK)
+#                         next
+#
+#                 # For each process type (eg: Name & Add, Name only) outlined in the configs file:
+#                 for proc_type in configs['processes']:
+#                     settings.proc_type = proc_type
+#
+#                     # # Get first process from config file
+#                     main_proc = min(configs['processes'][proc_type].keys())
+#                     settings.upload_table = main_proc['db_table']
+#
+#                     # If args.recycle matches the recycle setting for the first process type
+#                     if in_args.recycle == configs['processes'][proc_type][main_proc]['recycle_phase']:
+#
+#                         # Create working directories if don't exist
+#                         setup.Setup(settings).setupDirs()
+#
+#                         # Iterate over each process number in the config file
+#                         for proc_num in configs['processes'][proc_type]:
+#                             settings.proc_num = proc_num
+#
+#                             # # Define data types for clustered file. Enables faster loading.
+#                             # df_dtypes = settings.df_dtypes
+#
+#                             # Run dedupe for matching and calculate related stats for comparison
+#                             if in_args.region == 'Italy':
+#                                 # clust_df = data_matching.matching(configs, settings, df_dtypes, proc_num, directories, in_args, region_dir, runfile_mods)
+#                                 clust_df = data_matching.Matching(settings)
+#
+#                             if in_args.region == 'UK':
+#                                 clust_df = data_matching.Matching(settings).dedupe(src_df)
+#
+#                             extracts_file = data_matching.extractMatches(settings, clust_df)
+#                         break
+#                     else:
+#                         continue
+#                 # Output stats file:
+#                 stat_file = data_analysis.StatsCalculations(settings, clust_df, extracts_file, src_df).calculate()
+#
+#     except StopIteration:
+#         # Continue if no more config files found
+#         print("Done")
+#
+#         # For each process type (eg: Name & Add, Name only) outlined in the configs file:
+#     for proc_type in configs['processes']:
+#         settings.proc_type = proc_type
+#         # data_matching.ExtractionAndUploads(configs, proc_type, in_args,stat_file, data_matching, region_dir, directories, settings, runfile_mods, db_calls)
+#         data_matching.ExtractionAndUploads(settings, stat_file).extract()
 
-    runfile_mods = settings.runfile_mods
-    data_processing = runfile_mods.data_processing
-    data_analysis = runfile_mods.data_analysis
-    db_calls = runfile_mods.db_calls
-    setup = runfile_mods.setup
-    data_matching = runfile_mods.data_matching
+class Main:
+    def __init__(self, settings):
+        self.directories = settings.directories
+        self.in_args = settings.in_args
+        self.proc_type = settings.proc_type
+        self.region_dir = settings.region_dir
+        # self.configs = settings.configs
+        self.df_dtypes = settings.df_dtypes
+        # self.proc_num = settings.proc_num
+        self.training_cols = settings.training_cols
+        self.manual_matches_cols = settings.manual_matches_cols
+        # self.main_proc = settings.main_proc
+        self.config_path = settings.config_path
+        # Runfile mods
+        self.runfile_mods = settings.runfile_mods
+        self.data_processing = self.runfile_mods.data_processing
+        self.data_analysis = self.runfile_mods.data_analysis
+        self.db_calls = self.runfile_mods.db_calls
+        self.setup = self.runfile_mods.setup
+        self.data_matching = self.runfile_mods.data_matching
 
-    if not in_args.recycle:
+    def run_main(self):
+
+        if not in_args.recycle:
+            try:
+                # If registry/registry data file doesn't exist, pull from database
+                self.db_calls.checkDataExists(self.region_dir, self.directories, self.in_args, settings.registryTableSource)
+                # FIX THIS OR USE ABOVE
+                # self.db_calls.checkDataExists(settings)
+            except:
+                # Will fail if checkDataExists function doesn't exist (i.e. registry data sourced externally (not from db))
+                pass
+
+        self.setup.Setup(settings).setupRawDirs()
+
         try:
-            # If registry/registry data file doesn't exist, pull from database
-            # db_calls.checkDataExists(region_dir, directories, in_args, settings.registryTableSource)
-            # FIX THIS OR USE ABOVE
-            db_calls.checkDataExists(settings)
-        except:
-            # Will fail if checkDataExists function doesn't exist (i.e. registry data sourced externally (not from db))
-            pass
+            # For each config file read it and convert to dictionary for accessing
+            pyfiles = "*_config.py"
+            for conf_file in self.config_path.glob(pyfiles):
+                with open(conf_file) as config_file:
+                    file_contents = []
+                    file_contents.append(config_file.read())
 
-    setup.setupRawDirs(region_dir, directories)
+                    # Convert list to dictionary
+                    configs = ast.literal_eval(file_contents[0])
+                    settings.configs = configs
 
-    try:
-        # For each config file read it and convert to dictionary for accessing
-        pyfiles = "*_config.py"
-        for conf_file in config_path.glob(pyfiles):
-            with open(conf_file) as config_file:
-                file_contents = []
-                file_contents.append(config_file.read())
+                    conf_file_num = int(conf_file.name[0])
+                    settings.conf_file_num = conf_file_num
 
-                # Convert list to dictionary
-                configs = ast.literal_eval(file_contents[0])
-                settings.configs = configs
+                    # Clean registry and source datasets for linking
+                    # source df needed in memory for stats
+                    # src_df = data_processing.ProcessSourceData(region_dir, directories, in_args).clean()
+                    src_df = self.data_processing.ProcessSourceData(settings).clean()
 
-                conf_file_num = int(conf_file.name[0])
-                settings.conf_file_num = conf_file_num
+                    if not in_args.recycle:
+                        try:
+                            # data_processing.ProcessRegistryData(region_dir, directories, in_args).clean()
+                            self.data_processing.ProcessRegistryData(settings).clean()
+                        except AttributeError:
+                            # Skip if registry data not downloaded yet (i.e. UK)
+                            next
 
-                # Clean registry and source datasets for linking
-                # source df needed in memory for stats
-                pdb.set_trace()
+                    # For each process type (eg: Name & Add, Name only) outlined in the configs file:
+                    for proc_type in configs['processes']:
+                        settings.proc_type = proc_type
 
-                # src_df = data_processing.ProcessSourceData(region_dir, directories, in_args).clean()
-                src_df = data_processing.ProcessSourceData(settings).clean()
+                        # # Get first process from config file
+                        main_proc = min(configs['processes'][proc_type].keys())
+                        pdb.set_trace()
+                        settings.upload_table = str(main_proc['db_table'])
 
-                if not in_args.recycle:
-                    try:
-                        # data_processing.ProcessRegistryData(region_dir, directories, in_args).clean()
-                        data_processing.ProcessRegistryData(settings).clean()
-                    except AttributeError:
-                        # Skip if registry data not downloaded yet (i.e. UK)
-                        next
+                        # If args.recycle matches the recycle setting for the first process type
+                        if in_args.recycle == configs['processes'][proc_type][main_proc]['recycle_phase']:
 
-                # For each process type (eg: Name & Add, Name only) outlined in the configs file:
-                for proc_type in configs['processes']:
-                    settings.proc_type = proc_type
+                            # Create working directories if don't exist
+                            self.setup.Setup(settings).setupDirs()
 
-                    # # Get first process from config file
-                    main_proc = min(configs['processes'][proc_type].keys())
+                            # Iterate over each process number in the config file
+                            for proc_num in configs['processes'][proc_type]:
+                                settings.proc_num = proc_num
 
-                    # If args.recycle matches the recycle setting for the first process type
-                    if in_args.recycle == configs['processes'][proc_type][main_proc]['recycle_phase']:
+                                # # Define data types for clustered file. Enables faster loading.
+                                # df_dtypes = settings.df_dtypes
 
-                        # Create working directories if don't exist
-                        setup.Setup(settings).setupDirs()
+                                # Run dedupe for matching and calculate related stats for comparison
+                                if in_args.region == 'Italy':
+                                    # clust_df = data_matching.matching(configs, settings, df_dtypes, proc_num, directories, in_args, region_dir, runfile_mods)
+                                    clust_df = self.data_matching.Matching(settings)
 
-                        # Iterate over each process number in the config file
-                        for proc_num in configs['processes'][proc_type]:
-                            settings.proc_num = proc_num
+                                if in_args.region == 'UK':
+                                    clust_df = self.data_matching.Matching(settings).dedupe(src_df)
 
-                            # # Define data types for clustered file. Enables faster loading.
-                            # df_dtypes = settings.df_dtypes
+                                extracts_file = self.data_matching.extractMatches(settings, clust_df)
+                            break
+                        else:
+                            continue
+                    # Output stats file:
+                    stat_file = self.data_analysis.StatsCalculations(settings, clust_df, extracts_file, src_df).calculate()
 
-                            # Run dedupe for matching and calculate related stats for comparison
-                            if in_args.region == 'Italy':
-                                # clust_df = data_matching.matching(configs, settings, df_dtypes, proc_num, directories, in_args, region_dir, runfile_mods)
-                                clust_df = data_matching.Matching(settings)
+        except StopIteration:
+            # Continue if no more config files found
+            print("Done")
 
-                            if in_args.region == 'UK':
-                                clust_df = data_matching.Matching(settings).dedupe(src_df)
-
-                            extracts_file = data_matching.extractMatches(settings, clust_df)
-                        break
-                    else:
-                        continue
-                # Output stats file:
-                stat_file = data_analysis.StatsCalculations(settings, clust_df, extracts_file, src_df).calculate()
-
-    except StopIteration:
-        # Continue if no more config files found
-        print("Done")
-
-        # For each process type (eg: Name & Add, Name only) outlined in the configs file:
-    for proc_type in configs['processes']:
-
-        # data_matching.ExtractionAndUploads(configs, proc_type, in_args,stat_file, data_matching, region_dir, directories, settings, runfile_mods, db_calls)
-        data_matching.ExtractionAndUploads(configs, proc_type, in_args, stat_file, data_matching, region_dir, directories, settings, runfile_mods, db_calls)
+            # For each process type (eg: Name & Add, Name only) outlined in the configs file:
+        for proc_type in configs['processes']:
+            settings.proc_type = proc_type
+            # data_matching.ExtractionAndUploads(configs, proc_type, in_args,stat_file, data_matching, region_dir, directories, settings, runfile_mods, db_calls)
+            self.data_matching.ExtractionAndUploads(settings, stat_file).extract()
 
 
 if __name__ == '__main__':
@@ -155,9 +264,9 @@ if __name__ == '__main__':
 
     settings.in_args = in_args
     settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
-
+    # pdb.set_trace()
     # Define config file variables and related data types file
     settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
 
-    main(settings.region_dir, settings.in_args, settings.directories, settings.config_path, settings)
+    Main(settings).run_main()
 
