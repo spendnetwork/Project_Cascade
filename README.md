@@ -171,6 +171,6 @@ The best way to train the matching data is to have a strategy of sorts prior to 
 Clustering here is important because it will affect how much of the matched data will be copied to unmatched, but closely related source data. 
 
 #### 3. Altering the config files
-Once the training has complete, this is where the config files come into play, as we are now attempting to extract the best quality matches factoring in that longer strings can have lower levenshtein ratios and still be good matches compared to shorter strings.
+Once the training has complete, this is where the config files come into play, as we are now attempting to verify the best quality matches factoring in that longer strings can have lower levenshtein ratios and still be good matches compared to shorter strings.
 
 Create a new config file as required (must follow the current naming convention) and experiment with the 'char_counts' and 'min_match_score', making sure to increase one as you decrease the other. The module will automatically register additional files and run the process and output the stats to separate csvs for you to compare. These files will be saved in `Outputs/Extracted_Matches`.

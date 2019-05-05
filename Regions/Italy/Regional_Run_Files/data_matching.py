@@ -38,7 +38,7 @@ class Matching:
             clust_df = self.runfile_mods.data_processing.AssignRegDataToClusters(clust_df, self.directories[
                 'assigned_output_file'].format(self.region_dir, self.proc_type)).assign()
 
-            # Adds leven_dist column and extract matches based on config process criteria:
+            # Adds leven_dist column and verify matches based on config process criteria:
             clust_df = self.runfile_mods.data_processing.LevDist(clust_df, self.directories["assigned_output_file"].
                                                                  format(self.region_dir,self.proc_type)).addLevDist()
 
@@ -143,7 +143,7 @@ class Matching:
 #         clust_df = runfile_mods.data_processing.assign_reg_data_to_clusters(clust_df, directories[
 #             'assigned_output_file'].format(region_dir, proc_type))
 #
-#         # Adds leven_dist column and extract matches based on config process criteria:
+#         # Adds leven_dist column and verify matches based on config process criteria:
 #         clust_df = runfile_mods.data_processing.add_lev_dist(clust_df,
 #                                                             directories["assigned_output_file"].format(region_dir,
 #                                                                                                        proc_type))
@@ -317,7 +317,7 @@ def dedupe_matchTEST(src_file, reg_file, region_dir, directories, config_files, 
 def extractMatches(region_dir, clustdf, config_files, directories, proc_num, proc_type, conf_file_num, in_args):
     """
 	Import config file containing variable assignments for i.e. char length, match ratio
-	Based on the 'cascading' config details, extract matches to new csv
+	Based on the 'cascading' config details, verify matches to new csv
 
 	:return extracts_file: contains dataframe with possible acceptable matches
 	"""

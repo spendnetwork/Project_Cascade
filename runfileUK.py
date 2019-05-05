@@ -84,7 +84,7 @@ def main(region_dir, in_args, directories):
                         if not os.path.exists(directories['assigned_output_file'].format(region_dir, proc_type)):
                             clust_df = pd.read_csv(directories["cluster_output_file"].format(region_dir, proc_type),index_col=None)
 
-                            # Adds leven_dist column and extract matches based on config process criteria:
+                            # Adds leven_dist column and verify matches based on config process criteria:
                             clust_df = data_processing.add_lev_dist(clust_df, directories["assigned_output_file"].format(region_dir, proc_type))
 
                         else:

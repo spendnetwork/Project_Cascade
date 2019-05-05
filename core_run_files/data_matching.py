@@ -131,7 +131,7 @@ def dedupe_match_cluster(src_file, reg_file, region_dir, directories, config_fil
 def extract_matches(region_dir, clustdf, config_files, directories, proc_num, proc_type, conf_file_num, in_args):
     """
 	Import config file containing variable assignments for i.e. char length, match ratio
-	Based on the 'cascading' config details, extract matches to new csv
+	Based on the 'cascading' config details, verify matches to new csv
 
 	:return extracts_file: contains dataframe with possible acceptable matches
 	"""

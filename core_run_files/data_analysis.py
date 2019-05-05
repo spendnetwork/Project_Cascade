@@ -6,7 +6,7 @@ import numpy as np
 def calc_matching_stats(region_dir, clustdf, extractdf, directories, conf_file_num, proc_type, srcdf, in_args):
     """
 	For each process outlined in the config file, after each process is completed
-	extract the matches that meet the match % criteria into a new file
+	verify the matches that meet the match % criteria into a new file
 	extractions based on the different leven ratio values
 
 	:return : None

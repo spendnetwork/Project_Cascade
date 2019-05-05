@@ -1,32 +1,24 @@
 import pandas as pd
 import os
 import numpy as np
+import pdb
+from runfile import Main
 
-
-class StatsCalculations:
+class StatsCalculations(Main):
 
     """
 	For each process outlined in the config file, after each process is completed
-	extract the matches that meet the match % criteria into a new file
+	verify the matches that meet the match % criteria into a new file
 	extractions based on the different leven ratio values
 
 	:return : None
 	:output : a short stats file for each config file for manual comparison to see which is better
 	"""
     def __init__(self, settings, clustdf, extractdf, srcdf):
-        self.directories = settings.directories
-        self.in_args = settings.in_args
-        self.proc_type = settings.proc_type
-        self.region_dir = settings.region_dir
-        self.configs = settings.configs
-        self.df_dtypes = settings.df_dtypes
-        self.runfile_mods = settings.runfile_mods
-        self.proc_num = settings.proc.num
-        self.conf_file_num = settings.conf_file_num
+        Main.__init__(self, settings)
         self.clustdf = clustdf
         self.extractdf = extractdf
         self.srcdf = srcdf
-        self.stats_cols = settings.stats_cols
 
 
     def calculate(self):
@@ -39,8 +31,8 @@ class StatsCalculations:
 
         # Overall matches, including poor quality:
         statdf.at[self.conf_file_num, 'Config_File'] = self.conf_file_num
-        statdf.at[self.conf_file_num, 'Total_Matches'] = len(self.clustdf[pd.notnull(self.clustdf['reg_id'])])
-        statdf.at[self.conf_file_num, 'Percent_Matches'] = round(len(self.clustdf[pd.notnull(self.clustdf['reg_id'])]) / len(self.srcdf) * 100,2)
+        statdf.at[self.conf_file_num, 'Total_Matches'] = len(self.clustdf[pd.notnull(self.clustdf['CH_id'])])
+        statdf.at[self.conf_file_num, 'Percent_Matches'] = round(len(self.clustdf[pd.notnull(self.clustdf['CH_id'])]) / len(self.srcdf) * 100,2)
         # Overall optimised matches :
         statdf.at[self.conf_file_num, 'Optim_Matches'] = len(self.extractdf)
         # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
@@ -60,9 +52,6 @@ class StatsCalculations:
         else:
             main_stat_file = pd.read_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index_col=None)
             main_stat_file = pd.concat([main_stat_file, statdf], ignore_index=True, sort=True)
-            # main_stat_file.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index=False,
-            #                       columns=['Config_File', 'Leven_Dist_Avg', 'Optim_Matches', 'Percent_Matches',
-            #                                'Percent_Precision', 'Percent_Recall', 'Total_Matches'])
             main_stat_file.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index=False,
                                   columns=self.stats_cols)
             return main_stat_file

@@ -7,7 +7,7 @@ class StatsCalculations:
 
     """
 	For each process outlined in the config file, after each process is completed
-	extract the matches that meet the match % criteria into a new file
+	verify the matches that meet the match % criteria into a new file
 	extractions based on the different leven ratio values
 
 	:return : None
