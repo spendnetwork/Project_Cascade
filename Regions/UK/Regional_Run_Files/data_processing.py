@@ -107,9 +107,9 @@ class AssignRegDataToClusters:
         self.df.reset_index(drop=True, inplace=True)
         tqdm.pandas()
         print("Assigning close matches within clusters...")
-        df = self.df.groupby(['Cluster ID']).progress_apply(self.getMaxId)
-        df.to_csv(self.assigned_file, index=False)
-        return df
+        self.df = self.df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
+        self.df.to_csv(self.assigned_file, index=False)
+        return self.df
 
     def getMaxId(group):
         """
@@ -145,7 +145,7 @@ class ProcessSourceData(DataProcessing):
         adj_data = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(self.in_args.src_adj_name)
 
         if not os.path.exists(adj_data):
-            df = pd.read_csv(raw_data, dtype={'about_or_contact_text': np.str, 'home_page_text': np.str})
+            df = pd.read_csv(raw_data, dtype=self.df_dtypes)
             print("Re-organising source data...")
 
             # Remove punctuation and double spacing in name
@@ -161,7 +161,8 @@ class ProcessSourceData(DataProcessing):
             df.to_csv(adj_data, index=False)
         else:
             # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
-            df = pd.read_csv(adj_data)
+            df = pd.read_csv(adj_data, dtype=self.df_dtypes)
+
         return df
 
 

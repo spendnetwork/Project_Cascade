@@ -5,7 +5,6 @@ import ast
 from pathlib import Path
 import pdb
 import settings
-from importlib import reload
 
 def getInputArgs(rootdir, args=None):
     """
@@ -15,7 +14,7 @@ def getInputArgs(rootdir, args=None):
 	"""
 
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
-    parser.add_argument('--region', default='UK', type=str, help='Define the region/country (Italy/UK)')
+    parser.add_argument('--region', default='Italy', type=str, help='Define the region/country (Italy/UK)')
     parser.add_argument('--src_raw_name', default='source_data.csv', type=str,
                         help='Set raw source/source datafile name')
     parser.add_argument('--reg_raw_name', default='registry_data.csv', type=str, help='Set raw registry datafile name')
@@ -45,7 +44,6 @@ def getInputArgs(rootdir, args=None):
 class Main:
     def __init__(self, settings):
         # Defined in __main__
-
         self.directories = settings.directories
         self.in_args = settings.in_args
         self.region_dir = settings.region_dir
@@ -60,6 +58,7 @@ class Main:
         self.dbUpload_cols = settings.dbUpload_cols
         self.registryTableSource = settings.registryTableSource
         self.proc_type = settings.proc_type
+        self.dedupe_cols = settings.dedupe_cols
 
         # Runfile modules
         self.runfile_mods = settings.runfile_mods
@@ -101,38 +100,30 @@ class Main:
 
                     # Convert list to dictionary
                     configs = ast.literal_eval(file_contents[0])
-
-                    #
                     self.configs = configs
 
                     conf_file_num = int(conf_file.name[0])
-                    # settings.conf_file_num = conf_file_num
                     self.conf_file_num = conf_file_num
 
                     # Clean registry and source datasets for linking
                     # source df needed in memory for stats
-                    # src_df = data_processing.ProcessSourceData(region_dir, directories, in_args).clean()
-                    # pdb.set_trace()
                     src_df = self.data_processing.ProcessSourceData(self).clean()
 
                     if not in_args.recycle:
                         try:
-                            # data_processing.ProcessRegistryData(region_dir, directories, in_args).clean()
-                            self.data_processing.ProcessRegistryData(self).clean()
-                        except AttributeError:
+                            reg_df = self.data_processing.ProcessRegistryData(self).clean()
+                        except:
                             # Skip if registry data not downloaded yet (i.e. UK)
                             next
 
                     # For each process type (eg: Name & Add, Name only) outlined in the configs file:
                     for proc_type in configs['processes']:
-                        # settings.proc_type = proc_type
                         self.proc_type = proc_type
 
                         # # Get first process number from config file
                         main_proc_num = min(configs['processes'][proc_type].keys())
                         main_proc_configs = configs['processes'][proc_type][main_proc_num]
 
-                        # settings.upload_table = main_proc_configs['db_table']
                         self.upload_table = main_proc_configs['db_table']
 
                         # If args.recycle matches the recycle setting for the first process type
@@ -143,21 +134,13 @@ class Main:
 
                             # Iterate over each process number in the config file
                             for proc_num in configs['processes'][proc_type]:
-                                # settings.proc_num = proc_num
                                 self.proc_num = proc_num
 
-                                # # Define data types for clustered file. Enables faster loading.
-                                # df_dtypes = settings.df_dtypes
-
                                 # Run dedupe for matching and calculate related stats for comparison
-                                # if in_args.region == 'Italy':
-                                #     # clust_df = data_matching.matching(configs, settings, df_dtypes, proc_num, directories, in_args, region_dir, runfile_mods)
-                                #
-                                #     clust_df = self.data_matching.Matching(self)
+                                if in_args.region == 'Italy':
+                                    clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
 
                                 if in_args.region == 'UK':
-
-                                    # clust_df = self.data_matching.Matching(settings, src_df).dedupe()
                                     clust_df = self.data_matching.Matching(self, src_df).dedupe()
 
                                 extracts_file = self.data_matching.CascadeExtraction(self).extract(clust_df)

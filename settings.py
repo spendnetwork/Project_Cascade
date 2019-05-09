@@ -44,19 +44,34 @@ class Italy_Settings:
     proc_num = int
     best_config = int
 
+    # Need to define proc_num here otherwise will not be carried through as part of 'self'
+
+    conf_file_num = int
+    configs = dict
+    main_proc = int
+    upload_table = str
+
 class UK_Settings:
 
     runfile_mods = UK_run_files
 
-    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np.float, 'src_name': np.str,
-             'src_name_adj': np.str, 'CH_id': np.str, 'CH_name_adj': np.str,
+    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'ocid': np.str, 'src_name': np.str, 'src_id': np.str,
+                 'src_name_adj': np.str, 'src_streetaddress': np.str, 'CH_id': np.str, 'CH_name_adj': np.str,
                  'CH_address': np.str, 'src_name_short': np.str, 'CH_name_short': np.str, 'leven_dist_N': np.int,
-                 'reg_name': np.str, 'home_page_text' : np.str, 'about_or_contact_text' : np.str}
+                 }
 
-    training_cols = ['src_name', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N']
+    training_cols = ['src_name', 'CH_name', 'Manual_Match_N', 'CH_id', 'CH_address', 'leven_dist_N']
 
-    manual_matches_cols = ['src_name', 'CH_name', 'Manual_Match_N', 'about_or_contact_text', 'company_url', 'home_page_text', 'CH_id',
-     'CH_address', 'src_name_short', 'CH_name_short', 'leven_dist_N']
+    manual_matches_cols = ['src_id','src_name', 'CH_name', 'Manual_Match_N',
+                           # 'src_streetaddress',
+                           'CH_address', 'CH_id', 'src_name_short', 'CH_name_short', 'leven_dist_N',
+                           # 'ocid'
+                           ]
+
+    stats_cols = ['Config_File', 'Total_Matches', 'Percent_Matches', 'Optim_Matches', 'Percent_Precision',
+                  'Percent_Recall', 'Leven_Dist_Avg']
+
+    dbUpload_cols = ['src_name', 'src_id', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N']
 
     registryTableSource = str
     # Need to define proc_num here otherwise will not be carried through as part of 'self'
@@ -72,9 +87,6 @@ class UK_Settings:
     # defined after the directories are setup (which doesnt make sense - fix this)
     proc_type = 'Name_Only'
 
-    stats_cols = ['Config_File', 'Total_Matches', 'Percent_Matches', 'Optim_Matches', 'Percent_Precision',
-                  'Percent_Recall', 'Leven_Dist_Avg']
 
-    dbUpload_cols = ['src_name', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id',  'CH_address',  'leven_dist_N']
 
     best_config = int

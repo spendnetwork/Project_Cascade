@@ -1,9 +1,10 @@
 import pandas as pd
 import os
 import numpy as np
+from runfile import Main
 
 
-class StatsCalculations:
+class StatsCalculations(Main):
 
     """
 	For each process outlined in the config file, after each process is completed
@@ -14,19 +15,10 @@ class StatsCalculations:
 	:output : a short stats file for each config file for manual comparison to see which is better
 	"""
     def __init__(self, settings, clustdf, extractdf, srcdf):
-        self.directories = settings.directories
-        self.in_args = settings.in_args
-        self.proc_type = settings.proc_type
-        self.region_dir = settings.region_dir
-        self.configs = settings.configs
-        self.df_dtypes = settings.df_dtypes
-        self.runfile_mods = settings.runfile_mods
-        self.proc_num = settings.proc.num
-        self.conf_file_num = settings.conf_file_num
+        super().__init__(settings)
         self.clustdf = clustdf
         self.extractdf = extractdf
         self.srcdf = srcdf
-        self.stats_cols = settings.stats_cols
 
 
     def calculate(self):

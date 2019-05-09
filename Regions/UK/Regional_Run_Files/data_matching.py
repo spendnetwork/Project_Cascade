@@ -25,27 +25,28 @@ class Matching(Main):
         self.src_df = src_df
 
     def dedupe(self):
-
         if not os.path.exists(self.directories['match_output_file'].format(self.region_dir, self.proc_type)):
             self.companiesHouseMatching(self.src_df)
 
         self.runfile_mods.data_processing.ProcessRegistryData(self).clean()
-        # Run dedupe for matching and calculate related stats for comparison
+
 
         if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
-
+            # Run dedupe for matching and calculate related stats for comparison
             self.dedupeCluster()
 
         if not os.path.exists(self.directories['assigned_output_file'].format(self.region_dir, self.proc_type)):
             clust_df = pd.read_csv(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type), index_col=None)
+
+            clust_df = self.runfile_mods.data_processing.AssignRegDataToClusters(clust_df, self.directories[
+                'assigned_output_file'].format(self.region_dir, self.proc_type)).assign()
 
             # Adds leven_dist column and verify matches based on config process criteria:
             clust_df = self.runfile_mods.data_processing.LevDist(clust_df,
                                                             self.directories["assigned_output_file"].format(self.region_dir,
                                                                                                        self.proc_type)).addLevDist()
         else:
-            clust_df = pd.read_csv(self.directories["assigned_output_file"].format(self.region_dir, self.proc_type), dtype=self.df_dtypes,
-                                   index_col=None)
+            clust_df = pd.read_csv(self.directories["assigned_output_file"].format(self.region_dir, self.proc_type), index_col=None)
         return clust_df
 
     def companiesHouseMatching(self, df):
@@ -57,7 +58,7 @@ class Matching(Main):
 
         s = chwrapper.Search(access_token=companieshouse_key)
         # Tried matching to src_name_adj but results were poor. Keeping adj/short column for clustering...
-        org_strings = df['src_name']
+        org_strings = df['src_name'].astype(str)
         ch_name_dict = {}
         ch_id_dict = {}
         ch_addr_dict = {}
@@ -76,13 +77,13 @@ class Matching(Main):
             for word in tqdm(chunk):
                 response = s.search_companies(word)
                 if response.status_code == 200:
-                    dict = response.json()
                     # response.json() returns a nested dict with complete org info
-
+                    dict = response.json()
                     name = ''
                     chId = 0
                     chAddr = ''
                     dict = dict['items']
+
                     for i in range(len(dict)):
                         if fuzz.ratio(word, dict[i]['title']) > fuzz.ratio(word, name):
                             name = dict[i]['title']
@@ -141,6 +142,13 @@ class Matching(Main):
 
         train = ['--skip_training' if self.in_args.training else '']
 
+        # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
+        if os.path.exists('./learned_settings'):
+            os.remove('./learned_settings')
+
+        if os.path.exists('./csvdedupe/csvdedupe/learned_settings'):
+            os.remove('./csvdedupe/csvdedupe/learned_settings')
+
         # Clustering:
         if not os.path.exists(self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)):
             # Copy training file from first clustering session if recycle mode
@@ -185,7 +193,6 @@ class VerificationAndUploads(Main):
                 # ...otherwise pick best config_file based on stats file (max leven dist avg):
                 max_lev = self.stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
                 self.best_config = self.stat_file.at[max_lev, 'Config_File']
-
 
             self.manualMatching()
 
@@ -247,11 +254,8 @@ class VerificationAndUploads(Main):
             manual_match_file.to_csv(
                 self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
-            # return manual_match_file
-
 
         else:
-
             manual_match_file.to_csv(
                 self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
@@ -259,7 +263,7 @@ class VerificationAndUploads(Main):
             # return manual_match_file
 
         if not self.in_args.upload_to_db:
-            pdb.set_trace()
+            # pdb.set_trace()
             print(
                 "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(
                     self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(

@@ -13,16 +13,10 @@ host_remote = os.environ.get("HOST_REMOTE")
 dbname_remote = os.environ.get("DBNAME_REMOTE")
 user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
-#
+
 class DbCalls(Main):
     def __init__(self, settings):
         super().__init__(settings)
-        # self.table_name = table_name
-
-# class DbCalls(VerificationAndUploads):
-#     def __init__(self, table_name):
-#         super().__init__(self)
-#         self.table_name = table_name
 
     def addDataToTable(self):
         '''

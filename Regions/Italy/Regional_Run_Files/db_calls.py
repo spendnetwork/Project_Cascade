@@ -5,6 +5,7 @@ import pandas as pd
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
+from runfile import Main
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -13,47 +14,27 @@ dbname_remote = os.environ.get("DBNAME_REMOTE")
 user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
 
-class Db_Calls:
+class Db_Calls(Main):
     def __init__(self, settings):
-        self.directories = settings.directories
-        self.in_args = settings.in_args
-        self.proc_type = settings.proc_type
-        self.region_dir = settings.region_dir
-        self.configs = settings.configs
-        self.df_dtypes = settings.df_dtypes
-        self.runfile_mods = settings.runfile_mods
-        self.proc_num = settings.proc.num
-        self.runfile_mods = settings.runfile_mods
-        self.training_cols = settings.training_cols
-        self.manual_matches_cols = settings.manual_matches_cols
-        self.dbUpload_cols = settings.dbUpload_cols
-        self.best_config = settings.best_config
+        super().__init__(settings)
 
-
-
-    # def addDataToTable(region_dir, table_name, directories, proc_type, man_matched, in_args, dtypesmod):
-    def addDataToTable(self, table_name):
-
+    def addDataToTable(self):
         '''
         Adds the confirmed_matches data to table
         :param table_name: the database table to which the confirmed matches will be addded
         :param directories:  directory variables
         :param proc_type: Process type, initially name_only
-        :param man_matched: the dataframe containing the data
+        :param upload_file: the dataframe containing the data
         :return: None
         '''
-
+        # pdb.set_trace()
         upload_file = pd.read_csv(
-            self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
-            usecols=['src_name', 'src_address', 'reg_id', 'reg_name', 'reg_address', 'Manual_Match_N',
-                     'Manual_Match_NA'])
+            self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
+                self.best_config) + '.csv',
+            usecols=self.dbUpload_cols)
 
-        # Filter manual matches file to just confirmed Yes matches and non-blank org id's
-        confirmed_matches = upload_file[pd.notnull(upload_file['reg_id'])]
-        if self.in_args.recycle:
-            confirmed_matches = confirmed_matches[(upload_file['Manual_Match_NA'] == 'Y')]
-        else:
-            confirmed_matches = confirmed_matches[(upload_file['Manual_Match_N'] == 'Y')]
+        # # Filter manual matches file to just confirmed Yes matches and non-blank org id's
+        confirmed_matches = upload_file[pd.notnull(upload_file['CH_id'])]
 
         confirmed_matches.to_csv(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type),
                                  columns=self.dbUpload_cols,
@@ -64,16 +45,18 @@ class Db_Calls:
         with open(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type), 'r') as f:
             # Get headers dynamically
             reader = csv.reader(f)
+
             headers = next(reader, None)
             headers = ", ".join(headers)
+            self.headers = headers
             next(f)  # Skip header row
             # Input the data into the dedupe table
             # copy_expert allows access to csv methods (i.e. char escaping)
             cur.copy_expert(
-                """COPY {}({}) from stdin (format csv)""".format(table_name, headers), f)
+                """COPY {}({}) from stdin (format csv)""".format(self.upload_table, self.headers), f)
             print("Data uploaded succesfully...")
 
-        query = self.removeTableDuplicates(table_name, headers)
+        query = self.removeTableDuplicates()
         cur.execute(query)
         conn.commit()
 

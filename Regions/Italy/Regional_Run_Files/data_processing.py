@@ -5,14 +5,14 @@ from tqdm import tqdm
 import numpy as np
 from Regions.Italy.Regional_Run_Files import org_suffixes
 import string
+import pdb
+from runfile import Main
 
 
-class DataProcessing:
+class DataProcessing(Main):
 
-    def __init__(self, settings):
-        self.region_dir = settings.region_dir
-        self.directories = settings.directories
-        self.in_args = settings.in_args
+    # def __init__(self, settings):
+    #     super().__init__(settings)
 
     def remvPunct(self, df, orig_col, adj_col):
         """
@@ -241,7 +241,7 @@ class AssignRegDataToClusters:
         self.df.reset_index(drop=True, inplace=True)
         tqdm.pandas()
         print("Assigning close matches within clusters...")
-        self.df = self.df.groupby(['Cluster ID']).progress_apply(self.getMaxId)
+        self.df = self.df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
         self.df.to_csv(self.assigned_file, index=False)
         return self.df
 
