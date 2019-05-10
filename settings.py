@@ -2,6 +2,7 @@ import numpy as np
 import directories
 from Regions.Italy import Regional_Run_Files as ITA_run_files
 from Regions.UK import Regional_Run_Files as UK_run_files
+from Regions.UK_entities import Regional_Run_Files as UK_ent_run_files
 
 
 class Italy_Settings:
@@ -73,7 +74,6 @@ class UK_Settings:
 
     dbUpload_cols = ['src_name', 'src_id', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N']
 
-    registryTableSource = str
     # Need to define proc_num here otherwise will not be carried through as part of 'self'
     proc_num = int
     conf_file_num = int
@@ -90,3 +90,45 @@ class UK_Settings:
 
 
     best_config = int
+
+class UK_entities(UK_Settings):
+
+    def __init(self):
+        super().__init__(self)
+
+
+    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float,
+                 'src_name': np.str, 'src_name_adj': np.str, 'src_streetaddress': np.str, 'src_streetaddress_adj': np.str, 'src_name_short': np.str,
+                 'src_address_locality': np.str, 'src_address_postalcode': np.str, 'src_address_streetaddress': np.str,
+                 'reg_id': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str,  'reg_name_short': np.str,
+                 'leven_dist_N': np.int, 'leven_dist_NA': np.int,
+                 'Manual_Match_N':np.str,  'Manual_Match_NA':np.str,
+                 'src_joinfields':np.str, 'reg_joinfields':np.str
+                 }
+
+    runfile_mods = UK_ent_run_files
+
+    reg_data_source = 'uk_data.entity'
+
+    src_data_source = 'ocds.ocds_tenders_view'
+
+    dedupe_cols = ['src_name', 'src_name_adj', 'src_address_locality','src_address_postalcode','src_address_countryname','src_address_streetaddress', 'src_address_adj',
+                   'reg_id', 'reg_name', 'reg_name_adj', 'reg_address', 'reg_address_adj','src_joinfields', 'reg_joinfields']
+
+    src_data_cols = ['src_name','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress']
+
+    dbUpload_cols = ['src_name', 'src_id', 'reg_name', 'Manual_Match_N', 'reg_id', 'reg_address',
+                     'leven_dist_N']
+
+    manual_matches_cols = [ 'src_name',  'reg_name', 'Manual_Match_N', 'leven_dist_N',
+                           'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA',
+                            'src_name_short',
+                           'reg_name_short',
+                            'reg_id',
+                            'src_id',
+                            'reg_name_adj',
+                            'src_joinfields',
+                            'reg_joinfields']
+
+
+    training_cols = ['src_name', 'reg_name', 'Manual_Match_N', 'src_id', 'leven_dist_N']

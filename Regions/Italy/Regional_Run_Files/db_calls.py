@@ -88,35 +88,6 @@ class Db_Calls(Main):
             """.format(headers, table_name, table_name, table_name)
         return query
 
-# def createConnection():
-#     '''
-#     :return connection : the database connection object
-#     :return cur : the cursor (temporary storage for retrieved data
-#     '''
-#     print('Connecting to database...')
-#     conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
-#     cur = conn.cursor()
-#     return conn, cur
-
-
-# def removeTableDuplicates(table_name, headers):
-#     """
-#     :param table_name: the database table containing duplicates
-#     :param headers: the csv headers
-#     :return: the sql query to be executed
-#     """
-#
-#     print("Removing duplicates from table...")
-#     query = \
-#         """
-#         WITH dups AS
-#             (SELECT DISTINCT ON ({}) * FROM {})
-#
-#         DELETE FROM {} WHERE {}.id NOT IN
-#         (SELECT id FROM dups);
-#         """.format(headers, table_name, table_name, table_name)
-#     return query
-
 
 def checkDataExists(region_dir, directories, in_args, data_source):
 

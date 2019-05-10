@@ -14,7 +14,7 @@ def getInputArgs(rootdir, args=None):
 	"""
 
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
-    parser.add_argument('--region', default='Italy', type=str, help='Define the region/country (Italy/UK)')
+    parser.add_argument('--region', default='UK_entities', type=str, help='Define the region/country (Italy/UK)')
     parser.add_argument('--src_raw_name', default='source_data.csv', type=str,
                         help='Set raw source/source datafile name')
     parser.add_argument('--reg_raw_name', default='registry_data.csv', type=str, help='Set raw registry datafile name')
@@ -56,9 +56,11 @@ class Main:
         self.training_cols = settings.training_cols
         self.manual_matches_cols = settings.manual_matches_cols
         self.dbUpload_cols = settings.dbUpload_cols
-        self.registryTableSource = settings.registryTableSource
         self.proc_type = settings.proc_type
         self.dedupe_cols = settings.dedupe_cols
+        self.reg_data_source = settings.reg_data_source
+        self.src_data_source = settings.src_data_source
+        self.src_data_cols = settings.src_data_cols
 
         # Runfile modules
         self.runfile_mods = settings.runfile_mods
@@ -67,6 +69,7 @@ class Main:
         self.db_calls = self.runfile_mods.db_calls
         self.setup = self.runfile_mods.setup
         self.data_matching = self.runfile_mods.data_matching
+        self.convert_training = self.runfile_mods.convert_training
 
         # Defined during runtime
         self.main_proc = settings.main_proc
@@ -78,17 +81,15 @@ class Main:
 
     def run_main(self):
 
-        # if not in_args.recycle:
-        #     try:
-        #         # If registry/registry data file doesn't exist, pull from database
-        #         self.db_calls.checkDataExists(self.region_dir, self.directories, self.in_args, settings.registryTableSource)
-        #         # FIX THIS OR USE ABOVE
-        #         # self.db_calls.checkDataExists(settings)
-        #     except:
-        #         # Will fail if checkDataExists function doesn't exist (i.e. registry data sourced externally (not from db))
-        #         pass
-
         self.setup.Setup(self).setupRawDirs()
+
+        if not in_args.recycle:
+            try:
+                # If registry/registry data file doesn't exist, pull from database
+                self.db_calls.FetchData.checkDataExists(self)
+            except:
+                # Will fail if checkDataExists function doesn't exist (i.e. registry data sourced externally (not from db))
+                pass
 
         try:
             # For each config file read it and convert to dictionary for accessing
@@ -112,7 +113,7 @@ class Main:
                     if not in_args.recycle:
                         try:
                             reg_df = self.data_processing.ProcessRegistryData(self).clean()
-                        except:
+                        except FileNotFoundError:
                             # Skip if registry data not downloaded yet (i.e. UK)
                             next
 
@@ -137,11 +138,10 @@ class Main:
                                 self.proc_num = proc_num
 
                                 # Run dedupe for matching and calculate related stats for comparison
-                                if in_args.region == 'Italy':
-                                    clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
-
                                 if in_args.region == 'UK':
                                     clust_df = self.data_matching.Matching(self, src_df).dedupe()
+                                else:
+                                    clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
 
                                 extracts_file = self.data_matching.CascadeExtraction(self).extract(clust_df)
                             break
@@ -159,7 +159,7 @@ class Main:
             settings.proc_type = proc_type
             # data_matching.VerificationAndUploads(configs, proc_type, in_args,stat_file, data_matching, region_dir, directories, settings, runfile_mods, db_calls)
             self.data_matching.VerificationAndUploads(self, stat_file).verify()
-        #
+
         # if self.in_args.upload_to_db:
         #     # Add confirmed matches to relevant table
         #     self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
@@ -179,9 +179,12 @@ if __name__ == '__main__':
     if in_args.region == 'UK':
         settings = settings.UK_Settings
 
+    if in_args.region == 'UK_entities':
+        settings = settings.UK_entities
+
     settings.in_args = in_args
     settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
-    # pdb.set_trace()
+
     # Define config file variables and related data types file
     settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
 
