@@ -108,7 +108,6 @@ def checkDataExists(region_dir, directories, in_args, data_source):
             choice = input("Registry data not found, load from database? (y/n): ")
             if choice.lower() == 'y':
                 # Check env file exists
-                pdb.set_trace()
                 env_fpath = os.path.join('.', '.env')
                 if not os.path.exists(env_fpath):
                     print("Database credentials not found. Please complete the .env file using the '.env template'")

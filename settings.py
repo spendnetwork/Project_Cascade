@@ -97,13 +97,13 @@ class UK_entities(UK_Settings):
         super().__init__(self)
 
 
-    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float,
+    df_dtypes = {'Cluster ID': np.int, 'Confidence Score': np.float,
                  'src_name': np.str, 'src_name_adj': np.str, 'src_streetaddress': np.str, 'src_streetaddress_adj': np.str, 'src_name_short': np.str,
                  'src_address_locality': np.str, 'src_address_postalcode': np.str, 'src_address_streetaddress': np.str,
                  'reg_id': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str,  'reg_name_short': np.str,
                  'leven_dist_N': np.int, 'leven_dist_NA': np.int,
-                 'Manual_Match_N':np.str,  'Manual_Match_NA':np.str,
-                 'src_joinfields':np.str, 'reg_joinfields':np.str
+                 'Manual_Match_N':np.str,  'Manual_Match_NA': np.str,
+                 'src_joinfields':np.str, 'reg_joinfields': np.str
                  }
 
     runfile_mods = UK_ent_run_files

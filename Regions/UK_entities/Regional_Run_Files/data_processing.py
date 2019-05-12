@@ -41,7 +41,7 @@ class DataProcessing(Main):
         return df
 
 
-class LevDist:
+class LevDist(Main):
     '''
     Adds the levenshtein distance ratio comparing the amount of change required to convert the source org name
     to the registry org name and therefore a measure of the quality of the match
@@ -51,7 +51,8 @@ class LevDist:
     :return: clust_df
     '''
 
-    def __init__(self, clust_df, output_file=None):
+    def __init__(self, settings, clust_df, output_file=None):
+        super().__init__(settings)
         self.clust_df = clust_df
         self.output_file = output_file
 
@@ -103,21 +104,15 @@ class LevDist:
 
     	:return ratio: individual levenshtein distance between the registry and source org string
     	"""
-        # try:
-        #     return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(fuzz.ratio(row.src_joinfields,
-        #                                                                                    row.reg_joinfields))
-        # except:
-        #     return  int(fuzz.ratio(row.src_name_short, row.reg_name_short)), 0
-        #
-        # finally:
-        #     return 0, 0
-
+        # pdb.set_trace()
+        # print(row)
         if pd.notnull(row.src_name_short) and pd.notnull(row.reg_name_short):
             if pd.notnull(row.src_address_adj) and pd.notnull(row.reg_address_adj):
-                return fuzz.ratio(row.src_name_short, row.reg_name_short), fuzz.ratio(row.src_joinfields, row.reg_joinfields)
-        if pd.notnull(row.src_name_short) and pd.notnull(row.reg_name_short):
-
-            return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(0)
+                # print(int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(fuzz.ratio(row.src_joinfields, row.reg_joinfields)))
+                return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(fuzz.ratio(row.src_joinfields, row.reg_joinfields))
+            else:
+                # print(int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(0))
+                return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(0)
 
 
 
@@ -234,7 +229,7 @@ class ProcessRegistryData(DataProcessing):
 
             dffullmerge.drop_duplicates(inplace=True)
             print("...done")
-            pdb.set_trace()
+
             dffullmerge['reg_joinfields'] = dffullmerge['reg_joinfields'].astype(str)
             dffullmerge['reg_address_adj'] = dffullmerge['reg_address_adj'].astype(str)
             dffullmerge.to_csv(adj_data, index=False)

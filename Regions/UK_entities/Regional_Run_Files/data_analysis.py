@@ -50,7 +50,7 @@ class StatsCalculations(Main):
             statdf.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type, index=False))
         # if it does exist, concat current results with previous
         else:
-            main_stat_file = pd.read_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index_col=None)
+            main_stat_file = pd.read_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index_col=None, dtype=self.df_dtypes)
             main_stat_file = pd.concat([main_stat_file, statdf], ignore_index=True, sort=True)
             # main_stat_file.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index=False,
             #                       columns=['Config_File', 'Leven_Dist_Avg', 'Optim_Matches', 'Percent_Matches',

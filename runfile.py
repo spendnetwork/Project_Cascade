@@ -143,6 +143,10 @@ class Main:
                                 else:
                                     clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
 
+
+                                # EXTRACTS FUNCTION IS TAKING ONLY LEV DIST 100 MATCHES ON THE FIRST ITERATION AND NOT ADDING ANY MORE AFTER AT
+                                # DIFFERENT CASCADE LEVELS!!!
+
                                 extracts_file = self.data_matching.CascadeExtraction(self).extract(clust_df)
                             break
                         else:

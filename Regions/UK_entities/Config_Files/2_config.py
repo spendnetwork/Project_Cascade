@@ -42,6 +42,12 @@
               "char_counts" : 18,
               "min_match_score" : 65,
             },
+          8:
+            {
+                # Keep char count as previous procnum as now looking at anything > than 18, not just 15-18, to capture everything other char length
+                "char_counts": 18,
+                "min_match_score": 50,
+            }
 
         },
             "Name_Address":
@@ -85,6 +91,12 @@
                             "char_counts": 18,
                             "min_match_score": 65,
                         },
+                    8:
+                        {
+                            # Keep char count as previous procnum as now looking at anything > than 18, not just 15-18, to capture everything other char length
+                            "char_counts": 18,
+                            "min_match_score": 50,
+                        }
                 }
 
         }

@@ -147,20 +147,30 @@ class CascadeExtraction(Main):
         # Filter by current match_score:
         clustdf = clustdf[clustdf[levendist] >= self.configs['processes'][self.proc_type][self.proc_num]['min_match_score']]
 
+
         # if the earliest process, accept current clustdf as matches, if not (>min):
         if self.proc_num > min(self.configs['processes'][self.proc_type]):
-            try:
-                # Filter by char count and previous count (if exists):
+            # If at last proc num, filter for only > min char length to capture remaining long strings
+            if self.proc_num == max(self.configs['processes'][self.proc_type]):
                 clustdf = clustdf[
-                    clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num]['char_counts']]
-                clustdf = clustdf[
-                    clustdf.src_name_short.str.len() > self.configs['processes'][self.proc_type][self.proc_num - 1][
+                    clustdf.src_name_short.str.len() > self.configs['processes'][self.proc_type][self.proc_num][
                         'char_counts']]
-                # Filter by < 99 as first self.proc_num includes all lengths leading to duplicates
                 clustdf = clustdf[clustdf[levendist] <= 99]
-            except:
-                clustdf = clustdf[
-                    clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num]['char_counts']]
+            else:
+                try:
+                    # Filter by char count and previous count (if exists):
+                    clustdf = clustdf[
+                        clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num][
+                            'char_counts']]
+                    clustdf = clustdf[
+                        clustdf.src_name_short.str.len() > self.configs['processes'][self.proc_type][self.proc_num - 1][
+                            'char_counts']]
+                    # Filter by < 99 as first self.proc_num includes all lengths leading to duplicates
+                    clustdf = clustdf[clustdf[levendist] <= 99]
+                except:
+                    clustdf = clustdf[
+                        clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num][
+                            'char_counts']]
         else:
             if os.path.exists(self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
                     self.conf_file_num) + '.csv'):

@@ -195,10 +195,10 @@ class FetchData(DbCalls):
                   )
             --      OR (source = 'ted_notices' AND countryname = 'United Kingdom')
                    )
-              AND t.releasedate >= '2018-01-01'
+              AND t.releasedate >= '2017-01-01'
             --   AND t.json -> 'releases' -> 0 -> 'tag' ? 'tender'
             --   AND t.json -> 'releases' -> 0 -> 'tag' ? 'award'
-             limit 5000
+             
             ;
     
             """.format(self.src_data_source)

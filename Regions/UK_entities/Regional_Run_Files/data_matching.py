@@ -31,18 +31,19 @@ class Matching(Main):
                                    dtype=self.df_dtypes)
 
         #     # Copy registry data to high-confidence cluster records
-            clust_df = self.runfile_mods.data_processing.AssignRegDataToClusters(clust_df, self.directories[
+            clust_df = self.data_processing.AssignRegDataToClusters(clust_df, self.directories[
                 'assigned_output_file'].format(self.region_dir, self.proc_type)).assign()
 
+            clust_df = clust_df.fillna(value="")
+
             # Adds leven_dist column and verify matches based on config process criteria:
-            clust_df = self.runfile_mods.data_processing.LevDist(clust_df,
-                                                                 self.directories["assigned_output_file"].format(
+            clust_df = self.data_processing.LevDist(self, clust_df, self.directories["assigned_output_file"].format(
                                                                      self.region_dir,
                                                                      self.proc_type)).addLevDist()
         else:
+            # clust_df = pd.read_csv(self.directories["assigned_output_file"].format(self.region_dir, self.proc_type),index_col=None, dtype=self.df_dtypes)
             clust_df = pd.read_csv(self.directories["assigned_output_file"].format(self.region_dir, self.proc_type),
-                                   index_col=None, dtype=self.df_dtypes)
-
+                                   dtype=self.df_dtypes)
 
         return clust_df
 
@@ -97,8 +98,8 @@ class Matching(Main):
 
             p.wait()
             df = pd.read_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type),
-                             usecols=self.settings.dedupe_cols,
-                             dtype=self.settings.df_dtypes)
+                             usecols=self.dedupe_cols,
+                             dtype=self.df_dtypes)
             df = df[pd.notnull(df['src_name'])]
             df.to_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type), index=False)
 
@@ -128,6 +129,8 @@ class Matching(Main):
 
 
 class CascadeExtraction(Main):
+    def __init__(self, settings):
+        super().__init__(settings)
 
     def extract(self, clustdf):
         """
@@ -150,21 +153,27 @@ class CascadeExtraction(Main):
 
         # if the earliest process, accept current clustdf as matches, if not (>min):
         if self.proc_num > min(self.configs['processes'][self.proc_type]):
-            try:
-                # Filter by char count and previous count (if exists):
+            # If at last proc num, filter for only > min char length to capture remaining long strings
+            if self.proc_num == max(self.configs['processes'][self.proc_type]):
                 clustdf = clustdf[
-                    clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num]['char_counts']]
-                clustdf = clustdf[
-                    clustdf.src_name_short.str.len() > self.configs['processes'][self.proc_type][self.proc_num - 1][
+                    clustdf.src_name_short.str.len() > self.configs['processes'][self.proc_type][self.proc_num][
                         'char_counts']]
-                # Filter by < 99 as first self.proc_num includes all lengths leading to duplicates
                 clustdf = clustdf[clustdf[levendist] <= 99]
-            except:
-                clustdf = clustdf[
-                    clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num]['char_counts']]
+            else:
+                try:
+                    # Filter by char count and previous count (if exists):
+                    clustdf = clustdf[
+                        clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num]['char_counts']]
+                    clustdf = clustdf[
+                        clustdf.src_name_short.str.len() > self.configs['processes'][self.proc_type][self.proc_num - 1][
+                            'char_counts']]
+                    # Filter by < 99 as first self.proc_num includes all lengths leading to duplicates
+                    clustdf = clustdf[clustdf[levendist] <= 99]
+                except:
+                    clustdf = clustdf[
+                        clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num]['char_counts']]
         else:
-            if os.path.exists(self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
-                    self.conf_file_num) + '.csv'):
+            if os.path.exists(self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv'):
                 # Clear any previous extraction file for this config:
                 os.remove(self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
                     self.conf_file_num) + '.csv')
@@ -177,11 +186,11 @@ class CascadeExtraction(Main):
             clustdf.to_csv(
                 self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index=False)
-            return clustdf
+            # return clustdf
         else:
             extracts_file = pd.read_csv(
                 self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
-                index_col=None)
+                index_col=None, dtype=self.df_dtypes)
             extracts_file = pd.concat([extracts_file, clustdf], ignore_index=True, sort=True)
             extracts_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
             extracts_file.to_csv(
@@ -225,7 +234,7 @@ class VerificationAndUploads(Main):
 
                 conv_file = pd.read_csv(
                     self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
-                    usecols=self.training_cols)
+                    usecols=self.training_cols, dtype=self.df_dtypes)
 
                 try :
                     # Convert manual matches file to training json file for use in --recycle (next self.proc_type i.e. name & address)
@@ -247,10 +256,9 @@ class VerificationAndUploads(Main):
 
         manual_match_file = pd.read_csv(
             self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
-            index_col=None)
+            index_col=None, dtype=self.df_dtypes)
         manual_match_file['Manual_Match_N'] = ''
         manual_match_file['Manual_Match_NA'] = ''
-
 
         # Automatically confirm rows with leven dist of 100
         for index, row in manual_match_file.iterrows():
