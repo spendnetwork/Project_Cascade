@@ -228,21 +228,6 @@ class VerificationAndUploads(Main):
 
             self.manualMatching()
 
-            if self.in_args.convert_training:
-                # Ensure not in recycle mode for training file to be converted
-                assert not self.in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
-
-                conv_file = pd.read_csv(
-                    self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
-                    usecols=self.training_cols, dtype=self.df_dtypes)
-
-                try :
-                    # Convert manual matches file to training json file for use in --recycle (next self.proc_type i.e. name & address)
-                    self.runfile_mods.convert_training.ConvertToTraining(self).convert()
-                except AttributeError:
-                    # An AttributeError will be raised if the region does not require/have a convert_training module
-                    next
-
             if self.in_args.upload_to_db:
                 # Add confirmed matches to relevant table
                 self.runfile_mods.db_calls.DbCalls(self).addDataToTable()

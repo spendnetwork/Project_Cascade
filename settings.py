@@ -103,7 +103,7 @@ class UK_entities(UK_Settings):
                  'reg_id': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str,  'reg_name_short': np.str,
                  'leven_dist_N': np.int, 'leven_dist_NA': np.int,
                  'Manual_Match_N':np.str,  'Manual_Match_NA': np.str,
-                 'src_joinfields':np.str, 'reg_joinfields': np.str
+                 'src_joinfields':np.str, 'reg_joinfields': np.str, 'src_tag':np.str
                  }
 
     runfile_mods = UK_ent_run_files
@@ -112,15 +112,15 @@ class UK_entities(UK_Settings):
 
     src_data_source = 'ocds.ocds_tenders_view'
 
-    dedupe_cols = ['src_name', 'src_name_adj', 'src_address_locality','src_address_postalcode','src_address_countryname','src_address_streetaddress', 'src_address_adj',
+    dedupe_cols = ['src_name','src_tag', 'src_name_adj', 'src_address_locality','src_address_postalcode','src_address_countryname','src_address_streetaddress', 'src_address_adj',
                    'reg_id', 'reg_name', 'reg_name_adj', 'reg_address', 'reg_address_adj','src_joinfields', 'reg_joinfields']
 
-    src_data_cols = ['src_name','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress']
+    src_data_cols = ['src_name','src_tag','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress']
 
-    dbUpload_cols = ['src_name', 'src_id', 'reg_name', 'Manual_Match_N', 'reg_id', 'reg_address',
+    dbUpload_cols = ['src_name','src_tag', 'src_id', 'reg_name', 'Manual_Match_N', 'reg_id', 'reg_address',
                      'leven_dist_N']
 
-    manual_matches_cols = [ 'src_name',  'reg_name', 'Manual_Match_N', 'leven_dist_N',
+    manual_matches_cols = [ 'src_name','src_tag',  'reg_name', 'Manual_Match_N', 'leven_dist_N',
                            'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA',
                             'src_name_short',
                            'reg_name_short',

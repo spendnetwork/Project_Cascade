@@ -110,12 +110,11 @@ class Main:
                     # source df needed in memory for stats
                     src_df = self.data_processing.ProcessSourceData(self).clean()
 
-                    if not in_args.recycle:
-                        try:
-                            reg_df = self.data_processing.ProcessRegistryData(self).clean()
-                        except FileNotFoundError:
-                            # Skip if registry data not downloaded yet (i.e. UK)
-                            next
+                    try:
+                        reg_df = self.data_processing.ProcessRegistryData(self).clean()
+                    except FileNotFoundError:
+                        # Skip if registry data not downloaded yet (i.e. UK)
+                        next
 
                     # For each process type (eg: Name & Add, Name only) outlined in the configs file:
                     for proc_type in configs['processes']:
@@ -128,6 +127,7 @@ class Main:
                         self.upload_table = main_proc_configs['db_table']
 
                         # If args.recycle matches the recycle setting for the first process type
+
                         if in_args.recycle == main_proc_configs['recycle_phase']:
 
                             # Create working directories if don't exist
@@ -192,5 +192,7 @@ if __name__ == '__main__':
     # Define config file variables and related data types file
     settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
 
+    # if not in_args
     Main(settings).run_main()
+
 

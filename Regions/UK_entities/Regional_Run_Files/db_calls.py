@@ -178,8 +178,9 @@ class FetchData(DbCalls):
             SELECT
             
             -- ocid,
-            --t.json -> 'releases' -> 0 -> 'tag',
+            
             distinct t.buyer as src_name,
+            t.json -> 'releases' -> 0 -> 'tag' as src_tag,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'locality' as src_address_locality,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'postalCode' as src_address_postalcode,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'countryName' as src_address_countryname,
@@ -192,12 +193,12 @@ class FetchData(DbCalls):
                   'cf_notices',
             --       'cn_londoncontracts_uk',
                   ''
-                  )
-            --      OR (source = 'ted_notices' AND countryname = 'United Kingdom')
-                   )
+               --   )
+               --   OR (source = 'ted_notices' AND countryname = 'United Kingdom')
+              --  )
               AND t.releasedate >= '2017-01-01'
-            --   AND t.json -> 'releases' -> 0 -> 'tag' ? 'tender'
-            --   AND t.json -> 'releases' -> 0 -> 'tag' ? 'award'
+               --AND t.json -> 'releases' -> 0 -> 'tag' ? 'tender'
+               --AND t.json -> 'releases' -> 0 -> 'tag' ? 'award'
              
             ;
     
