@@ -37,11 +37,11 @@ pip install -r requirements.txt
 
 6. Run the module
 ```
-python run.py --registry_raw_name 'registry_data_sample.csv'
+python runfile.py --registry_raw_name 'registry_data_sample.csv'
 ```
 Or rename the sample file to registry_data.csv, which is the default name used when calling. _If no registry datafile is found, the user will be prompted with the option to download it from the remote database._
 ```
-python run.py
+python runfile.py
 ```
 
 The module makes use of argument parsing, with the following arguments:
@@ -60,7 +60,7 @@ The module makes use of argument parsing, with the following arguments:
 
 To amend the names if needed :
 ```
-python run.py --source_raw_name <filename>  # ...etc
+python runfile.py --source_raw_name <filename>  # ...etc
 ```
 
 The `--recycle` flag is used once the module has been run and trained for the first time. When this flag is used, the module will run for a second time, but will incorporate the training data obtained from the manual matching process created in the first 'round', as  kick-start of sorts. See 5. Recycling Matches below for more info.
@@ -101,7 +101,7 @@ Project_Cascade
     |--db_calls.py
     |--org_suffixes.py
     |--setup.py
-|--run.py
+|--runfile.py
 |--Pipfile
 |--Pipfile.lock
 |--README.md
@@ -118,7 +118,7 @@ _** Subject to change/ depending on naming conventions chosen in config files._
 ### Deduplication
 4.  The dedupe module comes into play next in two stages. First is the matching phase, which joins together our manual source data to the registry data. It does this using [dedupe](https://github.com/dedupeio/csvdedupe)'s `csvlink` command. Training data has been provided to provide the best quality matches, and so you are required to do nothing here, however if you want to modify the training data just use the `training` flag when calling the module:
 ```
-python run.py --training
+python runfile.py --training
 ```
 It is recommended that you study the dedupe documentation before modifying the training data, as experimentation is required to prevent over or under-fitting of the matching process. I have provided some notes at the end of this readme to explain my methods.
 
@@ -138,14 +138,14 @@ You can add as many config files as you like to experiment with different combin
 12. The program will then exit, allowing the user to review the matches that have been extracted based on the chosen config file. The next stage is to manually review the 'Manual_Matches_x' file within Outputs/X/Confirmed_Matches and enter Y/N/U in the Manual_Match column. All matches with a Levenshtein distance of 100 (i.e. an exact match) are automatically assigned 'Y'. Note that these matches can be verified in the terminal if the `-terminal_matching` flag is used. In this case, the program will not exit, and instead the user will be prompted to verify the matches using the same Y/N/U responses.
 13. If the program has exited, we will then do 2 things. The first is to convert these manual confirmed matches into a json training file to be fed back into the system but using more fields in the dedupe phase (see recycling matches section below). The second is to get these confirmed matches uploaded to the database. Do this by running the command:
 ```
-python run.py --convert_training --upload_to_db
+python runfile.py --convert_training --upload_to_db
 ```
 The new training files are copied into the relevant training folders ready to be called by dedupe, and the confirmed 'Y' matches are converted to a Confirmed_Matches.csv file and then uploaded to the database. At this point duplicates within the database are sought and removed.
 ### Re-cycling the matches
 14. These quality matches (Y), and poor quality matches (N) which have been converted to a json training file, can then be re-fed back into dedupe as a kick-start to more accurate training but now including the street address field. Once the process has completed for the first time, re-run the module using the `recycle` flag:
 
 ```
-python run.py --recycle
+python runfile.py --recycle
 ```
 
 This will run the entire process again but will use the new training data and will attempt to match both the organisation name and the address. Note that the old training data is duplicated here, so you can add to the training data for the recycle phase without impacting the initial phase if you wanted to re-run it. 

@@ -1,6 +1,6 @@
 # Project_Cascade
 
-The core premise of this module is to link datasets containing organisational data. One dataset is raw data, perhaps with errors due to manual input, and the other is an official registry, perhaps obtained from an external API such as the UK Companies House.
+The core premise of this module is to link data sets containing organisational data. One data set is raw data, perhaps with errors due to manual input, and the other is an official registry, perhaps obtained from an external API such as the UK Companies House.
 
 There are several setup, clean-up and post-matching stages (i.e. organisation suffix standardisation) that take place prior to and after the main event, which is the matching of records using dedupe.io's deduplication tool.
 
@@ -8,11 +8,13 @@ These stages are detailed below.
 
 The module has been designed to allow efficient addition of new types of data sources and approaches to matching the data. For example, three sub-projects included are Italian datasets, UK (all), and UK_entities (specific to Spend Network). The UK (all) is built to connect to the UK Companies House API, whereas the UK_entities is designed to retrieve internal datasets.
 
-The purpose is to find as many possible matches between the two datasets, verifying the quality of the manually curated (aka "source") data.
+The purpose is to find as many possible matches between the two data sets, verifying the quality of the manually curated (aka "source") data.
 
 Should the process be stopped at any point, the module has been constructed to check for each file created as it progresses. Therefore you can end the module and resume from where you left off.
 
-## Using the Module
+## Using the Module - UK Entities (default)
+
+The UK Entities module downloads both data sets internally from the Spend Network database. 
 
 ### Initial Set Up & Familiarisation
 
@@ -47,23 +49,20 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-5. Place the two raw data files into Raw_Data/
+5. Create .env file in root directory and add database credentials as per '.env template'
 
 6. Run the module
 ```
-python run.py --registry_raw_name 'registry_data_sample.csv'
-```
-Or rename the sample file to registry_data.csv, which is the default name used when calling. _If no registry datafile is found, the user will be prompted with the option to download it from the remote database._
-```
-python run.py
+python runfile.py
 ```
 
 The module makes use of argument parsing, with the following arguments:
 ```
---source_raw_name (default: 'source_data.csv')
---registry_raw_name (default: 'registry_data.csv')
---source_adj_name (default: 'source_data_adj.csv')
---registry_adj_name (default: 'registry_data_adj.csv')
+--region (default: 'UK_entities')
+--src_raw_name (default: 'source_data.csv')
+--reg_raw_name (default: 'registry_data.csv')
+--src_adj_name (default: 'source_data_adj.csv')
+--reg_adj_name (default: 'registry_data_adj.csv')
 --recycle (No parameters)
 --training (No parameters)
 --config_review (No parameters)
@@ -72,50 +71,53 @@ The module makes use of argument parsing, with the following arguments:
 --upload_to_db (No parameters)
 ```
 
-To amend the names if needed :
-```
-python run.py --source_raw_name <filename>  # ...etc
-```
+TBC : The `--recycle` flag is used once the module has been run and trained for the first time. When this flag is used, the module will run for a second time, but will incorporate the training data obtained from the manual matching process created in the first 'round', as  kick-start of sorts. See 5. Recycling Matches below for more info.
 
-The `--recycle` flag is used once the module has been run and trained for the first time. When this flag is used, the module will run for a second time, but will incorporate the training data obtained from the manual matching process created in the first 'round', as  kick-start of sorts. See 5. Recycling Matches below for more info.
-
-The default file formats are :
+The default imported-file formats are :
 
 ##### Source Data
 Filename : source_data.csv
-Fields : 'id' (int), 'supplier_name' (str), 'supplier_streetadd' (str)
+Fields : 'id' (int), 'source_name' (str), 'source_streetadd' (str)
 
 ##### Registry Data
 Filename : registry_data.csv
-Fields : 'org_name', 'street_address1', 'street_address2', 'street_address3', 'Org_ID'
+Fields : 'reg_name', 'street_address1', 'street_address2', 'street_address3', 'reg_id'
 
-##### Directory Structure
+##### UK_Entities Directory Structure
 
 ```
 Project_Cascade
-|--Config_Files
 |--csvdedupe
-|--Data_Inputs
-    |--Adj_Data
-    |--Raw_Data
-    |--Training_Files
-        |--Manual_&_Backups
+|--Regions
+    |--...
+    |--UK_entities
+        |--Config_Files
+        |--Data_Inputs
+            |--Adj_Data
+            |--Raw_Data
+            |--Training_Files
+                |--Manual_&_Backups
+                |--process_type **  # I.e. Name_Only, or Name_Address
+                    |--Clustering
+                    |--Matching
+    |--Outputs
         |--process_type **  # I.e. Name_Only, or Name_Address
-            |--Clustering
-            |--Matching
-|--Outputs
-    |--process_type **  # I.e. Name_Only, or Name_Address
-        |--Confirmed_Matches
-        |--Deduped_Data
-        |--Extracted_Matches
-|--run_files
-    |--convert_training.py
-    |--data_analysis.py
-    |--data_matching.py
-    |--db_calls.py
-    |--org_suffixes.py
-    |--setup.py
-|--run.py
+            |--Deduped_Data
+            |--Extracted_Matches
+            |--Manual_Matches
+    |--Regional_Run_Files
+        |--convert_training.py
+        |--data_analysis.py
+        |--data_matching.py
+        |--data_processing.py
+        |--db_calls.py
+        |--org_suffixes.py
+        |--setup.py
+|--runfile.py
+|--settings.py
+|--requirements.txt
+|--.env template
+|--directories.py
 |--Pipfile
 |--Pipfile.lock
 |--README.md
@@ -127,22 +129,22 @@ _** Subject to change/ depending on naming conventions chosen in config files._
 ### Data Cleaning 
 1. The module takes both datafiles and creates a new column with the org name cleaned up to help the matching process. For example, all company type suffixes (ltd, llp, srl etc) are standardised.
 2. In the same new column, punctuation is removed.
-3. For the registry data set which has several address columns, these are all merged into one, with related row entries duplicated.  
+3. If the registry data set has several address columns, these are all merged into one, with related row entries duplicated.  
 
 ### Deduplication
 4.  The dedupe module comes into play next in two stages. First is the matching phase, which joins together our manual source data to the registry data. It does this using [dedupe](https://github.com/dedupeio/csvdedupe)'s `csvlink` command. Training data has been provided to provide the best quality matches, and so you are required to do nothing here, however if you want to modify the training data just use the `training` flag when calling the module:
 ```
-python run.py --training
+python runfile.py --training
 ```
 It is recommended that you study the dedupe documentation before modifying the training data, as experimentation is required to prevent over or under-fitting of the matching process. I have provided some notes at the end of this readme to explain my methods.
 
 5. Second, the module takes this matched data and assigns rows into groups called clusters, in the event that two rows within the source data actually refer to the same company. This outputs both a cluster_ID and a confidence score of how likely that row belongs to that cluster.
 
-### Further Data Manipulation
+### Stretching out the matches
 6. We now have our matched and clustered dataset, which means that our source data is now linked to registry/registry data for verification and it is also grouped into clusters so we don't eg: contact the same company twice.
 If any data **within a cluster** hasn't been matched to registry data , then if there is a match anywhere within that cluster, that registry data is applied to the rest of the cluster. This is to increase the number of absolute matches. Quality control comes next.
 
-### Extracting the best matches
+### Quality Control
 7. Because of the many different ways of writing a company name, dedupe's matching/clustering phase can only take us so far.
 8. We then introduce a Levenshtein distance ratio to the data, which indicates just how good each match is based on the amount of alteration it would require to make one string the same as the other. The higher the score the better.
 9. Note that a short string with a difference of 1 letter between it and another string is much less likely to be a match than a long string with the same difference. Based on this, and a pre-defined config file, we introduce a cascading quality filter, which decreases the minimum levenshtein distance we are willing to accept, as the string length increases.
@@ -152,14 +154,14 @@ You can add as many config files as you like to experiment with different combin
 12. The program will then exit, allowing the user to review the matches that have been extracted based on the chosen config file. The next stage is to manually review the 'Manual_Matches_x' file within Outputs/X/Confirmed_Matches and enter Y/N/U in the Manual_Match column. All matches with a Levenshtein distance of 100 (i.e. an exact match) are automatically assigned 'Y'. Note that these matches can be verified in the terminal if the `-terminal_matching` flag is used. In this case, the program will not exit, and instead the user will be prompted to verify the matches using the same Y/N/U responses.
 13. If the program has exited, we will then do 2 things. The first is to convert these manual confirmed matches into a json training file to be fed back into the system but using more fields in the dedupe phase (see recycling matches section below). The second is to get these confirmed matches uploaded to the database. Do this by running the command:
 ```
-python run.py --convert_training --upload_to_db
+python runfile.py --convert_training --upload_to_db
 ```
 The new training files are copied into the relevant training folders ready to be called by dedupe, and the confirmed 'Y' matches are converted to a Confirmed_Matches.csv file and then uploaded to the database. At this point duplicates within the database are sought and removed.
 ### Re-cycling the matches
 14. These quality matches (Y), and poor quality matches (N) which have been converted to a json training file, can then be re-fed back into dedupe as a kick-start to more accurate training but now including the street address field. Once the process has completed for the first time, re-run the module using the `recycle` flag:
 
 ```
-python run.py --recycle
+python runfile.py --recycle
 ```
 
 This will run the entire process again but will use the new training data and will attempt to match both the organisation name and the address. Note that the old training data is duplicated here, so you can add to the training data for the recycle phase without impacting the initial phase if you wanted to re-run it. 
