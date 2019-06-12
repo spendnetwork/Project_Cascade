@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import pytest
 from pandas.util.testing import assert_frame_equal
-from run_files import data_processing
+from core_run_files import data_processing
 from tests.conftest import testdir
 
 
@@ -10,11 +10,11 @@ from tests.conftest import testdir
     ("Ditta ABBOTT VASCULAR Knoll-Ravizza S.p.A.", "ditta abbott vascular knollravizza spa")
 ])
 
-def test_remvPunct(test_priv_df, test_input, expected):
+def test_remvPunct(test_src_df, test_input, expected):
     # Tests remvPunct ensure all punctuation removed and strings lowered
-    input_index = test_priv_df.priv_name.str.find(test_input)
-    test_priv_df['priv_name_adj'] = data_processing.remvPunct(test_priv_df, 'priv_name','priv_name_adj')
-    assert test_priv_df.loc[input_index[0]].priv_name_adj == expected
+    input_index = test_src_df.src_name.str.find(test_input)
+    test_src_df['src_name_adj'] = data_processing.remvPunct(test_src_df, 'src_name','src_name_adj')
+    assert test_src_df.loc[input_index[0]].src_name_adj == expected
 
 
 @pytest.mark.parametrize("test_input, expected", [
@@ -39,7 +39,7 @@ def test_clustered_df():
 def test_orgids_assigned_to_clusters(test_clustered_df):
     # Tests that any cluster containing rows that have both a match and a none match gets
     # the match data copied over to the non match rows (highest confidence score)
-    df_processed = data_processing.assign_pub_data_to_clusters(test_clustered_df[0])
+    df_processed = data_processing.assign_reg_data_to_clusters(test_clustered_df[0])
     assert_frame_equal(df_processed, test_clustered_df[1])
 
 

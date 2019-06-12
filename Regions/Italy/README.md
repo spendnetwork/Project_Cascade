@@ -1,18 +1,4 @@
-# Project_Cascade
-
-The core premise of this module is to link datasets containing organisational data. One dataset is raw data, perhaps with errors due to manual input, and the other is an official registry, perhaps obtained from an external API such as the UK Companies House.
-
-There are several setup, clean-up and post-matching stages (i.e. organisation suffix standardisation) that take place prior to and after the main event, which is the matching of records using dedupe.io's deduplication tool.
-
-These stages are detailed below.
-
-The module has been designed to allow efficient addition of new types of data sources and approaches to matching the data. For example, three sub-projects included are Italian datasets, UK (all), and UK_entities (specific to Spend Network). The UK (all) is built to connect to the UK Companies House API, whereas the UK_entities is designed to retrieve internal datasets.
-
-The purpose is to find as many possible matches between the two datasets, verifying the quality of the manually curated (aka "source") data.
-
-Should the process be stopped at any point, the module has been constructed to check for each file created as it progresses. Therefore you can end the module and resume from where you left off.
-
-## Using the Module
+## Using the Italian Module
 
 ### Initial Set Up & Familiarisation
 

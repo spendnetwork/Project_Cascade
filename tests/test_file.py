@@ -1,26 +1,3 @@
-import pytest
-import pandas as pd
-import pdb
-from run_files import data_processing, data_matching, setup
-import os
-from pandas.util.testing import assert_frame_equal
-from Config_Files import config_dirs
-import ast
-from runfile import get_input_args
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Test line 87 onwards in runfile.py is functional. Maybe do a separate test for each mini function to ensure the whole thing can run.
 # If one thing doesn't work here and the file gets
 # still created then the rest of the if statement is skipped i.e. leven_dist etc.
@@ -33,8 +10,8 @@ from runfile import get_input_args
 #
 # test imported data matches usecols format
 #
-# def test_if_private_file_exists_movetopublicdata():
-#     # Test that if private adj file exists then skip to cleaning the public data file
+# def test_if_source_file_exists_movetoregistrydata():
+#     # Test that if source adj file exists then skip to cleaning the registry data file
 #     # Could expand to checking that if each file exists then it moves on to the next section without
 #     # duplicating or re-doing the process on the file that already exists.
 #     pass

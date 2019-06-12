@@ -1,30 +1,29 @@
 import ast
 import pandas as pd
 import pytest
-import pdb
-from Config_Files import config_dirs
-from run_files import data_matching
+import directories
+from core_run_files import data_matching
 import os
 
 
 @pytest.fixture()
 def load_samplerawdata(in_args, tmp_root):
-    privrawPath = os.path.join(tmp_root, in_args.priv_raw_name)
-    privraw = pd.read_csv(privrawPath)
+    srcrawPath = os.path.join(tmp_root, in_args.src_raw_name)
+    srcraw = pd.read_csv(srcrawPath)
 
-    pubrawPath = os.path.join(tmp_root, in_args.pub_raw_name)
-    pubraw = pd.read_csv(pubrawPath)
-    return privrawPath, privraw, pubrawPath, pubraw
+    regrawPath = os.path.join(tmp_root, in_args.reg_raw_name)
+    regraw = pd.read_csv(regrawPath)
+    return srcrawPath, srcraw, regrawPath, regraw
                             
 
 @pytest.fixture()
 def load_sampleadjdata(in_args, tmp_root):
-    privadjPath = os.path.join(tmp_root, in_args.priv_adj_name)
-    privadj = pd.read_csv(privadjPath)
+    srcadjPath = os.path.join(tmp_root, in_args.src_adj_name)
+    srcadj = pd.read_csv(srcadjPath)
 
-    pubadjPath = os.path.join(tmp_root,in_args.pub_adj_name)
-    pubadj = pd.read_csv(pubadjPath)
-    return privadjPath, privadj, pubadjPath, pubadj
+    regadjPath = os.path.join(tmp_root,in_args.reg_adj_name)
+    regadj = pd.read_csv(regadjPath)
+    return srcadjPath, srcadj, regadjPath, regadj
 
 @pytest.fixture()
 def load_clusteredData(in_args, tmp_root):
@@ -44,7 +43,7 @@ def load_testConfig():
 
 
 def test_extractMatches(load_clusteredData, tmp_root, load_testConfig):
-    data_matching.extract_matches(tmp_root,load_clusteredData , load_testConfig, config_dirs.dirs['dirs'], 1, 'Name_Only', 1)
+    data_matching.extract_matches(tmp_root, load_clusteredData, load_testConfig, directories.dirs['dirs'], 1, 'Name_Only', 1)
     assert 1
 
 def test_manualMatching():

@@ -10,37 +10,44 @@
                 "char_counts" : 0,
                 "min_match_score" : 100,
                 "recycle_phase" : False,
+                "db_table" : "matching.spaziodati_name_matches",
               },
         2 :
               {
                 "char_counts" : 3,
-                "min_match_score" : 95,
+                "min_match_score" : 90,
               },
-        3 : 
+        3 :
              {
               "char_counts" : 6,
-              "min_match_score" : 90,
-            },
-         4 : 
-             {
-              "char_counts" : 9,
               "min_match_score" : 85,
             },
-          5 : 
+         4 :
+             {
+              "char_counts" : 9,
+              "min_match_score" : 80,
+            },
+          5 :
              {
               "char_counts" : 12,
-              "min_match_score" : 80,
-            },
-          6 : 
-             {
-              "char_counts" : 15,
-              "min_match_score" : 80,
-            },
-          7 : 
-             {
-              "char_counts" : 18,
               "min_match_score" : 75,
             },
+          6 :
+             {
+              "char_counts" : 15,
+              "min_match_score" : 70,
+            },
+          7 :
+             {
+              "char_counts" : 18,
+              "min_match_score" : 65,
+            },
+            8:
+                {
+                    # Keep char count as previous procnum as now looking at anything > than 18, not just 15-18, to capture everything other char length
+                    "char_counts": 18,
+                    "min_match_score": 50,
+                }
 
         },
             "Name_Address":
@@ -52,38 +59,44 @@
                         "char_counts": 0,
                         "min_match_score": 100,
                         "recycle_phase": True,
+                        "db_table" : "matching.spaziodati_nameaddress_matches",
                     },
                     2:
                         {
                             "char_counts": 3,
-                            "min_match_score": 95,
+                            "min_match_score": 90,
                         },
                     3:
                         {
                             "char_counts": 6,
-                            "min_match_score": 90,
+                            "min_match_score": 85,
                         },
                     4:
                         {
                             "char_counts": 9,
-                            "min_match_score": 85,
+                            "min_match_score": 80,
                         },
                     5:
                         {
                             "char_counts": 12,
-                            "min_match_score": 80,
+                            "min_match_score": 75,
                         },
                     6:
                         {
                             "char_counts": 15,
-                            "min_match_score": 80,
+                            "min_match_score": 70,
                         },
                     7:
                         {
                             "char_counts": 18,
-                            "min_match_score": 75,
+                            "min_match_score": 65,
                         },
-
+                    8:
+                        {
+                            # Keep char count as previous procnum as now looking at anything > than 18, not just 15-18, to capture everything other char length
+                            "char_counts": 18,
+                            "min_match_score": 50,
+                        }
                 }
 
         }

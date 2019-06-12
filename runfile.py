@@ -1,16 +1,12 @@
-import sys
 import argparse
 import pandas as pd
 import os
-import numpy as np
 import ast
-from run_files import setup, data_matching, db_calls, convert_training, data_processing, data_analysis
 from pathlib import Path
 import pdb
-from Config_Files import config_dirs
+import settings
 
-
-def get_input_args(rootdir, args=None):
+def getInputArgs(rootdir, args=None):
     """
 	Assign arguments including defaults to pass to the python call
 
@@ -18,12 +14,13 @@ def get_input_args(rootdir, args=None):
 	"""
 
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
-    parser.add_argument('--priv_raw_name', default='private_data.csv', type=str,
-                        help='Set raw private/source datafile name')
-    parser.add_argument('--pub_raw_name', default='public_data.csv', type=str, help='Set raw public datafile name')
-    parser.add_argument('--priv_adj_name', default='priv_data_adj.csv', type=str,
-                        help='Set cleaned private/source datafile name')
-    parser.add_argument('--pub_adj_name', default='pub_data_adj.csv', type=str, help='Set cleaned public datafile name')
+    parser.add_argument('--region', default='UK_entities', type=str, help='Define the region/country (Italy/UK)')
+    parser.add_argument('--src_raw_name', default='source_data.csv', type=str,
+                        help='Set raw source/source datafile name')
+    parser.add_argument('--reg_raw_name', default='registry_data.csv', type=str, help='Set raw registry datafile name')
+    parser.add_argument('--src_adj_name', default='src_data_adj.csv', type=str,
+                        help='Set cleaned source/source datafile name')
+    parser.add_argument('--reg_adj_name', default='reg_data_adj.csv', type=str, help='Set cleaned registry datafile name')
     parser.add_argument('--recycle', action='store_true', help='Recycle the manual training data')
     parser.add_argument('--training', action='store_false', help='Modify/contribute to the training data')
     parser.add_argument('--config_review', action='store_true', help='Manually review/choose best config file results')
@@ -36,162 +33,157 @@ def get_input_args(rootdir, args=None):
 
     # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
     # Force an error and prompt user to add the training flag
-    if args.training == True and not os.path.exists(rootdir + "/Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json"):
+    if args.training == True and not os.path.exists(os.path.join(rootdir,"Regions",args.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
         print("Dedupe training files do not exist - running with --training flag to initiate training process")
-        args.training == False
-        # parser.error("Dedupe training files do not exist, please try 'python runfile.py --training' to begin training process")
+        parser.add_argument('--training', action='store_true', help='Modify/contribute to the training data')
+
+    args = parser.parse_args()
 
     return args, parser
 
+class Main:
+    def __init__(self, settings):
+        # Defined in __main__
+        self.directories = settings.directories
+        self.in_args = settings.in_args
+        self.region_dir = settings.region_dir
+        self.config_path = settings.config_path
+        self.settings = settings
 
-def main(rootdir, in_args, config_dirs):
-    setup.setupRawDirs(rootdir, config_dirs)
-    # Ignores config_dirs - convention is <num>_config.py
-    pyfiles = "*_config.py"
+        # Defined in settings file
+        self.df_dtypes = settings.df_dtypes
+        self.stats_cols = settings.stats_cols
+        self.training_cols = settings.training_cols
+        self.manual_matches_cols = settings.manual_matches_cols
+        self.dbUpload_cols = settings.dbUpload_cols
+        self.proc_type = settings.proc_type
+        self.dedupe_cols = settings.dedupe_cols
+        self.reg_data_source = settings.reg_data_source
+        self.src_data_source = settings.src_data_source
+        self.src_data_cols = settings.src_data_cols
 
-    try:
-        # For each config file read it and convert to dictionary for accessing
-        for conf_file in config_path.glob(pyfiles):
-            with open(conf_file) as config_file:
-                file_contents = []
-                file_contents.append(config_file.read())
+        # Runfile modules
+        self.runfile_mods = settings.runfile_mods
+        self.data_processing = self.runfile_mods.data_processing
+        self.data_analysis = self.runfile_mods.data_analysis
+        self.db_calls = self.runfile_mods.db_calls
+        self.setup = self.runfile_mods.setup
+        self.data_matching = self.runfile_mods.data_matching
+        self.convert_training = self.runfile_mods.convert_training
+        self.org_suffixes = self.runfile_mods.org_suffixes
 
-                # Convert list to dictionary
-                configs = ast.literal_eval(file_contents[0])
-                conf_file_num = int(conf_file.name[0])
+        # Defined during runtime
+        self.main_proc = settings.main_proc
+        self.configs = settings.configs
+        self.conf_file_num = settings.conf_file_num
+        self.proc_num = settings.proc_num
+        self.upload_table = settings.upload_table
+        self.best_config = settings.best_config
 
-                # Clean public and private datasets for linking
-                # private df needed in memory for stats
-                privdf = data_processing.clean_private_data(rootdir, config_dirs, in_args)
-                if not in_args.recycle:
-                    data_processing.clean_public_data(rootdir, config_dirs, in_args)
+    def run_main(self):
 
-                # For each process type (eg: Name & Add, Name only) outlined in the configs file:
-                for proc_type in configs['processes']:
-                    if in_args.recycle == configs['processes'][proc_type][min(configs['processes'][proc_type].keys())][
-                        'recycle_phase']:
+        self.setup.Setup(self).setupRawDirs()
 
-                        # Create working directories if don't exist
-                        setup.setup_dirs(config_dirs, rootdir, proc_type)
+        if not in_args.recycle:
+            try:
+                # If registry/registry data file doesn't exist, pull from database
+                self.db_calls.FetchData.checkDataExists(self)
+            except:
+                # Will fail if checkDataExists function doesn't exist (i.e. registry data sourced externally (not from db))
+                pass
 
-                        # Iterate over each process number in the config file
-                        for proc_num in configs['processes'][proc_type]:
-                            # # Get first process from config file
-                            # main_proc = min(configs['processes'][proc_type].keys())
+        try:
+            # For each config file read it and convert to dictionary for accessing
+            pyfiles = "*_config.py"
+            for conf_file in self.config_path.glob(pyfiles):
+                with open(conf_file) as config_file:
+                    file_contents = []
+                    file_contents.append(config_file.read())
 
-                            # Define data types for clustered file. Enables faster loading.
-                            clustdtype = {'Cluster ID': np.float64, 'Confidence Score': np.float,
-                                          'id': np.float, 'priv_name': np.str, 'priv_address': np.str,
-                                          'priv_name_adj': np.str, 'org_id': np.str, 'pub_name_adj': np.str,
-                                          'pub_address': np.str, 'priv_name_short': np.str, 'pub_name_short': np.str,
-                                          'leven_dist': np.int, 'org_name': np.str}
+                    # Convert list to dictionary
+                    configs = ast.literal_eval(file_contents[0])
+                    self.configs = configs
 
-                            # Run dedupe for matching and calculate related stats for comparison
-                            if not os.path.exists(config_dirs['assigned_output_file'].format(rootdir, proc_type)):
-                                priv_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_priv_data'].format(in_args.priv_adj_name)
-                                pub_file = config_dirs['adj_dir'].format(rootdir) + config_dirs['adj_pub_data'].format(in_args.pub_adj_name)
-                                # data_matching.dedupe_matchTEST(priv_file,pub_file, rootdir, )
+                    conf_file_num = int(conf_file.name[0])
+                    self.conf_file_num = conf_file_num
 
-                                data_matching.dedupe_match_cluster(priv_file, pub_file, rootdir, config_dirs, configs, proc_type, proc_num, in_args)
+                    # Clean registry and source datasets for linking
+                    # source df needed in memory for stats
+                    src_df = self.data_processing.ProcessSourceData(self).clean()
 
-                                clust_df = pd.read_csv(config_dirs["cluster_output_file"].format(rootdir, proc_type),
-                                                       index_col=None, dtype=clustdtype)
+                    try:
+                        reg_df = self.data_processing.ProcessRegistryData(self).clean()
+                    except FileNotFoundError:
+                        # Skip if registry data not downloaded yet (i.e. UK)
+                        next
 
-                                # Copy public data to high-confidence cluster records
-                                clust_df = data_processing.assign_pub_data_to_clusters(clust_df, config_dirs[
-                                    'assigned_output_file'].format(rootdir, proc_type))
+                    # For each process type (eg: Name & Add, Name only) outlined in the configs file:
+                    for proc_type in configs['processes']:
+                        self.proc_type = proc_type
 
-                                # Adds leven_dist column and extract matches based on config process criteria:
-                                clust_df = data_processing.add_lev_dist(clust_df,
-                                                                        config_dirs["assigned_output_file"].format(rootdir,
-                                                                            proc_type))
+                        # Get first process number from config file
+                        main_proc_num = min(configs['processes'][proc_type].keys())
+                        main_proc_configs = configs['processes'][proc_type][main_proc_num]
 
-                            else:
+                        self.upload_table = main_proc_configs['db_table']
 
-                                clust_df = pd.read_csv(config_dirs["assigned_output_file"].format(rootdir, proc_type),
-                                                       index_col=None, dtype=clustdtype, usecols=clustdtype.keys())
+                        # If args.recycle matches the recycle setting for the first process type
+                        if in_args.recycle == main_proc_configs['recycle_phase']:
 
-                            extracts_file = data_matching.extract_matches(rootdir, clust_df, configs, config_dirs, proc_num,
-                                                                          proc_type,
-                                                                          conf_file_num)
-                        break
-                    else:
-                        continue
-                # Output stats file:
-                stat_file = data_analysis.calc_matching_stats(rootdir, clust_df, extracts_file, config_dirs, conf_file_num,
-                                                              proc_type, privdf)
+                            # Create working directories if don't exist
+                            self.setup.Setup(self).setupDirs()
 
-    except StopIteration:
-        # Continue if no more config files found
+                            # Iterate over each process number in the config file
+                            for proc_num in configs['processes'][proc_type]:
+                                self.proc_num = proc_num
 
-        print("Done")
+                                # Run dedupe for matching and calculate related stats for comparison
+                                if in_args.region == 'UK':
+                                    clust_df = self.data_matching.Matching(self, src_df).dedupe()
+                                else:
 
-        # For each process type (eg: Name & Add, Name only) outlined in the configs file:
-    for proc_type in configs['processes']:
+                                    clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
 
-        # If recycle arg matches the recycle variable in the proc_type config file (want to restrict operations to just
-        # i.e. Name_Only but still have the dynamics to iterate through proc_types
-        if in_args.recycle == configs['processes'][proc_type][min(configs['processes'][proc_type].keys())][
-            'recycle_phase']:
+                                # EXTRACTS FUNCTION IS TAKING ONLY LEV DIST 100 MATCHES ON THE FIRST ITERATION AND NOT ADDING ANY MORE AFTER AT
+                                # DIFFERENT CASCADE LEVELS!!
 
-            # If user has used --config_review flag, set best_config variable based on manual review of stats file...
-            if in_args.config_review:
-                best_config = input(
-                    (
-                        "\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
-                        proc_type))
-            else:
-                # ...otherwise pick best config_file based on stats file (max leven dist avg):
-                max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
-                best_config = stat_file.at[max_lev, 'Config_File']
+                                extracts_file = self.data_matching.CascadeExtraction(self).extract(clust_df)
+                            break
+                        else:
+                            continue
+                    # Output stats file:
+                    stat_file = self.data_analysis.StatsCalculations(self, clust_df, extracts_file, src_df).calculate()
 
-            data_matching.manual_matching(rootdir, config_dirs, best_config, proc_type, in_args)
+        except StopIteration:
+            # Continue if no more config files found
+            print("Done")
 
-            man_matched = pd.read_csv(
-                config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
-                usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match'])
-
-            if in_args.convert_training:
-                # Ensure not in recycle mode for training file to be converted
-                assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
-
-                conv_file = pd.read_csv(
-                    config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
-                    usecols=['priv_name_adj', 'priv_address', 'pub_name_adj', 'pub_address', 'Manual_Match'])
-
-                # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
-                convert_training.convert_to_training(rootdir, config_dirs, conv_file)
-
-            if in_args.upload_to_db:
-                upload_file = pd.read_csv(
-                    config_dirs['manual_matches_file'].format(rootdir, proc_type) + '_' + str(best_config) + '.csv',
-                    usecols=['priv_name', 'priv_address', 'org_id', 'org_name', 'pub_address', 'Manual_Match'])
-
-                # Add confirmed matches to relevant proc_type table
-                if not in_args.recycle:
-                    db_calls.add_data_to_table(rootdir, "spaziodati.confirmed_nameonly_matches", config_dirs, proc_type,
-                                               upload_file)
-                    print("Process complete. Run 'python runfile.py --recycle' to begin training against additional fields.")
-                if in_args.recycle:
-                    db_calls.add_data_to_table(rootdir, "spaziodati.confirmed_nameaddress_matches", config_dirs, proc_type,
-                                               upload_file)
+        self.data_matching.VerificationAndUploads(self, stat_file).verify()
 
 if __name__ == '__main__':
 
     rootdir = os.path.dirname(os.path.abspath(__file__))
-    in_args, _ = get_input_args(rootdir)
+    in_args, _ = getInputArgs(rootdir)
+
     # Silence warning for df['process_num'] = str(proc_num)
     pd.options.mode.chained_assignment = None
-    # Define config file variables and related arguments
-    config_path = Path('./Config_Files')
-    config_dirs = config_dirs.dirs["dirs"]
+
+    if in_args.region == 'Italy':
+        settings = settings.Italy_Settings
+
+    if in_args.region == 'UK':
+        settings = settings.UK_Settings
+
+    if in_args.region == 'UK_entities':
+        settings = settings.UK_entities
+
+    settings.in_args = in_args
+    settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
+
+    # Define config file variables and related data types file
+    settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
+
+    # if not in_args
+    Main(settings).run_main()
 
 
-    # Ignores config_dirs - convention is <num>_config.py
-    pyfiles = "*_config.py"
-
-    if not in_args.recycle:
-        # If public/registry data file doesn't exist, pull from database
-        db_calls.checkDataExists(rootdir, config_dirs, in_args, "spaziodati.sd_sample")
-
-    main(rootdir, in_args, config_dirs)
