@@ -1,0 +1,38 @@
+
+    select
+  count(CASE WHEN orgs_ocds.legalname notnull then 1 END)                       as perfect_match_to_orgs_ocds_table,
+	count(CASE WHEN orgs_ocds.legalname isnull
+                AND orgs_lookup_distinct_buyer.scheme = 'GB-OO' then 1 END)     as matched_to_entity_table_in_orgs_lookup,
+  count(CASE WHEN orgs_ocds.legalname isnull
+                AND orgs_lookup_distinct_buyer.scheme != 'GB-OO' then 1 END)    as matched_to_other_registers_in_orgs_lookup,
+  count(CASE WHEN orgs_ocds.legalname isnull
+						AND orgs_lookup_distinct_buyer.legal_name isnull
+						AND m.manual_match_n = 'Y' 
+            AND m.src_name NOTNULL then 1 END)                                  as new_confirmed_matches,
+	count(CASE WHEN
+                orgs_ocds.legalname isnull
+								AND orgs_lookup_distinct_buyer.legal_name isnull
+                AND m.src_name NOTNULL 
+								AND (m.manual_match_n isnull 
+										OR m.manual_match_n = 'U'
+										) THEN 1 END)                                               as new_unconfirmed_matches,
+  count(CASE WHEN
+                orgs_ocds.legalname isnull
+								AND orgs_lookup_distinct_buyer.legal_name isnull
+                AND (m.src_name isnull 
+										OR (m.src_name notnull AND m.manual_match_n = 'N')
+										) THEN 1 END)                                               as unmatched,
+  count(*)                                                                      as total_buyers
+FROM
+  ocds.ocds_tenders_view t
+    LEFT JOIN ocds.orgs_ocds orgs_ocds ON (orgs_ocds.legalname = upper(btrim((t.buyer))))
+		LEFT JOIN ocds.orgs_lookup_distinct_buyer ON (orgs_lookup_distinct_buyer.org_string = upper(btrim((t.buyer))))
+    LEFT JOIN (
+      select distinct ON (upper(src_name)) *
+      from matching.matches_buyers_ocds_orgs
+    ) m ON (upper(t.buyer) = upper(m.src_name))
+WHERE
+  TRUE
+  AND t.source = 'cf_notices'
+  AND t.releasedate >= '2018-01-01'
+;
