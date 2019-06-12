@@ -2,7 +2,6 @@ import pandas as pd
 import os
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
-from Regions.UK.Regional_Run_Files import org_suffixes
 import string
 import pdb
 import numpy as np
@@ -29,7 +28,7 @@ class DataProcessing(Main):
         row = str(row).replace('-', ' ').replace("  ", " ").strip()
         rowsplit = str(row).split(" ")
         for i in rowsplit:
-            if i in org_suffixes.org_suffixes_dict.values():
+            if i in self.org_suffixes.org_suffixes_dict.values():
                 rowadj = row.replace(i, '').replace("  ", " ").strip()
         try:
             return rowadj
@@ -154,7 +153,7 @@ class ProcessSourceData(DataProcessing):
             df = self.remvPunct(df, orig_col, adj_col)
 
             # Replace organisation suffixes with standardised version
-            df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
+            df[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
             df['src_name_short'] = df.src_name_adj.apply(self.shortenName)
 
             print("...done")
@@ -179,6 +178,6 @@ class ProcessRegistryData(DataProcessing):
         orig_col = str('CH_name')
         df = self.remvPunct(df, orig_col, adj_col)
         # Replace organisation suffixes with standardised version
-        df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
+        df[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
         df['CH_name_short'] = df.CH_name_adj.apply(self.shortenName)
         df.to_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type),index=False)

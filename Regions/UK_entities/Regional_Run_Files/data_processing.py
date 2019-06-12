@@ -3,7 +3,7 @@ import os
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
 import numpy as np
-from Regions.Italy.Regional_Run_Files import org_suffixes
+from Regions.UK_entities.Regional_Run_Files import org_suffixes
 import string
 import pdb
 from runfile import Main
@@ -21,6 +21,7 @@ class DataProcessing(Main):
         :param adj_col: the orig_col with removed punctuation and standardised org_suffixes
         :return: adjusted dataframe
         """
+
         df[adj_col] = df[orig_col].str.translate(
             str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
         return df
@@ -65,6 +66,7 @@ class LevDist(Main):
         :param output_file: clustered file with added levenshtein distance
         :return: clust_df
         '''
+        pdb.set_trace()
         # Remove company suffixes for more relevant levenshtein distance calculation. Otherwise will have exaggerated
         # Distances if i.e. src name has 'srl' suffix but reg name doesn't.
         self.clust_df['src_name_short'] = self.clust_df.src_name_adj.apply(self.shortenName).astype(str)
@@ -72,6 +74,7 @@ class LevDist(Main):
         self.clust_df['reg_name_short'] = self.clust_df.reg_name_adj.apply(self.shortenName).astype(str)
 
         # Add column containing levenshtein distance between the matched registry & source org names
+        pdb.set_trace()
         if 'leven_dist_N' not in self.clust_df.columns:
             self.clust_df['leven_dist_N'], self.clust_df['leven_dist_NA'] = zip(
                 *self.clust_df.apply(self.calcMatchRatio, axis=1))
@@ -91,7 +94,7 @@ class LevDist(Main):
         row = str(row).replace('-', ' ').replace("  ", " ").strip()
         rowsplit = str(row).split(" ")
         for i in rowsplit:
-            if i in org_suffixes.org_suffixes_dict.values():
+            if i in self.org_suffixes.org_suffixes_dict.values():
                 rowadj = row.replace(i, '').replace("  ", " ").strip()
         try:
             return str(rowadj)
@@ -104,17 +107,13 @@ class LevDist(Main):
 
     	:return ratio: individual levenshtein distance between the registry and source org string
     	"""
-        # pdb.set_trace()
-        # print(row)
+
+
         if pd.notnull(row.src_name_short) and pd.notnull(row.reg_name_short):
             if pd.notnull(row.src_address_adj) and pd.notnull(row.reg_address_adj):
-                # print(int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(fuzz.ratio(row.src_joinfields, row.reg_joinfields)))
                 return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(fuzz.ratio(row.src_joinfields, row.reg_joinfields))
             else:
-                # print(int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(0))
                 return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(0)
-
-
 
 
 class ProcessSourceData(DataProcessing):
@@ -137,26 +136,20 @@ class ProcessSourceData(DataProcessing):
         if not os.path.exists(adj_data):
             df = pd.read_csv(raw_data, usecols=self.src_data_cols,
                              dtype=self.df_dtypes)
-            # df.rename(columns={'source_name': 'src_name', 'source_streetadd': 'src_address'}, inplace=True)
-            print("Re-organising source data...")
 
+            print("Re-organising source data...")
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
             orig_col = str('src_name')
             df = self.remvPunct(df, orig_col, adj_col)
 
             # Replace organisation suffixes with standardised version
-            df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
+            df[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
             # # Remove punctuation and double spacing in address
             adj_col = str('src_address_adj')
-            # orig_col = str('src_address')
-
             df[adj_col] = df['src_address_streetaddress'] + ', ' + df['src_address_locality'] + ', ' + df['src_address_postalcode'] + ', ' + df['src_address_countryname']
-
             df = self.remvPunct(df, adj_col, adj_col)
-            # df = self.remvStreetNumber(df, adj_col)
-            #
             df = self.joinFields(df, 'src')
 
             print("...done")
@@ -199,7 +192,7 @@ class ProcessRegistryData(DataProcessing):
                 chunk = self.remvPunct(chunk, orig_col, adj_col)
 
                 # Replace organisation suffixes with standardised version
-                chunk[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
+                chunk[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
 
                 # ls = []

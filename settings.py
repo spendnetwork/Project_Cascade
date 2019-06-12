@@ -42,15 +42,14 @@ class Italy_Settings:
                                            'reg_address', 'src_name', 'src_name_adj', 'src_address', 'src_address_adj', 'reg_address_adj',
                                            'Manual_Match_N', 'Manual_Match_NA', 'srcjoinfields', 'regjoinfields']
 
+    # Need to define proc_num here otherwise will not be carried through as part of 'self'
     proc_num = int
     best_config = int
-
-    # Need to define proc_num here otherwise will not be carried through as part of 'self'
-
     conf_file_num = int
     configs = dict
     main_proc = int
     upload_table = str
+
 
 class UK_Settings:
 
@@ -80,6 +79,7 @@ class UK_Settings:
     configs = dict
     main_proc = int
     upload_table = str
+    best_config = int
 
     directories = directories.dirs["dirs"]
 
@@ -88,14 +88,10 @@ class UK_Settings:
     proc_type = 'Name_Only'
 
 
-
-    best_config = int
-
 class UK_entities(UK_Settings):
 
     def __init(self):
         super().__init__(self)
-
 
     df_dtypes = {'Cluster ID': np.int, 'Confidence Score': np.float,
                  'src_name': np.str, 'src_name_adj': np.str, 'src_streetaddress': np.str, 'src_streetaddress_adj': np.str, 'src_name_short': np.str,
@@ -108,8 +104,8 @@ class UK_entities(UK_Settings):
 
     runfile_mods = UK_ent_run_files
 
-    reg_data_source = 'uk_data.entity'
-
+    # reg_data_source = 'uk_data.entity'
+    reg_data_source = 'ocds.orgs_ocds'
     src_data_source = 'ocds.ocds_tenders_view'
 
     dedupe_cols = ['src_name','src_tag', 'src_name_adj', 'src_address_locality','src_address_postalcode','src_address_countryname','src_address_streetaddress', 'src_address_adj',
@@ -128,6 +124,5 @@ class UK_entities(UK_Settings):
                             'reg_name_adj',
                             'src_joinfields',
                             'reg_joinfields']
-
 
     training_cols = ['src_name', 'reg_name', 'Manual_Match_N', 'src_id', 'leven_dist_N']

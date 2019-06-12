@@ -79,9 +79,9 @@ def dedupe_match_cluster(src_file, reg_file, region_dir, directories, config_fil
             # Copy manual matching file over to build on for clustering
             copyfile(directories['manual_matching_train_backup'].format(region_dir), directories['manual_training_file'].format(region_dir, proc_type))
 
-        # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
-        if os.path.exists('./learned_settings'):
-            os.remove('./learned_settings')
+        # # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes
+        #         # if os.path.exists('./learned_settings'):
+        #         #     os.remove('./learned_settings')
         print("Starting matching...")
 
         cmd = ['csvlink '

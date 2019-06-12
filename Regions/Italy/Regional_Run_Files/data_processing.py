@@ -90,7 +90,7 @@ class LevDist:
         row = str(row).replace('-', ' ').replace("  ", " ").strip()
         rowsplit = str(row).split(" ")
         for i in rowsplit:
-            if i in org_suffixes.org_suffixes_dict.values():
+            if i in self.org_suffixes.org_suffixes_dict.values():
                 rowadj = row.replace(i, '').replace("  ", " ").strip()
         try:
             return rowadj
@@ -138,7 +138,7 @@ class ProcessSourceData(DataProcessing):
             df = self.remvPunct(df, orig_col, adj_col)
 
             # Replace organisation suffixes with standardised version
-            df[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
+            df[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
             # Remove punctuation and double spacing in address
             adj_col = str('src_address_adj')
@@ -192,7 +192,7 @@ class ProcessRegistryData(DataProcessing):
                 chunk = self.remvPunct(chunk, orig_col, adj_col)
 
                 # Replace organisation suffixes with standardised version
-                chunk[adj_col].replace(org_suffixes.org_suffixes_dict, regex=True, inplace=True)
+                chunk[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
                 ls = []
                 # Merge multiple address columns into one column

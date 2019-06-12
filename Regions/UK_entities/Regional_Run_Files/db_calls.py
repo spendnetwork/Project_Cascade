@@ -5,7 +5,10 @@ import pandas as pd
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
+from pathlib import Path
+import runfile
 from runfile import Main
+import settings
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -35,9 +38,9 @@ class DbCalls(Main):
             usecols=self.dbUpload_cols)
 
         # # Filter manual matches file to just confirmed Yes matches and non-blank org id's
-        confirmed_matches = upload_file[pd.notnull(upload_file['CH_id'])]
-
-        confirmed_matches.to_csv(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type),
+        # confirmed_matches = upload_file[pd.notnull(upload_file['CH_id'])]
+        #
+        upload_file.to_csv(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type),
                                  columns=self.dbUpload_cols,
                                  index=False)
 
@@ -55,7 +58,6 @@ class DbCalls(Main):
             # copy_expert allows access to csv methods (i.e. char escaping)
             cur.copy_expert(
                 """COPY {}({}) from stdin (format csv)""".format(self.upload_table, self.headers), f)
-            print("Data uploaded succesfully...")
 
         query = self.removeTableDuplicates()
         cur.execute(query)
@@ -71,7 +73,7 @@ class DbCalls(Main):
         cur = conn.cursor()
         return conn, cur
 
-    def removeTableDuplicates(self, table_name, headers):
+    def removeTableDuplicates(self):
         """
         :param table_name: the database table containing duplicates
         :param headers: the csv headers
@@ -86,7 +88,7 @@ class DbCalls(Main):
 
             DELETE FROM {} WHERE {}.id NOT IN
             (SELECT id FROM dups);
-            """.format(headers, table_name, table_name, table_name)
+            """.format(self.headers, self.upload_table, self.upload_table, self.upload_table)
         return query
 
 class FetchData(DbCalls):
@@ -155,16 +157,15 @@ class FetchData(DbCalls):
                        /Raw_Data or load from database")
                     sys.exit()
 
-
     def createRegistryDataSQLQuery(self):
         """create query for pulling data from db"""
 
         query = \
             """
             SELECT
-           entity_name as reg_name,
-           entity_id as reg_id,
-           addr_line1 as reg_address
+           legalname as reg_name,
+           id as reg_id,
+           '' as reg_address
             from {}
             
             """.format(self.reg_data_source)
@@ -175,31 +176,25 @@ class FetchData(DbCalls):
 
         query = \
             """
-            SELECT
-            
-            -- ocid,
-            
+            SELECT            
             distinct t.buyer as src_name,
             t.json -> 'releases' -> 0 -> 'tag' as src_tag,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'locality' as src_address_locality,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'postalCode' as src_address_postalcode,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'countryName' as src_address_countryname,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'streetAddress' as src_address_streetaddress
-              --t.json
-            --   ,*
               FROM {} as t
             WHERE TRUE
               AND (t.source in (
                   'cf_notices',
-            --       'cn_londoncontracts_uk',
                   ''
-               --   )
-               --   OR (source = 'ted_notices' AND countryname = 'United Kingdom')
-              --  )
-              AND t.releasedate >= '2017-01-01'
+               )
+              OR (source = 'ted_notices' AND countryname = 'United Kingdom')
+              )
+              AND t.releasedate >= '2019-01-01'
                --AND t.json -> 'releases' -> 0 -> 'tag' ? 'tender'
                --AND t.json -> 'releases' -> 0 -> 'tag' ? 'award'
-             
+            
             ;
     
             """.format(self.src_data_source)
@@ -213,3 +208,30 @@ class FetchData(DbCalls):
         df = pd.read_sql(query, con=conn)
         conn.close()
         return df
+
+if __name__ == '__main__':
+    #
+    #
+    rootdir = os.path.dirname(os.path.abspath(__file__))
+    in_args, _ = runfile.getInputArgs(rootdir)
+    #
+    # # Silence warning for df['process_num'] = str(proc_num)
+    # pd.options.mode.chained_assignment = None
+    #
+    # if in_args.region == 'Italy':
+    #     settings = settings.Italy_Settings
+    #
+    # if in_args.region == 'UK':
+    #     settings = settings.UK_Settings
+
+    if in_args.region == 'UK_entities':
+        settings = settings.UK_entities
+
+    settings.in_args = in_args
+    settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
+
+    # Define config file variables and related data types file
+    settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
+
+    # if not in_args
+    DbCalls.addDataToTable(settings)

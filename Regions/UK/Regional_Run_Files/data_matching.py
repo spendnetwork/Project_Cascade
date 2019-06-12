@@ -30,16 +30,17 @@ class Matching(Main):
 
         self.runfile_mods.data_processing.ProcessRegistryData(self).clean()
 
-
         if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
             # Run dedupe for matching and calculate related stats for comparison
             self.dedupeCluster()
 
         if not os.path.exists(self.directories['assigned_output_file'].format(self.region_dir, self.proc_type)):
+
             clust_df = pd.read_csv(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type), index_col=None)
 
             clust_df = self.runfile_mods.data_processing.AssignRegDataToClusters(clust_df, self.directories[
                 'assigned_output_file'].format(self.region_dir, self.proc_type)).assign()
+
 
             # Adds leven_dist column and verify matches based on config process criteria:
             clust_df = self.runfile_mods.data_processing.LevDist(clust_df,
@@ -173,7 +174,6 @@ class VerificationAndUploads(Main):
         super().__init__(settings)
         self.stat_file = stat_file
 
-
     def verify(self):
 
         main_proc = self.configs['processes'][self.proc_type][min(self.configs['processes'][self.proc_type].keys())]
@@ -282,7 +282,6 @@ class CascadeExtraction(Main):
         levendist = str('leven_dist_N')
 
         # Round confidence scores to 2dp :
-
         clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
 
         # Filter by current match_score:

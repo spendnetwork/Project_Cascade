@@ -15,6 +15,7 @@ class Matching(Main):
 
     def dedupe(self):
         # Run dedupe for matching and clustering
+
         if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
 
             src_file = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
@@ -81,7 +82,6 @@ class Matching(Main):
             if os.path.exists('./csvdedupe/csvdedupe/learned_settings'):
                 os.remove('./csvdedupe/csvdedupe/learned_settings')
 
-
             print("Starting matching...")
 
             cmd = ['csvlink '
@@ -95,8 +95,8 @@ class Matching(Main):
                    ]
 
             p = subprocess.Popen(cmd, shell=True)
-
             p.wait()
+
             df = pd.read_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type),
                              usecols=self.dedupe_cols,
                              dtype=self.df_dtypes)
@@ -225,12 +225,11 @@ class VerificationAndUploads(Main):
                 max_lev = self.stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
                 self.best_config = self.stat_file.at[max_lev, 'Config_File']
 
-
             self.manualMatching()
 
-            if self.in_args.upload_to_db:
-                # Add confirmed matches to relevant table
-                self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
+            # if self.in_args.upload_to_db:
+            #     # Add confirmed matches to relevant table
+            #     self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
 
     def manualMatching(self):
@@ -275,7 +274,6 @@ class VerificationAndUploads(Main):
             manual_match_file.to_csv(
                 self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
-
 
         else:
 

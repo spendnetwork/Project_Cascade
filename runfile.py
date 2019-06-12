@@ -70,6 +70,7 @@ class Main:
         self.setup = self.runfile_mods.setup
         self.data_matching = self.runfile_mods.data_matching
         self.convert_training = self.runfile_mods.convert_training
+        self.org_suffixes = self.runfile_mods.org_suffixes
 
         # Defined during runtime
         self.main_proc = settings.main_proc
@@ -120,14 +121,13 @@ class Main:
                     for proc_type in configs['processes']:
                         self.proc_type = proc_type
 
-                        # # Get first process number from config file
+                        # Get first process number from config file
                         main_proc_num = min(configs['processes'][proc_type].keys())
                         main_proc_configs = configs['processes'][proc_type][main_proc_num]
 
                         self.upload_table = main_proc_configs['db_table']
 
                         # If args.recycle matches the recycle setting for the first process type
-
                         if in_args.recycle == main_proc_configs['recycle_phase']:
 
                             # Create working directories if don't exist
@@ -141,11 +141,11 @@ class Main:
                                 if in_args.region == 'UK':
                                     clust_df = self.data_matching.Matching(self, src_df).dedupe()
                                 else:
+
                                     clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
 
-
                                 # EXTRACTS FUNCTION IS TAKING ONLY LEV DIST 100 MATCHES ON THE FIRST ITERATION AND NOT ADDING ANY MORE AFTER AT
-                                # DIFFERENT CASCADE LEVELS!!!
+                                # DIFFERENT CASCADE LEVELS!!
 
                                 extracts_file = self.data_matching.CascadeExtraction(self).extract(clust_df)
                             break
@@ -158,16 +158,7 @@ class Main:
             # Continue if no more config files found
             print("Done")
 
-            # For each process type (eg: Name & Add, Name only) outlined in the configs file:
-        for proc_type in configs['processes']:
-            settings.proc_type = proc_type
-            # data_matching.VerificationAndUploads(configs, proc_type, in_args,stat_file, data_matching, region_dir, directories, settings, runfile_mods, db_calls)
-            self.data_matching.VerificationAndUploads(self, stat_file).verify()
-
-        # if self.in_args.upload_to_db:
-        #     # Add confirmed matches to relevant table
-        #     self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
-
+        self.data_matching.VerificationAndUploads(self, stat_file).verify()
 
 if __name__ == '__main__':
 
