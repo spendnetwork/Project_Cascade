@@ -8,7 +8,6 @@ __pycache__
 *.zip
 .idea/workspace.xml
 *.env
-*/SQL/
-*/Archive/
-core_run_files/
+/Regions/UK_entities/SQL/
+/Regions/UK_entities/Archive/
 *.pyc
