@@ -66,7 +66,6 @@ class LevDist(Main):
         :param output_file: clustered file with added levenshtein distance
         :return: clust_df
         '''
-        pdb.set_trace()
         # Remove company suffixes for more relevant levenshtein distance calculation. Otherwise will have exaggerated
         # Distances if i.e. src name has 'srl' suffix but reg name doesn't.
         self.clust_df['src_name_short'] = self.clust_df.src_name_adj.apply(self.shortenName).astype(str)
@@ -74,7 +73,6 @@ class LevDist(Main):
         self.clust_df['reg_name_short'] = self.clust_df.reg_name_adj.apply(self.shortenName).astype(str)
 
         # Add column containing levenshtein distance between the matched registry & source org names
-        pdb.set_trace()
         if 'leven_dist_N' not in self.clust_df.columns:
             self.clust_df['leven_dist_N'], self.clust_df['leven_dist_NA'] = zip(
                 *self.clust_df.apply(self.calcMatchRatio, axis=1))
@@ -107,8 +105,6 @@ class LevDist(Main):
 
     	:return ratio: individual levenshtein distance between the registry and source org string
     	"""
-
-
         if pd.notnull(row.src_name_short) and pd.notnull(row.reg_name_short):
             if pd.notnull(row.src_address_adj) and pd.notnull(row.reg_address_adj):
                 return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(fuzz.ratio(row.src_joinfields, row.reg_joinfields))
