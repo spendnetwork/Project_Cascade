@@ -69,6 +69,10 @@ The module makes use of argument parsing, with the following arguments:
 --terminal_matching (No parameters)
 --convert_training (No parameters)
 --upload_to_db (No parameters)
+--clear_all (No parameters) - delete all csvs and start from scratch
+--clear_adj (No parameters) - delete all except the raw files and run module from the data cleaning section
+--clear_outputs (No parameters) - re-run deduping process onwards, clearing all necessary output files
+--clear_post_matching (No parameters) - re-run quality control only (match extraction)
 ```
 
 TBC : The `--recycle` flag is used once the module has been run and trained for the first time. When this flag is used, the module will run for a second time, but will incorporate the training data obtained from the manual matching process created in the first 'round', as  kick-start of sorts. See 5. Recycling Matches below for more info.

@@ -27,6 +27,11 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--terminal_matching', action='store_true', help='Perform manual matching in terminal')
     parser.add_argument('--convert_training', action='store_true', help='Convert confirmed matches to training file for recycle phase')
     parser.add_argument('--upload_to_db', action='store_true' , help='Add confirmed matches to database')
+    parser.add_argument('--clear_all', action='store_true', help='Clear all datafiles')
+    parser.add_argument('--clear_adj', action='store_true', help='Clear all files except raw data')
+    parser.add_argument('--clear_outputs', action='store_true', help='Clear all files except inputs')
+    parser.add_argument('--clear_post_matching', action='store_true', help='Clear all files after matching phase')
+
 
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
     args = parser.parse_args(args)
@@ -40,6 +45,7 @@ def getInputArgs(rootdir, args=None):
     args = parser.parse_args()
 
     return args, parser
+
 
 class Main:
     def __init__(self, settings):
@@ -83,6 +89,8 @@ class Main:
     def run_main(self):
 
         self.setup.Setup(self).setupRawDirs()
+        # Delete csvs if required
+        self.setup.ClearFiles(self).clearFiles()
 
         if not in_args.recycle:
             try:
@@ -131,7 +139,7 @@ class Main:
                         if in_args.recycle == main_proc_configs['recycle_phase']:
 
                             # Create working directories if don't exist
-                            self.setup.Setup(self).setupDirs()
+                            self.setup.Setup(self).SetupDirs()
 
                             # Iterate over each process number in the config file
                             for proc_num in configs['processes'][proc_type]:
@@ -183,7 +191,7 @@ if __name__ == '__main__':
     # Define config file variables and related data types file
     settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
 
-    # if not in_args
+
     Main(settings).run_main()
 
 
