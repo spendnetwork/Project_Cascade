@@ -8,7 +8,7 @@ __pycache__
 *.zip
 .idea/workspace.xml
 *.env
-SQL/
-TESTRAINING/
+*/SQL/
+*/Archive/
 core_run_files/
 *.pyc
