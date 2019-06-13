@@ -22,8 +22,10 @@ class Setup:
 
         if not os.path.exists(self.directories['proc_type_dir'].format(self.region_dir, self.proc_type)):
             os.makedirs(self.directories['proc_type_dir'].format(self.region_dir, self.proc_type))
-        if not os.path.exists(self.directories['confirmed_matches_dir'].format(self.region_dir, self.proc_type)) :
-            os.makedirs(self.directories['confirmed_matches_dir'].format(self.region_dir, self.proc_type))
+        if not os.path.exists(self.directories['manual_matches_dir'].format(self.region_dir, self.proc_type)) :
+            os.makedirs(self.directories['manual_matches_dir'].format(self.region_dir, self.proc_type))
+        if not os.path.exists(self.directories['uploads_dir'].format(self.region_dir, self.proc_type)):
+                os.makedirs(self.directories['uploads_dir'].format(self.region_dir, self.proc_type))
         if not os.path.exists(self.directories['deduped_dir'].format(self.region_dir, self.proc_type)):
             os.makedirs(self.directories['deduped_dir'].format(self.region_dir, self.proc_type))
         if not os.path.exists(self.directories['proc_type_train_dir'].format(self.region_dir, self.proc_type)):
@@ -47,9 +49,6 @@ class Setup:
 
 
 class ClearFiles(Setup):
-    # def _init__(self, settings):
-    #     super().__init__(settings)
-
     def clearFiles(self):
 
         if self.in_args.clear_all:
@@ -81,7 +80,7 @@ class ClearFiles(Setup):
             os.remove(file)
 
     def clear_manual_matches(self):
-        self.removeFiles(os.path.join(self.directories['confirmed_matches_dir'].format(self.region_dir, self.proc_type), '*'))
+        self.removeFiles(os.path.join(self.directories['manual_matches_dir'].format(self.region_dir, self.proc_type), '*'))
 
     def clear_extract_matches(self):
         self.removeFiles(os.path.join(self.directories['proc_type_matches_dir'].format(self.region_dir, self.proc_type), '*'))

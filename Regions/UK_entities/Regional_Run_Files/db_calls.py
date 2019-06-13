@@ -107,55 +107,51 @@ class FetchData(DbCalls):
 
     def checkDataExists(self):
         # If registry data doesn't exist:
-
         if not os.path.exists(self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg_raw_name)):
             # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
-            if not self.in_args.upload_to_db:
-                choice = input("Registry data not found, load from database? (y/n): ")
-                if choice.lower() == 'y':
+            # if not self.in_args.upload_to_db:
+            #     choice = input("Registry data not found, load from database? (y/n): ")
+            #     if choice.lower() == 'y':
                     # Check env file exists
-                    env_fpath = os.path.join('.', '.env')
-                    if not os.path.exists(env_fpath):
-                        print("Database credentials not found. Please complete the .env file using the '.env template'")
-                        sys.exit()
+            env_fpath = os.path.join('.', '.env')
+            if not os.path.exists(env_fpath):
+                print("Database credentials not found. Please complete the .env file using the '.env template'")
+                sys.exit()
 
-                    # Load registry data
-                    query = self.db_calls.FetchData.createRegistryDataSQLQuery(self)
-                    df = self.db_calls.FetchData.fetchData(self, query)
-                    df.to_csv(
-                        self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg_raw_name),
-                        index=False)
-                else:
-                    print("Registry data required - please copy in data csv to Data_Inputs\
-                    /Raw_Data or load from database")
+            # Load registry data
+            query = self.db_calls.FetchData.createRegistryDataSQLQuery(self)
+            df = self.db_calls.FetchData.fetchData(self, query)
+            df.to_csv(
+                self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg_raw_name),
+                index=False)
 
         # If source data doesn't exist:
         if not os.path.exists(
                 self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_src_data'].format(
                     self.in_args.src_raw_name)):
             # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
-            if not self.in_args.upload_to_db:
-                choice = input("Source data not found, load from database? (y/n): ")
-                if choice.lower() == 'y':
-                    # Check env file exists
+            # if not self.in_args.upload_to_db:
+            #     choice = input("Source data not found, load from database? (y/n): ")
+            #     if choice.lower() == 'y':
+            #         # Check env file exists
 
-                    env_fpath = os.path.join('.', '.env')
-                    if not os.path.exists(env_fpath):
-                        print(
-                            "Database credentials not found. Please complete the .env file using the '.env template'")
-                        sys.exit()
+            env_fpath = os.path.join('.', '.env')
+            if not os.path.exists(env_fpath):
+                print(
+                    "Database credentials not found. Please complete the .env file using the '.env template'")
+                sys.exit()
 
-                    # Load source data
-                    query = self.db_calls.FetchData.createSourceDataSQLQuery(self)
-                    df = self.db_calls.FetchData.fetchData(self, query)
-                    df.to_csv(
-                        self.directories['raw_dir'].format(self.region_dir) + self.directories[
-                            'raw_src_data'].format(self.in_args.src_raw_name),
-                        index=False)
-                else:
-                    print("Source data required - please copy in data csv to Data_Inputs\
-                       /Raw_Data or load from database")
-                    sys.exit()
+            # Load source data
+            query = self.db_calls.FetchData.createSourceDataSQLQuery(self)
+            df = self.db_calls.FetchData.fetchData(self, query)
+            df.to_csv(
+                self.directories['raw_dir'].format(self.region_dir) + self.directories[
+                    'raw_src_data'].format(self.in_args.src_raw_name),
+                index=False)
+                # else:
+                #     print("Source data required - please copy in data csv to Data_Inputs\
+                #        /Raw_Data or load from database")
+                #     sys.exit()
 
     def createRegistryDataSQLQuery(self):
         """create query for pulling data from db"""
@@ -183,7 +179,7 @@ class FetchData(DbCalls):
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'postalCode' as src_address_postalcode,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'countryName' as src_address_countryname,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'streetAddress' as src_address_streetaddress
-              FROM {} as t
+              FROM {0} as t
             WHERE TRUE
               AND (t.source in (
                   'cf_notices',
@@ -191,13 +187,13 @@ class FetchData(DbCalls):
                )
               OR (source = 'ted_notices' AND countryname = 'United Kingdom')
               )
-              AND t.releasedate >= '2019-01-01'
+              AND t.releasedate >= {1}
                --AND t.json -> 'releases' -> 0 -> 'tag' ? 'tender'
                --AND t.json -> 'releases' -> 0 -> 'tag' ? 'award'
             
             ;
     
-            """.format(self.src_data_source)
+            """.format(self.src_data_source, "'" + self.in_args.data_date + "'")
         return query
 
 
@@ -214,15 +210,6 @@ if __name__ == '__main__':
     #
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = runfile.getInputArgs(rootdir)
-    #
-    # # Silence warning for df['process_num'] = str(proc_num)
-    # pd.options.mode.chained_assignment = None
-    #
-    # if in_args.region == 'Italy':
-    #     settings = settings.Italy_Settings
-    #
-    # if in_args.region == 'UK':
-    #     settings = settings.UK_Settings
 
     if in_args.region == 'UK_entities':
         settings = settings.UK_entities

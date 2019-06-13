@@ -5,6 +5,7 @@ import ast
 from pathlib import Path
 import pdb
 import settings
+import datetime
 
 def getInputArgs(rootdir, args=None):
     """
@@ -12,7 +13,6 @@ def getInputArgs(rootdir, args=None):
 
 	:return: arguments variable for both directory and the data file
 	"""
-
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
     parser.add_argument('--region', default='UK_entities', type=str, help='Define the region/country (Italy/UK)')
     parser.add_argument('--src_raw_name', default='source_data.csv', type=str,
@@ -31,6 +31,10 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--clear_adj', action='store_true', help='Clear all files except raw data')
     parser.add_argument('--clear_outputs', action='store_true', help='Clear all files except inputs')
     parser.add_argument('--clear_post_matching', action='store_true', help='Clear all files after matching phase')
+    # parser.add_argument('--data_date', type=str, default='"' + (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d') + '"'
+    parser.add_argument('--data_date', type=str,
+                        default=(datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+                        , help='Set source data date to be downloaded from (inclusive)')
 
 
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
@@ -190,7 +194,6 @@ if __name__ == '__main__':
 
     # Define config file variables and related data types file
     settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
-
 
     Main(settings).run_main()
 

@@ -276,7 +276,6 @@ class VerificationAndUploads(Main):
                 index=False, columns=self.manual_matches_cols)
 
         else:
-
             manual_match_file.to_csv(
                 self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
