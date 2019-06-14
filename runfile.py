@@ -26,7 +26,7 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--config_review', action='store_true', help='Manually review/choose best config file results')
     parser.add_argument('--terminal_matching', action='store_true', help='Perform manual matching in terminal')
     parser.add_argument('--convert_training', action='store_true', help='Convert confirmed matches to training file for recycle phase')
-    parser.add_argument('--upload_to_db', action='store_true' , help='Add confirmed matches to database')
+    parser.add_argument('--upload', action='store_true' , help='Add confirmed matches to database')
     parser.add_argument('--clear_all', action='store_true', help='Clear all datafiles')
     parser.add_argument('--clear_adj', action='store_true', help='Clear all files except raw data')
     parser.add_argument('--clear_outputs', action='store_true', help='Clear all files except inputs')

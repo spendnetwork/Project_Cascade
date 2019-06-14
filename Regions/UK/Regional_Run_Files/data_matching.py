@@ -177,7 +177,6 @@ class VerificationAndUploads(Main):
     def verify(self):
 
         main_proc = self.configs['processes'][self.proc_type][min(self.configs['processes'][self.proc_type].keys())]
-        # pdb.set_trace()
         # If recycle arg matches the recycle variable in the self.proc_type config file (want to restrict operations to just
         # i.e. Name_Only but still have the dynamics to iterate through proc_types
         if self.in_args.recycle == main_proc['recycle_phase']:
@@ -211,7 +210,7 @@ class VerificationAndUploads(Main):
                     # An AttributeError will be raised if the region does not require/have a convert_training module
                     next
 
-            if self.in_args.upload_to_db:
+            if self.in_args.upload:
                 # Add confirmed matches to relevant table
                 self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
@@ -262,10 +261,9 @@ class VerificationAndUploads(Main):
 
             # return manual_match_file
 
-        if not self.in_args.upload_to_db:
-            # pdb.set_trace()
+        if not self.in_args.upload:
             print(
-                "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(
+                "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
                     self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
                         self.best_config) + '.csv'))
 

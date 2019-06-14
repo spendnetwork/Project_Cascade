@@ -227,9 +227,9 @@ class VerificationAndUploads(Main):
 
             self.manualMatching()
 
-            # if self.in_args.upload_to_db:
-            #     # Add confirmed matches to relevant table
-            #     self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
+            if self.in_args.upload:
+                # Add confirmed matches to relevant table
+                self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
 
     def manualMatching(self):
@@ -273,20 +273,21 @@ class VerificationAndUploads(Main):
             print("Saving...")
             manual_match_file.to_csv(
                 self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
-                index=False, columns=self.manual_matches_cols)
-
+                # index=False, columns=self.manual_matches_cols)
+                index=False, columns=self.dbUpload_cols)
         else:
             manual_match_file.to_csv(
                 self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
-                index=False, columns=self.manual_matches_cols)
+                # index=False, columns=self.manual_matches_cols)
+                index=False, columns=self.dbUpload_cols)
 
             # return manual_match_file
 
-        if not self.in_args.upload_to_db:
-            print(
-                "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(
-                    self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
-                        self.best_config) + '.csv'))
+        # if not self.in_args.upload:
+        #     print(
+        #         "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
+        #             self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
+        #                 self.best_config) + '.csv'))
 
 # def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, proc_type, proc_num, in_args):
 #     """

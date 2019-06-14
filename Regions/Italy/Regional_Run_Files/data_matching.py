@@ -209,7 +209,7 @@ class VerificationAndUploads(Main):
     def verify(self):
 
         main_proc = self.configs['processes'][self.proc_type][min(self.configs['processes'][self.proc_type].keys())]
-        # pdb.set_trace()
+
         # If recycle arg matches the recycle variable in the self.proc_type config file (want to restrict operations to just
         # i.e. Name_Only but still have the dynamics to iterate through proc_types
         if self.in_args.recycle == main_proc['recycle_phase']:
@@ -244,7 +244,7 @@ class VerificationAndUploads(Main):
                     # An AttributeError will be raised if the region does not require/have a convert_training module
                     next
 
-            if self.in_args.upload_to_db:
+            if self.in_args.upload:
                 # Add confirmed matches to relevant table
                 self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
@@ -298,10 +298,9 @@ class VerificationAndUploads(Main):
 
             # return manual_match_file
 
-        if not self.in_args.upload_to_db:
-            # pdb.set_trace()
+        if not self.in_args.upload:
             print(
-                "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(
+                "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
                     self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
                         self.best_config) + '.csv'))
 #
@@ -337,7 +336,7 @@ class VerificationAndUploads(Main):
 #             # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
 #             convert_training.convertToTraining(region_dir, directories, conv_file)
 #
-#         if in_args.upload_to_db:
+#         if in_args.upload:
 #             # Add confirmed matches to relevant table
 #             db_calls.addDataToTable(region_dir, main_proc['db_table'], directories, proc_type, in_args, settings)
 
@@ -517,12 +516,12 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #                                  columns=['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
 #                                           'reg_address','src_name', 'src_name_adj', 'src_address', 'src_address_adj', 'reg_address_adj', 'Manual_Match_N','Manual_Match_NA', 'srcjoinfields', 'regjoinfields'])
 #         if not in_args.recycle:
-#             if not in_args.upload_to_db:
-#                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload_to_db".format(
+#             if not in_args.upload:
+#                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
 #                 directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'))
 #         else:
-#             if not in_args.upload_to_db:
-#                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --recycle --upload_to_db".format(
+#             if not in_args.upload:
+#                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --recycle --upload".format(
 #                     directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'))
 
 

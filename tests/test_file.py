@@ -37,6 +37,6 @@
 
 # test that delete duplicates within database actually returns a unique database
 # pass in test_clustered.csv to the database, run deduplication on the table, then assert that it matches the test_deduplicated_data.csv
-# could also combine this with a test_upload_to_db properly. Maybe upload test_clustered.csv and then assert that the table in the database is exactly equal to the original test_clustered.csv file.
+# could also combine this with a test_upload properly. Maybe upload test_clustered.csv and then assert that the table in the database is exactly equal to the original test_clustered.csv file.
 # OR can test the sql query is an insert function as per the test_insert() function in the core repo (test_database.py)
 # def test_uploadtodb():

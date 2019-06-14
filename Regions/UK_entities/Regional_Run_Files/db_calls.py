@@ -9,6 +9,7 @@ from pathlib import Path
 import runfile
 from runfile import Main
 import settings
+import glob
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -32,36 +33,56 @@ class DbCalls(Main):
         :return: None
         '''
 
-        upload_file = pd.read_csv(
-            self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
-                self.best_config) + '.csv',
-            usecols=self.dbUpload_cols)
-
-        # # Filter manual matches file to just confirmed Yes matches and non-blank org id's
-        # confirmed_matches = upload_file[pd.notnull(upload_file['CH_id'])]
-        #
-        upload_file.to_csv(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type),
-                                 columns=self.dbUpload_cols,
-                                 index=False)
-
         conn, cur = self.createConnection()
+        files = glob.glob(os.path.join(self.directories['uploads_dir'].format(self.region_dir, self.proc_type),'*'))
+        for upload_file in files:
+            with open(upload_file, 'r') as f:
+                # Get headers dynamically
+                reader = csv.reader(f)
 
-        with open(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type), 'r') as f:
-            # Get headers dynamically
-            reader = csv.reader(f)
+                headers = next(reader, None)
+                headers = ", ".join(headers)
+                self.headers = headers
+                next(f)  # Skip header row
+                # Input the data into the dedupe table
+                # copy_expert allows access to csv methods (i.e. char escaping)
+                cur.copy_expert(
+                    """COPY {}({}) from stdin (format csv)""".format(self.upload_table, headers), f)
 
-            headers = next(reader, None)
-            headers = ", ".join(headers)
-            self.headers = headers
-            next(f)  # Skip header row
-            # Input the data into the dedupe table
-            # copy_expert allows access to csv methods (i.e. char escaping)
-            cur.copy_expert(
-                """COPY {}({}) from stdin (format csv)""".format(self.upload_table, self.headers), f)
-
-        query = self.removeTableDuplicates()
-        cur.execute(query)
-        conn.commit()
+            query = self.removeTableDuplicates()
+            cur.execute(query)
+            conn.commit()
+        #
+        # upload_file = pd.read_csv(
+        #     self.directories['uploads_file'].format(self.region_dir, self.proc_type) + '_' + str(
+        #         self.best_config) + '.csv',
+        #     usecols=self.dbUpload_cols)
+        #
+        # # # Filter manual matches file to just confirmed Yes matches and non-blank org id's
+        # # confirmed_matches = upload_file[pd.notnull(upload_file['CH_id'])]
+        # #
+        # upload_file.to_csv(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type),
+        #                          columns=self.dbUpload_cols,
+        #                          index=False)
+        #
+        # conn, cur = self.createConnection()
+        #
+        # with open(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type), 'r') as f:
+        #     # Get headers dynamically
+        #     reader = csv.reader(f)
+        #
+        #     headers = next(reader, None)
+        #     headers = ", ".join(headers)
+        #     self.headers = headers
+        #     next(f)  # Skip header row
+        #     # Input the data into the dedupe table
+        #     # copy_expert allows access to csv methods (i.e. char escaping)
+        #     cur.copy_expert(
+        #         """COPY {}({}) from stdin (format csv)""".format(self.upload_table, self.headers), f)
+        #
+        # query = self.removeTableDuplicates()
+        # cur.execute(query)
+        # conn.commit()
 
     def createConnection(self):
         '''
@@ -108,8 +129,8 @@ class FetchData(DbCalls):
     def checkDataExists(self):
         # If registry data doesn't exist:
         if not os.path.exists(self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg_raw_name)):
-            # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
-            # if not self.in_args.upload_to_db:
+            # If specific upload arg hasn't been passed (i.e. we're running for the first time)
+            # if not self.in_args.upload:
             #     choice = input("Registry data not found, load from database? (y/n): ")
             #     if choice.lower() == 'y':
                     # Check env file exists
@@ -129,8 +150,8 @@ class FetchData(DbCalls):
         if not os.path.exists(
                 self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_src_data'].format(
                     self.in_args.src_raw_name)):
-            # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
-            # if not self.in_args.upload_to_db:
+            # If specific upload arg hasn't been passed (i.e. we're running for the first time)
+            # if not self.in_args.upload:
             #     choice = input("Source data not found, load from database? (y/n): ")
             #     if choice.lower() == 'y':
             #         # Check env file exists
@@ -155,7 +176,7 @@ class FetchData(DbCalls):
 
     def createRegistryDataSQLQuery(self):
         """create query for pulling data from db"""
-
+        print("Obtaining registry data...")
         query = \
             """
             SELECT
@@ -169,7 +190,7 @@ class FetchData(DbCalls):
 
     def createSourceDataSQLQuery(self):
         """create query for pulling data from db"""
-
+        print("Obtaining source data...")
         query = \
             """
             SELECT            

@@ -27,7 +27,7 @@ class Db_Calls(Main):
         :param upload_file: the dataframe containing the data
         :return: None
         '''
-        # pdb.set_trace()
+
         upload_file = pd.read_csv(
             self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
                 self.best_config) + '.csv',
@@ -103,8 +103,8 @@ def checkDataExists(region_dir, directories, in_args, data_source):
     # If registry data doesn't exist:
     if not os.path.exists(
             directories['raw_dir'].format(region_dir) + directories['raw_reg_data'].format(in_args.reg_raw_name)):
-        # If specific upload_to_db arg hasn't been passed (i.e. we're running for the first time)
-        if not in_args.upload_to_db:
+        # If specific upload arg hasn't been passed (i.e. we're running for the first time)
+        if not in_args.upload:
             choice = input("Registry data not found, load from database? (y/n): ")
             if choice.lower() == 'y':
                 # Check env file exists

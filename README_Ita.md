@@ -55,7 +55,7 @@ The module makes use of argument parsing, with the following arguments:
 --config_review (No parameters)
 --terminal_matching (No parameters)
 --convert_training (No parameters)
---upload_to_db (No parameters)
+--upload (No parameters)
 ```
 
 To amend the names if needed :
@@ -138,7 +138,7 @@ You can add as many config files as you like to experiment with different combin
 12. The program will then exit, allowing the user to review the matches that have been extracted based on the chosen config file. The next stage is to manually review the 'Manual_Matches_x' file within Outputs/X/Confirmed_Matches and enter Y/N/U in the Manual_Match column. All matches with a Levenshtein distance of 100 (i.e. an exact match) are automatically assigned 'Y'. Note that these matches can be verified in the terminal if the `-terminal_matching` flag is used. In this case, the program will not exit, and instead the user will be prompted to verify the matches using the same Y/N/U responses.
 13. If the program has exited, we will then do 2 things. The first is to convert these manual confirmed matches into a json training file to be fed back into the system but using more fields in the dedupe phase (see recycling matches section below). The second is to get these confirmed matches uploaded to the database. Do this by running the command:
 ```
-python runfile.py --convert_training --upload_to_db
+python runfile.py --convert_training --upload
 ```
 The new training files are copied into the relevant training folders ready to be called by dedupe, and the confirmed 'Y' matches are converted to a Confirmed_Matches.csv file and then uploaded to the database. At this point duplicates within the database are sought and removed.
 ### Re-cycling the matches
