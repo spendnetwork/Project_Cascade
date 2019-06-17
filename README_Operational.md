@@ -26,6 +26,8 @@ This guide provides instructions for running the matching script using WebApps.
  
  ### Once checking is complete
  
- - In the FTP browser drag and drop the file into the Uploads folder
+ - In the FTP browser drag and drop the file into the Uploads folder within `/home/snbot/davidm/Project_Cascade/Regions/Outputs/
  
  - Upload the file to the database by running `python runfile.py --upload`
+ 
+
