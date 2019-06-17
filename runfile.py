@@ -31,11 +31,9 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--clear_adj', action='store_true', help='Clear all files except raw data')
     parser.add_argument('--clear_outputs', action='store_true', help='Clear all files except inputs')
     parser.add_argument('--clear_post_matching', action='store_true', help='Clear all files after matching phase')
-    # parser.add_argument('--data_date', type=str, default='"' + (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d') + '"'
     parser.add_argument('--data_date', type=str,
                         default=(datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
                         , help='Set source data date to be downloaded from (inclusive)')
-
 
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
     args = parser.parse_args(args)

@@ -1,4 +1,10 @@
+[DB Credentials]
 HOST_REMOTE=
 DBNAME_REMOTE=
 USER_REMOTE=
 PASSWORD_REMOTE=
+
+[AWS IAM Credentials]
+aws_access_key_id =
+aws_secret_access_key =
+region =
