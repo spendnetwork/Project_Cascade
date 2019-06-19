@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import numpy as np
+import pdb
 from runfile import Main
 
 
@@ -20,8 +21,8 @@ class StatsCalculations(Main):
         self.extractdf = extractdf
         self.srcdf = srcdf
 
-
     def calculate(self):
+
         # Remove old stats file if exists and if first iteration over config files:
         if os.path.exists(self.directories['stats_file'].format(self.region_dir, self.proc_type)):
             if self.conf_file_num == 1:

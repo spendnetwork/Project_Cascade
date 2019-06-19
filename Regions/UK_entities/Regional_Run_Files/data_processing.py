@@ -2,12 +2,9 @@ import pandas as pd
 import os
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
-import numpy as np
-from Regions.UK_entities.Regional_Run_Files import org_suffixes
 import string
-import pdb
 from runfile import Main
-
+import pdb
 
 class DataProcessing(Main):
 
@@ -130,7 +127,7 @@ class ProcessSourceData(DataProcessing):
             self.in_args.src_adj_name)
 
         if not os.path.exists(adj_data):
-            df = pd.read_csv(raw_data, usecols=self.src_data_cols,
+            df = pd.read_csv(raw_data, usecols=self.raw_src_data_cols,
                              dtype=self.df_dtypes)
 
             print("Re-organising source data...")
@@ -147,7 +144,8 @@ class ProcessSourceData(DataProcessing):
             df[adj_col] = df['src_address_streetaddress'] + ', ' + df['src_address_locality'] + ', ' + df['src_address_postalcode'] + ', ' + df['src_address_countryname']
             df = self.remvPunct(df, adj_col, adj_col)
             df = self.joinFields(df, 'src')
-
+            df = df.drop(['src_address_streetaddress', 'src_address_locality', 'src_address_postalcode',
+                          'src_address_countryname'], axis=1)
             print("...done")
             df.to_csv(adj_data, index=False)
         else:
@@ -166,7 +164,6 @@ class ProcessRegistryData(DataProcessing):
 	"""
 
     def clean(self):
-
 
         raw_data = self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(
             self.in_args.reg_raw_name)
@@ -190,20 +187,6 @@ class ProcessRegistryData(DataProcessing):
                 # Replace organisation suffixes with standardised version
                 chunk[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
-
-                # ls = []
-                # # Merge multiple address columns into one column
-                # for idx, row in tqdm(chunk.iterrows()):
-                #     ls.append(tuple([row['reg_id'], row['reg_name'], row['reg_name_adj'], row['street_address1']]))
-                #     for key in ['street_address2', 'street_address3']:
-                #         if pd.notnull(row[key]):
-                #             ls.append(tuple([row['reg_id'], row['reg_name'], row['reg_name_adj'], row[key]]))
-                # labels = ['reg_id', 'reg_name', 'reg_name_adj', 'street_address']
-
-                # dfmerge = pd.DataFrame.from_records(ls, columns=labels)
-                #
-                # dfmerge.rename(columns={'street_address': 'reg_address'}, inplace=True)
-
                 # Remove punctuation and double spacing in address
                 adj_col = str('reg_address_adj')
                 orig_col = str('reg_address')
@@ -220,6 +203,10 @@ class ProcessRegistryData(DataProcessing):
             print("...done")
 
             dffullmerge['reg_joinfields'] = dffullmerge['reg_joinfields'].astype(str)
+            dffullmerge['reg_source'] = dffullmerge['reg_source'].astype(str)
+            dffullmerge['reg_created_at'] = dffullmerge['reg_created_at'].astype(str)
+            dffullmerge['reg_scheme'] = dffullmerge['reg_scheme'].astype(str)
+            dffullmerge['reg_id'] = dffullmerge['reg_id'].astype(str)
             dffullmerge['reg_address_adj'] = dffullmerge['reg_address_adj'].astype(str)
             dffullmerge.to_csv(adj_data, index=False)
             return dffullmerge

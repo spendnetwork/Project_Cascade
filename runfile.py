@@ -68,7 +68,7 @@ class Main:
         self.dedupe_cols = settings.dedupe_cols
         self.reg_data_source = settings.reg_data_source
         self.src_data_source = settings.src_data_source
-        self.src_data_cols = settings.src_data_cols
+        self.raw_src_data_cols = settings.raw_src_data_cols
 
         # Runfile modules
         self.runfile_mods = settings.runfile_mods

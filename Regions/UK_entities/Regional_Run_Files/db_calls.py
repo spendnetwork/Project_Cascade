@@ -174,6 +174,23 @@ class FetchData(DbCalls):
                 #        /Raw_Data or load from database")
                 #     sys.exit()
 
+    # def createRegistryDataSQLQuery(self):
+    #     """create query for pulling data from db"""
+    #     print("Obtaining registry data...")
+    #     query = \
+    #         """
+    #         SELECT
+    #        legalname as reg_name,
+    #        id as reg_id,
+    #        '' as reg_address,
+    #        scheme as reg_scheme,
+    #        source as reg_source,
+    #        created_at as reg_created_at
+    #         from {}
+    #
+    #         """.format(self.reg_data_source)
+    #     return query
+
     def createRegistryDataSQLQuery(self):
         """create query for pulling data from db"""
         print("Obtaining registry data...")
@@ -182,9 +199,12 @@ class FetchData(DbCalls):
             SELECT
            legalname as reg_name,
            id as reg_id,
-           '' as reg_address
+           '' as reg_address,
+           scheme as reg_scheme,
+           source as reg_source,
+           created_at as reg_created_at
             from {}
-            
+
             """.format(self.reg_data_source)
         return query
 
@@ -199,7 +219,9 @@ class FetchData(DbCalls):
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'locality' as src_address_locality,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'postalCode' as src_address_postalcode,
             t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'countryName' as src_address_countryname,
-            t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'streetAddress' as src_address_streetaddress
+            t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'streetAddress' as src_address_streetaddress,
+            t.source as source
+            
               FROM {0} as t
             WHERE TRUE
               AND (t.source in (
@@ -229,6 +251,7 @@ class FetchData(DbCalls):
 if __name__ == '__main__':
     #
     #
+
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = runfile.getInputArgs(rootdir)
 

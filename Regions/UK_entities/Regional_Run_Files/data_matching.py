@@ -14,8 +14,8 @@ class Matching(Main):
         self.reg_df = reg_df
 
     def dedupe(self):
-        # Run dedupe for matching and clustering
 
+        # Run dedupe for matching and clustering
         if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
 
             src_file = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
@@ -41,10 +41,12 @@ class Matching(Main):
             clust_df = self.data_processing.LevDist(self, clust_df, self.directories["assigned_output_file"].format(
                                                                      self.region_dir,
                                                                      self.proc_type)).addLevDist()
+            clust_df = clust_df[pd.notnull(clust_df['src_name'])]
         else:
             # clust_df = pd.read_csv(self.directories["assigned_output_file"].format(self.region_dir, self.proc_type),index_col=None, dtype=self.df_dtypes)
             clust_df = pd.read_csv(self.directories["assigned_output_file"].format(self.region_dir, self.proc_type),
                                    dtype=self.df_dtypes)
+            clust_df = clust_df[pd.notnull(clust_df['src_name'])]
 
         return clust_df
 

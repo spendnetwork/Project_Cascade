@@ -99,8 +99,12 @@ class UK_entities(UK_Settings):
                  'reg_id': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str,  'reg_name_short': np.str,
                  'leven_dist_N': np.int, 'leven_dist_NA': np.int,
                  'Manual_Match_N':np.str,  'Manual_Match_NA': np.str,
-                 'src_joinfields':np.str, 'reg_joinfields': np.str, 'src_tag':np.str
+                 'src_joinfields':np.str, 'reg_joinfields': np.str, 'src_tag':np.str,
+                 'reg_source': np.str, 'reg_created_at': np.str, 'reg_scheme':np.str, 'src_address_adj': np.str
                  }
+
+
+
 
     runfile_mods = UK_ent_run_files
 
@@ -108,12 +112,15 @@ class UK_entities(UK_Settings):
     reg_data_source = 'ocds.orgs_ocds'
     src_data_source = 'ocds.ocds_tenders_view'
 
-    dedupe_cols = ['src_name','src_tag', 'src_name_adj', 'src_address_locality','src_address_postalcode','src_address_countryname','src_address_streetaddress', 'src_address_adj',
-                   'reg_id', 'reg_name', 'reg_name_adj', 'reg_address', 'reg_address_adj','src_joinfields', 'reg_joinfields']
+    dedupe_cols = ['src_name','src_tag', 'src_name_adj', 'src_address_adj',
+                   'reg_id', 'reg_name', 'reg_name_adj', 'reg_address', 'reg_address_adj','src_joinfields', 'reg_joinfields',
+                   'reg_source', 'reg_created_at', 'reg_scheme']
 
-    src_data_cols = ['src_name','src_tag','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress']
 
-    dbUpload_cols = ['src_name', 'reg_name','leven_dist_N',  'Manual_Match_N', 'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA', 'reg_id',  'src_tag', 'src_id']
+    raw_src_data_cols = ['src_name','src_tag','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress']
+
+
+    dbUpload_cols = ['src_name', 'reg_name','leven_dist_N',  'Manual_Match_N', 'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA', 'reg_id',  'src_tag', 'src_id', 'reg_source', 'reg_created_at', 'reg_scheme']
 
     manual_matches_cols = [ 'src_name','src_tag',  'reg_name', 'Manual_Match_N', 'leven_dist_N',
                            'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA',
@@ -123,6 +130,7 @@ class UK_entities(UK_Settings):
                             'src_id',
                             'reg_name_adj',
                             'src_joinfields',
-                            'reg_joinfields']
-
-    training_cols = ['src_name', 'reg_name', 'Manual_Match_N', 'src_id', 'leven_dist_N']
+                            'reg_joinfields',
+                            'reg_source',
+                            'reg_created_at',
+                            'reg_scheme']
