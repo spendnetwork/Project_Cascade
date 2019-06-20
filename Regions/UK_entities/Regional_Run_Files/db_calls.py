@@ -10,6 +10,9 @@ import runfile
 from runfile import Main
 import settings
 import glob
+import boto3
+from botocore.exceptions import ClientError
+
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -52,37 +55,7 @@ class DbCalls(Main):
             query = self.removeTableDuplicates()
             cur.execute(query)
             conn.commit()
-        #
-        # upload_file = pd.read_csv(
-        #     self.directories['uploads_file'].format(self.region_dir, self.proc_type) + '_' + str(
-        #         self.best_config) + '.csv',
-        #     usecols=self.dbUpload_cols)
-        #
-        # # # Filter manual matches file to just confirmed Yes matches and non-blank org id's
-        # # confirmed_matches = upload_file[pd.notnull(upload_file['CH_id'])]
-        # #
-        # upload_file.to_csv(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type),
-        #                          columns=self.dbUpload_cols,
-        #                          index=False)
-        #
-        # conn, cur = self.createConnection()
-        #
-        # with open(self.directories['confirmed_matches_file'].format(self.region_dir, self.proc_type), 'r') as f:
-        #     # Get headers dynamically
-        #     reader = csv.reader(f)
-        #
-        #     headers = next(reader, None)
-        #     headers = ", ".join(headers)
-        #     self.headers = headers
-        #     next(f)  # Skip header row
-        #     # Input the data into the dedupe table
-        #     # copy_expert allows access to csv methods (i.e. char escaping)
-        #     cur.copy_expert(
-        #         """COPY {}({}) from stdin (format csv)""".format(self.upload_table, self.headers), f)
-        #
-        # query = self.removeTableDuplicates()
-        # cur.execute(query)
-        # conn.commit()
+
 
     def createConnection(self):
         '''
@@ -129,11 +102,7 @@ class FetchData(DbCalls):
     def checkDataExists(self):
         # If registry data doesn't exist:
         if not os.path.exists(self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg_raw_name)):
-            # If specific upload arg hasn't been passed (i.e. we're running for the first time)
-            # if not self.in_args.upload:
-            #     choice = input("Registry data not found, load from database? (y/n): ")
-            #     if choice.lower() == 'y':
-                    # Check env file exists
+            # Check env file exists
             env_fpath = os.path.join('.', '.env')
             if not os.path.exists(env_fpath):
                 print("Database credentials not found. Please complete the .env file using the '.env template'")
@@ -141,7 +110,7 @@ class FetchData(DbCalls):
 
             # Load registry data
             query = self.db_calls.FetchData.createRegistryDataSQLQuery(self)
-            df = self.db_calls.FetchData.fetchData(self, query)
+            df = self.db_calls.FetchData.fetchdata(self, query)
             df.to_csv(
                 self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg_raw_name),
                 index=False)
@@ -150,11 +119,6 @@ class FetchData(DbCalls):
         if not os.path.exists(
                 self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_src_data'].format(
                     self.in_args.src_raw_name)):
-            # If specific upload arg hasn't been passed (i.e. we're running for the first time)
-            # if not self.in_args.upload:
-            #     choice = input("Source data not found, load from database? (y/n): ")
-            #     if choice.lower() == 'y':
-            #         # Check env file exists
 
             env_fpath = os.path.join('.', '.env')
             if not os.path.exists(env_fpath):
@@ -164,32 +128,11 @@ class FetchData(DbCalls):
 
             # Load source data
             query = self.db_calls.FetchData.createSourceDataSQLQuery(self)
-            df = self.db_calls.FetchData.fetchData(self, query)
+            df = self.db_calls.FetchData.fetchdata(self, query)
             df.to_csv(
                 self.directories['raw_dir'].format(self.region_dir) + self.directories[
                     'raw_src_data'].format(self.in_args.src_raw_name),
                 index=False)
-                # else:
-                #     print("Source data required - please copy in data csv to Data_Inputs\
-                #        /Raw_Data or load from database")
-                #     sys.exit()
-
-    # def createRegistryDataSQLQuery(self):
-    #     """create query for pulling data from db"""
-    #     print("Obtaining registry data...")
-    #     query = \
-    #         """
-    #         SELECT
-    #        legalname as reg_name,
-    #        id as reg_id,
-    #        '' as reg_address,
-    #        scheme as reg_scheme,
-    #        source as reg_source,
-    #        created_at as reg_created_at
-    #         from {}
-    #
-    #         """.format(self.reg_data_source)
-    #     return query
 
     def createRegistryDataSQLQuery(self):
         """create query for pulling data from db"""
@@ -233,14 +176,13 @@ class FetchData(DbCalls):
               AND t.releasedate >= {1}
                --AND t.json -> 'releases' -> 0 -> 'tag' ? 'tender'
                --AND t.json -> 'releases' -> 0 -> 'tag' ? 'award'
-            
             ;
     
             """.format(self.src_data_source, "'" + self.in_args.data_date + "'")
         return query
 
 
-    def fetchData(self, query):
+    def fetchdata(self, query):
         """ retrieve data from the db using query"""
         conn, _ = self.db_calls.DbCalls.createConnection(self)
         print('Importing data...')
@@ -248,10 +190,72 @@ class FetchData(DbCalls):
         conn.close()
         return df
 
-if __name__ == '__main__':
-    #
-    #
 
+class AwsTransfers(Main):
+
+    def __init__(self, settings):
+        super().__init__(settings)
+        self.bucket = 'sn-orgmatching'
+
+    def transfer(self):
+        '''
+        Core function for the class. Checks args and either uploads to or downloads from s3 bucket
+        :return: None
+        '''
+
+        if self.in_args.prodn_unverified:
+            files = glob.glob(os.path.join(self.directories['manual_matches_dir'].format(self.region_dir, self.proc_type), '*'))
+
+            for filepath in files:
+                filename = os.path.basename(filepath)
+                self.upload_file(filepath, self.bucket, 'Unverified_matches/' + filename)
+
+        if self.in_args.prodn_verified:
+            self.download_verified_files()
+        # Delete this file, with the given prefix from both the verified and unverified folders in s3
+        # Transfer any files in uploads folder to uk_entities table.
+
+    def download_verified_files(self):
+        # Scan s3 verified folder for files
+        s3 = boto3.client('s3')
+        response = s3.list_objects(Bucket=self.bucket, Prefix='Verified_matches/')
+
+        # Ignore first file entry in dict as is just the folder name. Returns a list of files
+        files = response['Contents'][1:]
+
+        # For any files in verified - transfer them to the Uploads folder within the normal google box
+        for i in range(len(files)):
+            s3.download_file('sn-orgmatching',
+                             files[i]['Key'],
+                             os.path.join(self.directories['uploads_dir'].format(self.region_dir,
+                                                                                 self.proc_type),
+                                          os.path.basename(files[i]['Key'])))
+
+    @staticmethod
+    def upload_file(file_name, bucket, object_name=None):
+        """Upload a file to an S3 bucket
+
+        :param file_name: File to upload
+        :param bucket: Bucket to upload to
+        :param object_name: S3 object name. If not specified then file_name is used
+        :return: True if file was uploaded, else False
+        """
+
+        # If S3 object_name was not specified, use file_name
+        if object_name is None:
+            object_name = file_name
+
+        # Upload the file
+        s3_client = boto3.client('s3')
+        try:
+            response = s3_client.upload_file(file_name, bucket, object_name)
+        except ClientError as e:
+            print(e)
+            return False
+        return True
+
+
+if __name__ == '__main__':
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = runfile.getInputArgs(rootdir)
 
@@ -266,3 +270,9 @@ if __name__ == '__main__':
 
     # if not in_args
     DbCalls.addDataToTable(settings)
+
+    # import boto3
+    # >> > s3 = boto3.client('s3')
+    # response = s3.upload_file(
+    #     '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/holder/Matches_Buyers_DMadj.csv',
+    #     'sn-orgmatching, ' Verified_matches / lalal.csv')

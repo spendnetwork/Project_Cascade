@@ -35,6 +35,9 @@ def getInputArgs(rootdir, args=None):
                         default=(datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
                         , help='Set source data date to be downloaded from (inclusive)')
 
+    parser.add_argument('--prodn_unverified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
+    parser.add_argument('--prodn_verified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
+
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
     args = parser.parse_args(args)
 
@@ -169,6 +172,8 @@ class Main:
             print("Done")
 
         self.data_matching.VerificationAndUploads(self, stat_file).verify()
+
+        self.db_calls.AwsTransfers(self).transfer()
 
 if __name__ == '__main__':
 

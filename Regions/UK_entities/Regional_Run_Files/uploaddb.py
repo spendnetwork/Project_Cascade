@@ -13,7 +13,6 @@ user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
 
 
-
 def addDataToTable():
     '''
     Adds the confirmed_matches data to table
