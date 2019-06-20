@@ -22,10 +22,10 @@ class Setup:
 
         if not os.path.exists(self.directories['proc_type_dir'].format(self.region_dir, self.proc_type)):
             os.makedirs(self.directories['proc_type_dir'].format(self.region_dir, self.proc_type))
-        if not os.path.exists(self.directories['manual_matches_dir'].format(self.region_dir, self.proc_type)) :
-            os.makedirs(self.directories['manual_matches_dir'].format(self.region_dir, self.proc_type))
-        if not os.path.exists(self.directories['uploads_dir'].format(self.region_dir, self.proc_type)):
-                os.makedirs(self.directories['uploads_dir'].format(self.region_dir, self.proc_type))
+        if not os.path.exists(self.directories['unverified_matches_dir'].format(self.region_dir, self.proc_type)) :
+            os.makedirs(self.directories['unverified_matches_dir'].format(self.region_dir, self.proc_type))
+        if not os.path.exists(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type)):
+                os.makedirs(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type))
         if not os.path.exists(self.directories['deduped_dir'].format(self.region_dir, self.proc_type)):
             os.makedirs(self.directories['deduped_dir'].format(self.region_dir, self.proc_type))
         if not os.path.exists(self.directories['proc_type_train_dir'].format(self.region_dir, self.proc_type)):
@@ -52,7 +52,7 @@ class ClearFiles(Setup):
     def clearFiles(self):
 
         if self.in_args.clear_all:
-            self.clear_manual_matches()
+            self.clear_unverified_matches()
             self.clear_extract_matches()
             self.clear_deduped_data()
             self.clear_raw_data()
@@ -61,17 +61,17 @@ class ClearFiles(Setup):
         if self.in_args.clear_adj:
             self.clear_adj_data()
             self.clear_deduped_data()
-            self.clear_manual_matches()
+            self.clear_unverified_matches()
             self.clear_extract_matches()
 
         if self.in_args.clear_outputs:
-            self.clear_manual_matches()
+            self.clear_unverified_matches()
             self.clear_extract_matches()
             self.clear_deduped_data()
 
         if self.in_args.clear_post_matching:
             self.clear_extract_matches()
-            self.clear_manual_matches()
+            self.clear_unverified_matches()
 
     @staticmethod
     def removeFiles(fp):
@@ -79,8 +79,8 @@ class ClearFiles(Setup):
         for file in files:
             os.remove(file)
 
-    def clear_manual_matches(self):
-        self.removeFiles(os.path.join(self.directories['manual_matches_dir'].format(self.region_dir, self.proc_type), '*'))
+    def clear_unverified_matches(self):
+        self.removeFiles(os.path.join(self.directories['unverified_matches_dir'].format(self.region_dir, self.proc_type), '*'))
 
     def clear_extract_matches(self):
         self.removeFiles(os.path.join(self.directories['proc_type_matches_dir'].format(self.region_dir, self.proc_type), '*'))

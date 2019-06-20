@@ -200,7 +200,7 @@ class VerificationAndUploads(Main):
                 assert not self.in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
 
                 conv_file = pd.read_csv(
-                    self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+                    self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                     usecols=self.training_cols)
 
                 try :
@@ -251,12 +251,12 @@ class VerificationAndUploads(Main):
 
             print("Saving...")
             manual_match_file.to_csv(
-                self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+                self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
 
         else:
             manual_match_file.to_csv(
-                self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+                self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
 
             # return manual_match_file
@@ -264,7 +264,7 @@ class VerificationAndUploads(Main):
         if not self.in_args.upload:
             print(
                 "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
-                    self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
+                    self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
                         self.best_config) + '.csv'))
 
 class CascadeExtraction(Main):

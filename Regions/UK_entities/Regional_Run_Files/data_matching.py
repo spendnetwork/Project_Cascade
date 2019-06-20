@@ -5,6 +5,7 @@ import numpy as np
 from shutil import copyfile
 import pdb
 from runfile import Main
+from datetime import datetime
 
 
 class Matching(Main):
@@ -274,67 +275,11 @@ class VerificationAndUploads(Main):
 
             print("Saving...")
             manual_match_file.to_csv(
-                self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+                self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type, datetime.today().strftime('%Y-%m-%d')),
                 # index=False, columns=self.manual_matches_cols)
                 index=False, columns=self.dbUpload_cols)
         else:
             manual_match_file.to_csv(
-                self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+                self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type, datetime.today().strftime('%Y-%m-%d')),
                 # index=False, columns=self.manual_matches_cols)
                 index=False, columns=self.dbUpload_cols)
-
-            # return manual_match_file
-
-        # if not self.in_args.upload:
-        #     print(
-        #         "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
-        #             self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
-        #                 self.best_config) + '.csv'))
-
-# def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, proc_type, proc_num, in_args):
-#     """
-# 	Deduping - first the registry and source data are matched using dedupes csvlink,
-# 	then the matched file is put into clusters
-# 	:param directories: file/folder locations
-# 	:param  config_files: the main config files
-# 	:param proc_type: the 'type' of the process (Name, Name & Address)
-# 	:param proc_num: the individual process within the config file
-# 	:return None
-# 	:output : matched output file
-# 	:output : matched and clustered output file
-# 	"""
-#     src_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['source_data']
-#     reg_fields = config_files['processes'][proc_type][proc_num]['dedupe_field_names']['registry_data']
-#
-#     train = ['--skip_training' if in_args.training else '']
-#     # Matching:
-#     if not os.path.exists(directories['match_output_file'].format(region_dir, proc_type)):
-#         if in_args.recycle:
-#             # Copy manual matching file over to build on for clustering
-#             copyfile(directories['manual_matching_train_backup'].format(region_dir), directories['manual_training_file'].format(region_dir, proc_type))
-#
-#         # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
-#         if os.path.exists('./learned_settings'):
-#             os.remove('./learned_settings')
-#         print("Starting matching...")
-#
-#         cmd = ['csvlink '
-#                + str(src_file) + ' '
-#                + str(reg_df)
-#                + ' --field_names_1 ' + ' '.join(src_fields)
-#                + ' --field_names_2 ' + ' '.join(reg_fields)
-#                + ' --training_file ' + directories['manual_training_file'].format(region_dir, proc_type)
-#                + ' --output_file ' + directories['match_output_file'].format(region_dir, proc_type) + ' '
-#                + str(train[0])
-#                ]
-#         p = subprocess.Popen(cmd, shell=True)
-#
-#         p.wait()
-#         df = pd.read_csv(directories['match_output_file'].format(region_dir, proc_type),
-#                          usecols=['id', 'src_name', 'src_address', 'src_name_adj', 'src_address_adj', 'reg_id', 'reg_name',
-#                                   'reg_name_adj','reg_address_adj',
-#                                   'reg_address', 'reg_address_adj', 'srcjoinfields', 'regjoinfields'],
-#                          dtype={'id': np.str, 'src_name': np.str, 'src_address': np.str, 'src_name_adj': np.str, 'src_address_adj': np.str,
-#                                 'reg_id': np.str, 'reg_name': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str, 'srcjoinfields':np.str, 'regjoinfields':np.str})
-#         df = df[pd.notnull(df['src_name'])]
-#         df.to_csv(directories['match_output_file'].format(region_dir, proc_type), index=False)

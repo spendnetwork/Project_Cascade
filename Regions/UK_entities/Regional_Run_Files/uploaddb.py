@@ -24,7 +24,7 @@ def addDataToTable():
     '''
 
     conn, cur = createConnection()
-    files = glob.glob(os.path.join('/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/Uploads', '*'))
+    files = glob.glob(os.path.join('/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/Verified_Matches', '*'))
     for upload_file in files:
         with open(upload_file, 'r') as f:
             # Get headers dynamically

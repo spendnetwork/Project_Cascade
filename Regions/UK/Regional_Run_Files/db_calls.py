@@ -28,7 +28,7 @@ class DbCalls(Main):
         :return: None
         '''
         upload_file = pd.read_csv(
-            self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+            self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
             usecols=self.dbUpload_cols)
 
         # # Filter manual matches file to just confirmed Yes matches and non-blank org id's

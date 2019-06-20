@@ -234,7 +234,7 @@ class VerificationAndUploads(Main):
                 assert not self.in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
 
                 conv_file = pd.read_csv(
-                    self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+                    self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                     usecols=self.training_cols)
 
                 try :
@@ -285,7 +285,7 @@ class VerificationAndUploads(Main):
 
             print("Saving...")
             manual_match_file.to_csv(
-                self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+                self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
             # return manual_match_file
 
@@ -293,7 +293,7 @@ class VerificationAndUploads(Main):
         else:
 
             manual_match_file.to_csv(
-                self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+                self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
 
             # return manual_match_file
@@ -301,7 +301,7 @@ class VerificationAndUploads(Main):
         if not self.in_args.upload:
             print(
                 "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
-                    self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
+                    self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
                         self.best_config) + '.csv'))
 #
 # def extractionAndUploads(configs, proc_type, in_args,stat_file, region_dir, directories, settings, convert_training, db_calls):
@@ -330,7 +330,7 @@ class VerificationAndUploads(Main):
 #             assert not in_args.recycle, "Failed as convert flag to be used for name_only. Run excluding --recycle flag."
 #
 #             conv_file = pd.read_csv(
-#                 directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
+#                 directories['unverified_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
 #                 usecols=settings.training_cols)
 #
 #             # Convert manual matches file to training json file for use in --recycle (next proc_type i.e. name & address)
@@ -498,7 +498,7 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #         manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 #
 #         print("Saving...")
-#         manual_match_file.to_csv(directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
+#         manual_match_file.to_csv(directories['unverified_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
 #                                  index=False,
 #                                  # columns=['reg_id', 'id', 'reg_name',
 #                                  #          'src_name','reg_address', 'src_address', 'leven_dist_N', 'leven_dist_NA','Manual_Match_N','Manual_Match_NA'])
@@ -508,7 +508,7 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #         return manual_match_file
 #
 #     else:
-#         manual_match_file.to_csv(directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
+#         manual_match_file.to_csv(directories['unverified_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
 #                                  index=False,
 #                                  # columns=['reg_id', 'id', 'reg_name',
 #                                  #          'src_name', 'reg_address', 'src_address', 'leven_dist_N', 'leven_dist_NA',
@@ -518,11 +518,11 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #         if not in_args.recycle:
 #             if not in_args.upload:
 #                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
-#                 directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'))
+#                 directories['unverified_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'))
 #         else:
 #             if not in_args.upload:
 #                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --recycle --upload".format(
-#                     directories['manual_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'))
+#                     directories['unverified_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'))
 
 
 # def matching(configs, proc_type, df_dtypes, proc_num, directories, in_args, region_dir, runfile_mods):

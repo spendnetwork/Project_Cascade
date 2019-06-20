@@ -26,13 +26,13 @@ dirs = {
                   "extract_matches_file": "{0}/Outputs/{1}/Extracted_Matches/Extracted_Matches",
                   "stats_file": "{0}/Outputs/{1}/Extracted_Matches/Matches_Stats_{1}.csv",
 
-                  "manual_matches_file": "{0}/Outputs/{1}/Manual_Matches/Manual_Matches",
+                  "unverified_matches_file": "{0}/Outputs/{1}/Unverified_Matches/{2}_matches.csv",
                   "manual_training_file": "{0}/Data_Inputs/Training_Files/{1}/Matching/matching_training.json",
                   "manual_matching_train_backup": "{0}/Data_Inputs/Training_Files/Manual_&_Backups/manual_matching_training.json",
                   "backups_dir": "{0}/Data_Inputs/Training_Files/Manual_&_Backups",
                   "cluster_training_backup": "{0}/Data_Inputs/Training_Files/Manual_&_Backups/cluster_training_backup.json",
-                  "manual_matches_dir": "{0}/Outputs/{1}/Manual_Matches/",
-                  "uploads_dir": "{0}/Outputs/{1}/Uploads/",
+                  "unverified_matches_dir": "{0}/Outputs/{1}/Unverified_Matches/",
+                  "verified_matches_dir": "{0}/Outputs/{1}/Verified_Matches/",
 
 
             }}

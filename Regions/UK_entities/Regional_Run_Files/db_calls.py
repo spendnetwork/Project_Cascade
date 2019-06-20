@@ -37,7 +37,7 @@ class DbCalls(Main):
         '''
 
         conn, cur = self.createConnection()
-        files = glob.glob(os.path.join(self.directories['uploads_dir'].format(self.region_dir, self.proc_type),'*'))
+        files = glob.glob(os.path.join(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type),'*'))
         for upload_file in files:
             with open(upload_file, 'r') as f:
                 # Get headers dynamically
@@ -204,7 +204,7 @@ class AwsTransfers(Main):
         '''
 
         if self.in_args.prodn_unverified:
-            files = glob.glob(os.path.join(self.directories['manual_matches_dir'].format(self.region_dir, self.proc_type), '*'))
+            files = glob.glob(os.path.join(self.directories['unverified_matches_dir'].format(self.region_dir, self.proc_type), '*'))
 
             for filepath in files:
                 filename = os.path.basename(filepath)
@@ -212,8 +212,6 @@ class AwsTransfers(Main):
 
         if self.in_args.prodn_verified:
             self.download_verified_files()
-        # Delete this file, with the given prefix from both the verified and unverified folders in s3
-        # Transfer any files in uploads folder to uk_entities table.
 
     def download_verified_files(self):
         # Scan s3 verified folder for files
@@ -225,11 +223,22 @@ class AwsTransfers(Main):
 
         # For any files in verified - transfer them to the Uploads folder within the normal google box
         for i in range(len(files)):
-            s3.download_file('sn-orgmatching',
+            s3.download_file(self.bucket,
                              files[i]['Key'],
-                             os.path.join(self.directories['uploads_dir'].format(self.region_dir,
+                             os.path.join(self.directories['verified_matches_dir'].format(self.region_dir,
                                                                                  self.proc_type),
                                           os.path.basename(files[i]['Key'])))
+
+            # Delete from verified folder once re-uploaded to webapps
+            s3.delete_object(Bucket=self.bucket, Key=files[i]['Key'])
+
+            try:
+                # Delete from unverified folder so team know which haven't been verified yet (located via date prefix of verified file incase of name change by team)
+                response = s3.list_objects(Bucket=self.bucket, Prefix='Unverified_matches/' + os.path.basename(files[i]['Key'])[:10])
+                file = response['Contents'][:]
+                s3.delete_object(Bucket=self.bucket, Key=file[i]['Key'])
+            except:
+                pass
 
     @staticmethod
     def upload_file(file_name, bucket, object_name=None):

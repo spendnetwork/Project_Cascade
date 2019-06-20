@@ -16,7 +16,7 @@ class ConvertToTraining(Main):
         """
 
         self.conv_file = pd.read_csv(
-                    self.directories['manual_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv', dtype=self.df_dtypes)
+                    self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv', dtype=self.df_dtypes)
         # Filter for matched entries
         self.conv_file = self.conv_file[pd.notnull(self.conv_file['Manual_Match_NA'])]
         manualdict = {}
