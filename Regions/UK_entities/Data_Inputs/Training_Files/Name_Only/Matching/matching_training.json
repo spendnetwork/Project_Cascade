@@ -1,0 +1,741 @@
+{
+  "distinct": [
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "ministry of defence, air support, c17 command support and airborne equipment project team (csae pt)",
+          "src_tag": "['award']",
+          "src_name_adj": "ministry of defence air support c17 command support and airborne equipment project team csae pt",
+          "src_address_adj": "walnut 2b abbey wood bristol bs34 8jh united kingdom",
+          "src_joinfields": "ministry of defence air support c17 command support and airborne equipment project team csae pt walnut 2b abbey wood bristol bs34 8jh united kingdom"
+        },
+        {
+          "src_name_adj": "in2action ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination ltd",
+          "src_tag": "['award']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "24hr central car hire ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "foodbuy, a trading division of compass contract services (uk) ltd, acting as agent on behalf of supply chain coordination ltd (\u201csccl\u201d) who are the management function of nhs supply chain on behalf of the department of health",
+          "src_tag": "['tender']",
+          "src_name_adj": "foodbuy a trading division of compass contract services uk ltd acting as agent on behalf of supply chain coordination ltd \u201csccl\u201d who are the management function of nhs supply chain on behalf of the department of health",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "foodbuy a trading division of compass contract services uk ltd acting as agent on behalf of supply chain coordination ltd \u201csccl\u201d who are the management function of nhs supply chain on behalf of the department of health co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "department of health social services and public safety northern ireland"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "department for environment, food & rural affairs",
+          "src_tag": "['tender']",
+          "src_name_adj": "department for environment food rural affairs",
+          "src_address_adj": "ahdb stoneleigh park kenilworth warwickshire cv8 2lz england",
+          "src_joinfields": "department for environment food rural affairs ahdb stoneleigh park kenilworth warwickshire cv8 2lz england"
+        },
+        {
+          "src_name_adj": "department for international development overseas superannuation"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
+          "src_tag": "['planning']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "k9 meals on wheels ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination ltd",
+          "src_tag": "['award']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "milestone 22 ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "thames valley housing association ltd (tvh) and metropolitan housing trust ltd (mht) trading as metropolitan thames valley",
+          "src_tag": "['award']",
+          "src_name_adj": "thames valley housing association ltd tvh and metropolitan housing trust ltd mht trading as metropolitan thames valley",
+          "src_address_adj": "premier house 52 london road twickenham tw1 3rp united kingdom",
+          "src_joinfields": "thames valley housing association ltd tvh and metropolitan housing trust ltd mht trading as metropolitan thames valley premier house 52 london road twickenham tw1 3rp united kingdom"
+        },
+        {
+          "src_name_adj": "stvincents housing association ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination ltd",
+          "src_tag": "['award']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "10ace ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
+          "src_tag": "['planning']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "mack 1 ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "department for education : department for education",
+          "src_tag": "['award']",
+          "src_name_adj": "department for education department for education",
+          "src_address_adj": "floor 9 the capital building old hall street liverpool l3 9pp england",
+          "src_joinfields": "department for education department for education floor 9 the capital building old hall street liverpool l3 9pp england"
+        },
+        {
+          "src_name_adj": "department for communities and local government"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
+          "src_tag": "['planning']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "csk support 24 ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination ltd",
+          "src_tag": "['award']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "025 nursery ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "ps043 the provision of occupational health services for university students: a professional and confidential student health screening and inoculation service",
+          "src_tag": "['tender']",
+          "src_name_adj": "ps043 the provision of occupational health services for university students a professional and confidential student health screening and inoculation service",
+          "src_address_adj": "birmingham city university university house 15 bartholomew row birmingham b5 5ju united kingdom",
+          "src_joinfields": "ps043 the provision of occupational health services for university students a professional and confidential student health screening and inoculation service birmingham city university university house 15 bartholomew row birmingham b5 5ju united kingdom"
+        },
+        {
+          "src_name_adj": "pgba2 ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
+          "src_tag": "['planning']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "gen2 property ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination ltd",
+          "src_tag": "['award']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "sgc services uk ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain collaborative procurement partnership llp (acting on behalf of supply chain coordination ltd (sccl) whose registered office is at skipton house, 80 london road, london, se1 6lh",
+          "src_tag": "['tender']",
+          "src_name_adj": "nhs supply chain collaborative procurement partnership llp acting on behalf of supply chain coordination ltd sccl whose registered office is at skipton house 80 london road london se1 6lh",
+          "src_address_adj": "nhs supply chain cpp llp 2nd floor don valley house savile street east sheffield s4 7uq united kingdom",
+          "src_joinfields": "nhs supply chain collaborative procurement partnership llp acting on behalf of supply chain coordination ltd sccl whose registered office is at skipton house 80 london road london se1 6lh nhs supply chain cpp llp 2nd floor don valley house savile street east sheffield s4 7uq united kingdom"
+        },
+        {
+          "src_name_adj": "6thvision ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
+          "src_tag": "['planning']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "contact plus 24 ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination ltd",
+          "src_tag": "['award']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "carevehicle 1 ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "foodbuy, a trading division of compass contract services (uk) ltd, acting as agent on behalf of supply chain coordination ltd(\u201csccl\") who are the management function of nhs supply chain on behalf of the department of health.",
+          "src_tag": "['award']",
+          "src_name_adj": "foodbuy a trading division of compass contract services uk ltd acting as agent on behalf of supply chain coordination ltd\u201csccl who are the management function of nhs supply chain on behalf of the department of health",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "foodbuy a trading division of compass contract services uk ltd acting as agent on behalf of supply chain coordination ltd\u201csccl who are the management function of nhs supply chain on behalf of the department of health co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "pbm contracting ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "business services organisation, procurement and logistics service on behalf of the belfast health and social care trust, northern health and social care trust, western health and social care trust, south eastern health and social care trust and southern health and social care trust.",
+          "src_tag": "['tender']",
+          "src_name_adj": "business services organisation procurement and logistics service on behalf of the belfast health and social care trust northern health and social care trust western health and social care trust south eastern health and social care trust and southern health and social care trust",
+          "src_address_adj": "77 boucher crescent belfast bt12 6hu united kingdom",
+          "src_joinfields": "business services organisation procurement and logistics service on behalf of the belfast health and social care trust northern health and social care trust western health and social care trust south eastern health and social care trust and southern health and social care trust 77 boucher crescent belfast bt12 6hu united kingdom"
+        },
+        {
+          "src_name_adj": "turfmech machinery ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "foodbuy, a trading division of compass contract services (uk) ltd, acting as agent on behalf of supply chain coordination ltd (\u201csccl\u201d) who are the management function of nhs supply chain on behalf of the department of health",
+          "src_tag": "['tender']",
+          "src_name_adj": "foodbuy a trading division of compass contract services uk ltd acting as agent on behalf of supply chain coordination ltd \u201csccl\u201d who are the management function of nhs supply chain on behalf of the department of health",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "foodbuy a trading division of compass contract services uk ltd acting as agent on behalf of supply chain coordination ltd \u201csccl\u201d who are the management function of nhs supply chain on behalf of the department of health co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "p m services uk ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain collaborative procurement partnership llp (acting on behalf of supply chain coordination ltd (sccl) whose registered office is at skipton house, 80 london road, london, se1 6lh",
+          "src_tag": "['tender']",
+          "src_name_adj": "nhs supply chain collaborative procurement partnership llp acting on behalf of supply chain coordination ltd sccl whose registered office is at skipton house 80 london road london se1 6lh",
+          "src_address_adj": "nhs supply chain cpp llp 2nd floor don valley house savile street east sheffield s4 7uq united kingdom",
+          "src_joinfields": "nhs supply chain collaborative procurement partnership llp acting on behalf of supply chain coordination ltd sccl whose registered office is at skipton house 80 london road london se1 6lh nhs supply chain cpp llp 2nd floor don valley house savile street east sheffield s4 7uq united kingdom"
+        },
+        {
+          "src_name_adj": "av3 plugins ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "bristol and weston purchasing consortium on behalf of north bristol nhs trust",
+          "src_tag": "['tender']",
+          "src_name_adj": "bristol and weston purchasing consortium on behalf of north bristol nft",
+          "src_address_adj": null,
+          "src_joinfields": null
+        },
+        {
+          "src_name_adj": "bristol foyer"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
+          "src_tag": "['planning']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "j deane construction ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination ltd",
+          "src_tag": "['award']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "beeline taxis 09 ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "invitation to tender for the provision of lot 1: food waste treatment services and/or lot 2: garden waste treatment services",
+          "src_tag": "['tender']",
+          "src_name_adj": "invitation to tender for the provision of lot 1 food waste treatment services andor lot 2 garden waste treatment services",
+          "src_address_adj": null,
+          "src_joinfields": null
+        },
+        {
+          "src_name_adj": "imago 2 ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "supply of natural gas to inspiration trust 01/06/19 x 1 and 01/10/19 x 25 meters",
+          "src_tag": "['tender']",
+          "src_name_adj": "supply of natural gas to inspiration trust 010619 x 1 and 011019 x 25 meters",
+          "src_address_adj": "inspiration trust weights and measures building 28 bethel street norwich nr2 1nr united kingdom",
+          "src_joinfields": "supply of natural gas to inspiration trust 010619 x 1 and 011019 x 25 meters inspiration trust weights and measures building 28 bethel street norwich nr2 1nr united kingdom"
+        },
+        {
+          "src_name_adj": "p1m ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "thames valley police",
+          "src_tag": "['planning']",
+          "src_name_adj": "thames valley police",
+          "src_address_adj": "thames valley police procurement services operational meadow house hq north kidlington ox5 1nz england",
+          "src_joinfields": "thames valley police thames valley police procurement services operational meadow house hq north kidlington ox5 1nz england"
+        },
+        {
+          "src_name_adj": "thames valley family mediation service ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
+          "src_tag": "['planning']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "enterprising 4 change ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "greater manchester combined authority \u2014 greater manchester police",
+          "src_tag": "['tender']",
+          "src_name_adj": "greater manchester combined authority \u2014 greater manchester police",
+          "src_address_adj": "openshaw complex lawton street openshaw manchester m11 2ns united kingdom",
+          "src_joinfields": "greater manchester combined authority \u2014 greater manchester police openshaw complex lawton street openshaw manchester m11 2ns united kingdom"
+        },
+        {
+          "src_name_adj": "greater together"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "north east london foundation trust and barnet enfield and haringey nhs trust",
+          "src_tag": "['tender']",
+          "src_name_adj": "north east london foundation trust and barnet enfield and haringey nft",
+          "src_address_adj": "west wing ceme innovation centre marsh way rainham rm13 8gq england",
+          "src_joinfields": "north east london foundation trust and barnet enfield and haringey nft west wing ceme innovation centre marsh way rainham rm13 8gq england"
+        },
+        {
+          "src_name_adj": "one north east london"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "invitation to tender for the provision of lot 1: food waste treatment services and/or lot 2: garden waste treatment services",
+          "src_tag": "['tender']",
+          "src_name_adj": "invitation to tender for the provision of lot 1 food waste treatment services andor lot 2 garden waste treatment services",
+          "src_address_adj": null,
+          "src_joinfields": null
+        },
+        {
+          "src_name_adj": "bus 2 ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "west midlands police",
+          "src_tag": "['tender']",
+          "src_name_adj": "west midlands police",
+          "src_address_adj": "police headquarters lloyd house colmore circus q birmingham west midlands b4 6nq united kingdom",
+          "src_joinfields": "west midlands police police headquarters lloyd house colmore circus q birmingham west midlands b4 6nq united kingdom"
+        },
+        {
+          "src_name_adj": "west midlands training services uk ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "leicester college",
+          "src_tag": "['tenderamendment']",
+          "src_name_adj": "leicester college",
+          "src_address_adj": "welford road leicester le2 7lw england",
+          "src_joinfields": "leicester college welford road leicester le2 7lw england"
+        },
+        {
+          "src_name_adj": "leicester holme project ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain collaborative procurement partnership llp (acting on behalf of supply chain coordination ltd (sccl) whose registered office is at skipton house, 80 london road, london, se1 6lh",
+          "src_tag": "['tender']",
+          "src_name_adj": "nhs supply chain collaborative procurement partnership llp acting on behalf of supply chain coordination ltd sccl whose registered office is at skipton house 80 london road london se1 6lh",
+          "src_address_adj": "nhs supply chain cpp llp 2nd floor don valley house savile street east sheffield s4 7uq united kingdom",
+          "src_joinfields": "nhs supply chain collaborative procurement partnership llp acting on behalf of supply chain coordination ltd sccl whose registered office is at skipton house 80 london road london se1 6lh nhs supply chain cpp llp 2nd floor don valley house savile street east sheffield s4 7uq united kingdom"
+        },
+        {
+          "src_name_adj": "ad2 realisations ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
+          "src_tag": "['planning']",
+          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
+          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
+          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
+        },
+        {
+          "src_name_adj": "rural development services uk ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "amog consulting ltd",
+          "src_tag": "['tenderamendment']",
+          "src_name_adj": "amog consulting ltd",
+          "src_address_adj": "hilltop marlpits lane ninfield battle tn339ld england",
+          "src_joinfields": "amog consulting ltd hilltop marlpits lane ninfield battle tn339ld england"
+        },
+        {
+          "src_name_adj": "slalom consulting ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs property services",
+          "src_tag": "['tender']",
+          "src_name_adj": "nhs property services",
+          "src_address_adj": "nhs property services 99 gresham street london ec2v 7ng united kingdom",
+          "src_joinfields": "nhs property services nhs property services 99 gresham street london ec2v 7ng united kingdom"
+        },
+        {
+          "src_name_adj": "norbury property services london ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs england north (greater manchester health and social care partnership)",
+          "src_tag": "['tender']",
+          "src_name_adj": "nhs england north greater manchester health and social care partnership",
+          "src_address_adj": "3 piccadilly place london road manchester m1 3bn england",
+          "src_joinfields": "nhs england north greater manchester health and social care partnership 3 piccadilly place london road manchester m1 3bn england"
+        },
+        {
+          "src_name_adj": "pdp ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nhs supply chain acting as agent for supply chain coordination ltd",
+          "src_tag": "['tender']",
+          "src_name_adj": "nhs supply chain acting as agent for supply chain coordination ltd",
+          "src_address_adj": "wilderspool park stockton heath warrington wa4 6hl united kingdom",
+          "src_joinfields": "nhs supply chain acting as agent for supply chain coordination ltd wilderspool park stockton heath warrington wa4 6hl united kingdom"
+        },
+        {
+          "src_name_adj": "pbld ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "one of or all of the following councils; causeway coast and glens borough council and derry city and strabane district council on behalf of the north west region waste management group",
+          "src_tag": "['tender']",
+          "src_name_adj": "one of or all of the following councils causeway coast and glens borough council and derry city and strabane district council on behalf of the north west region waste management group",
+          "src_address_adj": "98 strand road derry bt48 7nn united kingdom",
+          "src_joinfields": "one of or all of the following councils causeway coast and glens borough council and derry city and strabane district council on behalf of the north west region waste management group 98 strand road derry bt48 7nn united kingdom"
+        },
+        {
+          "src_name_adj": "leigh mather sales ltd"
+        }
+      ]
+    }
+  ],
+  "match": [
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "countess of chester hospital",
+          "src_tag": "['tender']",
+          "src_name_adj": "countess of chester hospital",
+          "src_address_adj": "liverpool road chester ch21ul england",
+          "src_joinfields": "countess of chester hospital liverpool road chester ch21ul england"
+        },
+        {
+          "src_name_adj": "countess of chester hospital nhsft"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "student loans company",
+          "src_tag": "['tenderamendment']",
+          "src_name_adj": "student loans company",
+          "src_address_adj": "100 bothwell street glasgow g2 7jd united kingdom",
+          "src_joinfields": "student loans company 100 bothwell street glasgow g2 7jd united kingdom"
+        },
+        {
+          "src_name_adj": "student loans company ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "m h s homes ltd",
+          "src_tag": "['tenderamendment']",
+          "src_name_adj": "m h s homes ltd",
+          "src_address_adj": "broadside leviathan way chatham me4 4ll england",
+          "src_joinfields": "m h s homes ltd broadside leviathan way chatham me4 4ll england"
+        },
+        {
+          "src_name_adj": "mhs homes ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "durham university",
+          "src_tag": "['tenderamendment']",
+          "src_name_adj": "durham university",
+          "src_address_adj": "stockton road durham dh1 3le england",
+          "src_joinfields": "durham university stockton road durham dh1 3le england"
+        },
+        {
+          "src_name_adj": "durham university developments ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "kingston university",
+          "src_tag": "['tender']",
+          "src_name_adj": "kingston university",
+          "src_address_adj": "high street kingston upon thames surrey kt1 1lq united kingdom",
+          "src_joinfields": "kingston university high street kingston upon thames surrey kt1 1lq united kingdom"
+        },
+        {
+          "src_name_adj": "kingston university campus enterprises ltd"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "barnardo&#39;s",
+          "src_tag": "['tender']",
+          "src_name_adj": "barnardo39s",
+          "src_address_adj": "tanners lane ilford ig61qg england",
+          "src_joinfields": "barnardo39s tanners lane ilford ig61qg england"
+        },
+        {
+          "src_name_adj": "barnardos"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "nuneaton and bedworth council",
+          "src_tag": "['award']",
+          "src_name_adj": "nuneaton and bedworth council",
+          "src_address_adj": "gresham road depot bermuda industrial estate nuneaton cv10 7qr united kingdom",
+          "src_joinfields": "nuneaton and bedworth council gresham road depot bermuda industrial estate nuneaton cv10 7qr united kingdom"
+        },
+        {
+          "src_name_adj": "nuneaton bedworth council for voluntary service"
+        }
+      ]
+    },
+    {
+      "__class__": "tuple",
+      "__value__": [
+        {
+          "src_name": "south east of scotland transport partnership (sestran)",
+          "src_tag": "['tender']",
+          "src_name_adj": "south east of scotland transport partnership sestran",
+          "src_address_adj": "area 3d bridge victoria quay edinburgh eh6 6qq united kingdom",
+          "src_joinfields": "south east of scotland transport partnership sestran area 3d bridge victoria quay edinburgh eh6 6qq united kingdom"
+        },
+        {
+          "src_name_adj": "southeast of scotland transport partnership sestran"
+        }
+      ]
+    }
+  ]
+}
