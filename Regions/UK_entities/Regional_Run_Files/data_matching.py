@@ -6,7 +6,8 @@ from shutil import copyfile
 import pdb
 from runfile import Main
 from datetime import datetime
-
+from csvdedupe.csvlink import launch_new_instance
+import sys
 
 class Matching(Main):
     def __init__(self, settings, src_df, reg_df):
@@ -99,6 +100,19 @@ class Matching(Main):
 
             p = subprocess.Popen(cmd, shell=True)
             p.wait()
+
+            # sys.argv = ['/Users/davidmellor/Code/Spend_Network/Data_Projects/csvdedupe/csvdedupe/csvlink.py',
+            #             'csvlink'
+            #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Data_Inputs/Adj_Data/src_data_adj.csv',
+            #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Data_Inputs/Adj_Data/reg_data_adj.csv',
+            #             '--field_names_1', 'src_name_adj', '--field_names_2', 'reg_name_adj', '--training_file',
+            #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Data_Inputs/Training_Files/Name_Only/Matching/matching_training.json',
+            #             '--output_file',
+            #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/Deduped_Data/Name_Only_matched.csv',
+            #             '--skip_training']
+
+
+            launch_new_instance()
 
             df = pd.read_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type),
                              usecols=self.dedupe_cols,
