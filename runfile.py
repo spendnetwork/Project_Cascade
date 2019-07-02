@@ -154,7 +154,6 @@ class Main:
                                 if in_args.region == 'UK':
                                     clust_df = self.data_matching.Matching(self, src_df).dedupe()
                                 else:
-
                                     clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
 
                                 # EXTRACTS FUNCTION IS TAKING ONLY LEV DIST 100 MATCHES ON THE FIRST ITERATION AND NOT ADDING ANY MORE AFTER AT

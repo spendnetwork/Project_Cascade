@@ -6,7 +6,8 @@ from shutil import copyfile
 import pdb
 from runfile import Main
 from datetime import datetime
-from csvdedupe.csvlink import launch_new_instance
+from csvdedupe.csvlink import launch_new_instance as launch_matching
+from csvdedupe.csvdedupe import launch_new_instance as launch_clustering
 import sys
 
 class Matching(Main):
@@ -80,27 +81,27 @@ class Matching(Main):
                          self.directories['manual_training_file'].format(self.region_dir, self.proc_type))
 
             # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
-            if os.path.exists('./learned_settings'):
-                os.remove('./learned_settings')
-
-            if os.path.exists('./csvdedupe/csvdedupe/learned_settings'):
-                os.remove('./csvdedupe/csvdedupe/learned_settings')
+            # if os.path.exists('./learned_settings'):
+            #     os.remove('./learned_settings')
+            #
+            # if os.path.exists('./csvdedupe/csvdedupe/learned_settings'):
+            #     os.remove('./csvdedupe/csvdedupe/learned_settings')
 
             print("Starting matching...")
 
-            cmd = ['csvlink '
-                   + str(src_file) + ' '
-                   + str(reg_df)
-                   + ' --field_names_1 ' + ' '.join(src_fields)
-                   + ' --field_names_2 ' + ' '.join(reg_fields)
-                   + ' --training_file ' + self.directories['manual_training_file'].format(self.region_dir, self.proc_type)
-                   + ' --output_file ' + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
-                   + str(train[0])
-                   ]
-
-            p = subprocess.Popen(cmd, shell=True)
-            p.wait()
-
+            # cmd = ['csvlink '
+            #        + str(src_file) + ' '
+            #        + str(reg_df)
+            #        + ' --field_names_1 ' + ' '.join(src_fields)
+            #        + ' --field_names_2 ' + ' '.join(reg_fields)
+            #        + ' --training_file ' + self.directories['manual_training_file'].format(self.region_dir, self.proc_type)
+            #        + ' --output_file ' + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
+            #        + str(train[0])
+            #        ]
+            #
+            # p = subprocess.Popen(cmd, shell=True)
+            # p.wait()
+            #
             # sys.argv = ['/Users/davidmellor/Code/Spend_Network/Data_Projects/csvdedupe/csvdedupe/csvlink.py',
             #             'csvlink'
             #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Data_Inputs/Adj_Data/src_data_adj.csv',
@@ -111,8 +112,17 @@ class Matching(Main):
             #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/Deduped_Data/Name_Only_matched.csv',
             #             '--skip_training']
 
+            sys.argv = [
+                        'csvlink',
+                        str(src_file),
+                        str(reg_df),
+                        '--field_names_1', ' '.join(src_fields), '--field_names_2', ' '.join(reg_fields), '--training_file',
+                        self.directories['manual_training_file'].format(self.region_dir, self.proc_type),
+                        '--output_file',
+                        self.directories['match_output_file'].format(self.region_dir, self.proc_type),
+                        str(train[0])]
 
-            launch_new_instance()
+            launch_matching()
 
             df = pd.read_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type),
                              usecols=self.dedupe_cols,
@@ -128,14 +138,40 @@ class Matching(Main):
                          self.directories['cluster_training_file'].format(self.region_dir, self.proc_type))
 
             print("Starting clustering...")
-            cmd = ['python csvdedupe.py '
-                   + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
-                   + ' --field_names ' + ' '.join(src_fields) + ' '
-                   + str(train[0])
-                   + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir, self.proc_type)
-                   + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)]
-            p = subprocess.Popen(cmd, cwd=os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
-            p.wait()  # wait for subprocess to finish
+
+            # cmd = ['python csvdedupe.py '
+            #        + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
+            #        + ' --field_names ' + ' '.join(src_fields) + ' '
+            #        + str(train[0])
+            #        + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir, self.proc_type)
+            #        + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)]
+
+            # cmd = ['csvdedupe '
+            #        + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
+            #        + ' --field_names ' + ' '.join(src_fields) + ' '
+            #        + str(train[0])
+            #        + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir,
+            #                                                                                 self.proc_type)
+            #        + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir,
+            #                                                                             self.proc_type)]
+
+            # p = subprocess.Popen(cmd, cwd=os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
+            # p = subprocess.Popen(cmd, shell=True)
+            # p.wait()  # wait for subprocess to finish
+
+            sys.argv = [
+                        'csvdedupe',
+                        self.directories['match_output_file'].format(self.region_dir, self.proc_type),
+                        '--field_names',
+                        ' '.join(src_fields),
+                        str(train[0]),
+                        '--training_file',
+                        self.directories['cluster_training_file'].format(self.region_dir, self.proc_type),
+                        '--output_file',
+                        self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)
+                        ]
+
+            launch_clustering()
 
             if not self.in_args.recycle:
                 # Copy training file to backup, so it can be found and copied into recycle phase clustering
