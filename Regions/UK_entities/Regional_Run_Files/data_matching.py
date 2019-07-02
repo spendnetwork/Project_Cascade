@@ -79,7 +79,7 @@ class Matching(Main):
                 # Copy manual matching file over to build on for clustering
                 copyfile(self.directories['manual_matching_train_backup'].format(self.region_dir),
                          self.directories['manual_training_file'].format(self.region_dir, self.proc_type))
-
+            # DO NOT UNCOMMENT - CAUSES BUG
             # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
             # if os.path.exists('./learned_settings'):
             #     os.remove('./learned_settings')
