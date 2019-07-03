@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a8df3694a74b69b9a8dd2fb5b8547bc98e723130b9b77c0ff93bfe0895382add"
+            "sha256": "23758a3944da396fde5fafe3490bc5825e7d77e5ab45e18ac9d939e23f75801b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -164,6 +164,7 @@
         "csvdedupe": {
             "editable": true,
             "git": "https://www.github.com/DMells/csvdedupe",
+
             "ref": "1b7cb22458dcf5a7e9df9f0098b1ba711bb5fd96"
         },
         "datetime-distance": {

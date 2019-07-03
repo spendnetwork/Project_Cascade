@@ -15,9 +15,9 @@ python-dotenv = "*"
 psycopg2-binary = "*"
 pytest = "*"
 pandas = "*"
-csvdedupe = {editable = true,git = "https://www.github.com/DMells/csvdedupe"}
 chwrapper = "*"
 boto3 = "*"
+csvdedupe = {editable = true,git = "https://www.github.com/dmells/csvdedupe"}
 
 [requires]
 python_version = "3.6"
