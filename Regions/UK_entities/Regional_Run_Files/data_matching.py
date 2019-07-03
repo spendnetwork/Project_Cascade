@@ -120,7 +120,8 @@ class Matching(Main):
                         self.directories['manual_training_file'].format(self.region_dir, self.proc_type),
                         '--output_file',
                         self.directories['match_output_file'].format(self.region_dir, self.proc_type),
-                        str(train[0])]
+                        str(train[0])
+            ]
 
             launch_matching()
 
