@@ -111,13 +111,14 @@ class Matching(Main):
             #             '--output_file',
             #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/Deduped_Data/Name_Only_matched.csv',
             #             '--skip_training']
-
             sys.argv = [
                         'csvlink',
                         str(src_file),
                         str(reg_df),
                         '--field_names_1', ' '.join(src_fields), '--field_names_2', ' '.join(reg_fields), '--training_file',
                         self.directories['manual_training_file'].format(self.region_dir, self.proc_type),
+                        '--sample_size', '500',
+                        '--settings_file','/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/learned_settings',
                         '--output_file',
                         self.directories['match_output_file'].format(self.region_dir, self.proc_type),
                         str(train[0])

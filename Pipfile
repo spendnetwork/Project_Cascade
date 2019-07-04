@@ -17,7 +17,7 @@ pytest = "*"
 pandas = "*"
 chwrapper = "*"
 boto3 = "*"
-csvdedupe = {editable = true,git = "https://www.github.com/dmells/csvdedupe"}
+csvdedupe = {git = "https://www.github.com/dmells/csvdedupe"}
 
 [requires]
 python_version = "3.6"
