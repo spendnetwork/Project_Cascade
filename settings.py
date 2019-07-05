@@ -135,7 +135,7 @@ class UK_entities(UK_Settings):
                             'reg_scheme']
 
 
-class CQC_settings(UK_Settings):
+class CQC_settings(UK_entities):
 
     def __init__(self):
         super().__init__(self)
@@ -157,6 +157,6 @@ class CQC_settings(UK_Settings):
 
     raw_src_data_cols = ['src_name']
 
-    dedupe_cols = ['src_name', 'reg_name', 'reg_id']
+    dedupe_cols = ['src_name','src_name_adj', 'reg_name_adj', 'reg_name', 'reg_id']
 
-    manual_matches_cols = ['src_name', 'reg_name', 'reg_id']
+    manual_matches_cols = ['src_name','src_name_adj', 'reg_name_adj', 'reg_name', 'reg_id']

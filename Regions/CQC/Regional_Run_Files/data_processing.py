@@ -103,10 +103,10 @@ class LevDist(Main):
     	:return ratio: individual levenshtein distance between the registry and source org string
     	"""
         if pd.notnull(row.src_name_short) and pd.notnull(row.reg_name_short):
-            if pd.notnull(row.src_address_adj) and pd.notnull(row.reg_address_adj):
-                return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(fuzz.ratio(row.src_joinfields, row.reg_joinfields))
-            else:
-                return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(0)
+            # if pd.notnull(row.src_address_adj) and pd.notnull(row.reg_address_adj):
+            #     return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(fuzz.ratio(row.src_joinfields, row.reg_joinfields))
+            # else:
+            return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(0)
 
 
 class ProcessSourceData(DataProcessing):
