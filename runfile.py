@@ -191,6 +191,9 @@ if __name__ == '__main__':
     if in_args.region == 'UK_entities':
         settings = settings.UK_entities
 
+    if in_args.region == 'CQC':
+        settings = settings.CQC_settings
+
     settings.in_args = in_args
     settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
 

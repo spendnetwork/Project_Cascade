@@ -1,5 +1,3 @@
-import os
-
 dirs = {
       "dirs":
             {
@@ -33,7 +31,6 @@ dirs = {
                   "cluster_training_backup": "{0}/Data_Inputs/Training_Files/Manual_&_Backups/cluster_training_backup.json",
                   "unverified_matches_dir": "{0}/Outputs/{1}/Unverified_Matches/",
                   "verified_matches_dir": "{0}/Outputs/{1}/Verified_Matches/",
-
 
             }}
 

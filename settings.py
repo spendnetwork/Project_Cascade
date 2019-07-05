@@ -3,6 +3,7 @@ import directories
 from Regions.Italy import Regional_Run_Files as ITA_run_files
 from Regions.UK import Regional_Run_Files as UK_run_files
 from Regions.UK_entities import Regional_Run_Files as UK_ent_run_files
+from Regions.CQC import Regional_Run_Files as CQC_run_files
 
 
 class Italy_Settings:
@@ -90,7 +91,7 @@ class UK_Settings:
 
 class UK_entities(UK_Settings):
 
-    def __init(self):
+    def __init__(self):
         super().__init__(self)
 
     df_dtypes = {'Cluster ID': np.int, 'Confidence Score': np.float,
@@ -116,7 +117,6 @@ class UK_entities(UK_Settings):
                    'reg_id', 'reg_name', 'reg_name_adj', 'reg_address', 'reg_address_adj','src_joinfields', 'reg_joinfields',
                    'reg_source', 'reg_created_at', 'reg_scheme']
 
-
     raw_src_data_cols = ['src_name','src_tag','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress']
 
 
@@ -134,3 +134,28 @@ class UK_entities(UK_Settings):
                             'reg_source',
                             'reg_created_at',
                             'reg_scheme']
+
+class CQC_settings(UK_entities):
+    def __init__(self):
+        super().__init__(self)
+
+    runfile_mods = CQC_run_files
+
+    src_data_source = None
+    reg_data_source = 'uk_data.cqc_hsca_locations'
+    # ocds.cqc_orgs_lookup, ocds.cqc_ratings_locations, ocds.cqc_ratings_providers
+
+    df_dtypes = {'Cluster ID': np.int, 'Confidence Score': np.float,
+                 'src_name': np.str, 'src_name_adj': np.str,
+                 'src_name_short': np.str,
+                 'reg_id': np.str, 'reg_name_adj': np.str,
+                 'reg_name_short': np.str,
+                 'leven_dist_N': np.int, 'leven_dist_NA': np.int,
+                 'Manual_Match_N': np.str, 'Manual_Match_NA': np.str,
+                 }
+
+    raw_src_data_cols = ['src_name']
+
+    dedupe_cols = ['src_name', 'reg_name', 'reg_id']
+
+    manual_matches_cols = ['src_name', 'reg_name', 'reg_id']

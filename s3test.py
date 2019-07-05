@@ -7,10 +7,10 @@ import logging
 from botocore.exceptions import ClientError
 
 # get the remote database details from .env
-# load_dotenv(find_dotenv())
-# aws_access_key_id = os.environ.get("aws_access_key_id")
-# aws_secret_access_key = os.environ.get("aws_secret_access_key")
-# region = os.environ.get("regn")
+load_dotenv(find_dotenv())
+aws_access_key_id = os.environ.get("aws_access_key_id")
+aws_secret_access_key = os.environ.get("aws_secret_access_key")
+region = os.environ.get("regn")
 
 def upload_file(file_name, bucket, object_name=None):
     """Upload a file to an S3 bucket
@@ -37,9 +37,9 @@ def upload_file(file_name, bucket, object_name=None):
 
 if __name__ == '__main__':
 
-    s3 = boto3.client('s3')
+    s3 = boto3.resource('s3')
 
-
+    pdb.set_trace()
     data = open(
         '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/holder/Matches_Buyers_DMadj.csv',
         'rb')

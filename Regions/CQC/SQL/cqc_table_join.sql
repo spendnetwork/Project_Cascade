@@ -1,0 +1,23 @@
+-- SELECT
+-- distinct(t1.location_id) as location_id,
+-- t1.location_name as location_name,
+-- t1.provider_name as provider_name,
+-- t1.provider_id as provider_id,
+-- t1.provider_ch_id as provider_ch_id,
+-- 'cqc_hsca_locations' as table_name
+--
+-- FROM uk_data.cqc_hsca_locations t1
+-- FULL OUTER JOIN
+--   (
+--     SELECT
+--     DISTINCT cqc_location as location_id,
+--     org_string as location_name,
+--     provider_name,
+--     cqc_id as provider_id,
+--     'cqc_orgs_lookup' as table_name
+--     FROM uk_data.cqc_orgs_lookup
+--   ) t2 on t1.location_id = t2.location_id
+--
+-- ORDER BY location_name
+
+select count(distinct(uk_data.cqc_hsca_locations.location_id)) as cqc_hsca_locations from uk_data.cqc_hsca_locations;
