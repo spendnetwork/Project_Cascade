@@ -118,7 +118,7 @@ class Matching(Main):
                         '--field_names_1', ' '.join(src_fields), '--field_names_2', ' '.join(reg_fields), '--training_file',
                         self.directories['manual_training_file'].format(self.region_dir, self.proc_type),
                         '--sample_size', '500',
-                        '--settings_file','/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/learned_settings',
+                        '--settings_file',os.path.join(os.getcwd(), 'learned_settings'),
                         '--output_file',
                         self.directories['match_output_file'].format(self.region_dir, self.proc_type),
                         str(train[0])
@@ -169,6 +169,7 @@ class Matching(Main):
                         str(train[0]),
                         '--training_file',
                         self.directories['cluster_training_file'].format(self.region_dir, self.proc_type),
+                        '--settings_file', os.path.join(os.getcwd(), 'learned_settings'),
                         '--output_file',
                         self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)
                         ]
