@@ -79,6 +79,7 @@ class Matching(Main):
                 # Copy manual matching file over to build on for clustering
                 copyfile(self.directories['manual_matching_train_backup'].format(self.region_dir),
                          self.directories['manual_training_file'].format(self.region_dir, self.proc_type))
+
             # DO NOT UNCOMMENT - CAUSES BUG
             # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
             # if os.path.exists('./learned_settings'):
@@ -89,45 +90,34 @@ class Matching(Main):
 
             print("Starting matching...")
 
-            # cmd = ['csvlink '
-            #        + str(src_file) + ' '
-            #        + str(reg_df)
-            #        + ' --field_names_1 ' + ' '.join(src_fields)
-            #        + ' --field_names_2 ' + ' '.join(reg_fields)
-            #        + ' --training_file ' + self.directories['manual_training_file'].format(self.region_dir, self.proc_type)
-            #        + ' --output_file ' + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
-            #        + str(train[0])
-            #        ]
-            #
-            # p = subprocess.Popen(cmd, shell=True)
-            # p.wait()
-            #
-            # sys.argv = ['/Users/davidmellor/Code/Spend_Network/Data_Projects/csvdedupe/csvdedupe/csvlink.py',
-            #             'csvlink'
-            #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Data_Inputs/Adj_Data/src_data_adj.csv',
-            #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Data_Inputs/Adj_Data/reg_data_adj.csv',
-            #             '--field_names_1', 'src_name_adj', '--field_names_2', 'reg_name_adj', '--training_file',
-            #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Data_Inputs/Training_Files/Name_Only/Matching/matching_training.json',
+            cmd = ['csvlink '
+                   + str(src_file) + ' '
+                   + str(reg_df)
+                   + ' --field_names_1 ' + ' '.join(src_fields)
+                   + ' --field_names_2 ' + ' '.join(reg_fields)
+                   + ' --training_file ' + self.directories['manual_training_file'].format(self.region_dir, self.proc_type)
+                   + ' --output_file ' + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
+                   + str(train[0])
+                   ]
+
+            p = subprocess.Popen(cmd, shell=True)
+            p.wait()
+
+            # sys.argv = [
+            #             'csvlink',
+            #             str(src_file),
+            #             str(reg_df),
+            #             '--field_names_1', ' '.join(src_fields), '--field_names_2', ' '.join(reg_fields), '--training_file',
+            #             self.directories['manual_training_file'].format(self.region_dir, self.proc_type),
+            #             '--sample_size', '500',
             #             '--output_file',
-            #             '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/Deduped_Data/Name_Only_matched.csv',
-            #             '--skip_training']
-
-            sys.argv = [
-                        'csvlink',
-                        str(src_file),
-                        str(reg_df),
-                        '--field_names_1', ' '.join(src_fields), '--field_names_2', ' '.join(reg_fields), '--training_file',
-                        self.directories['manual_training_file'].format(self.region_dir, self.proc_type),
-                        '--sample_size', '500',
-
-                        '--output_file',
-                        self.directories['match_output_file'].format(self.region_dir, self.proc_type),
-                        str(train[0])
-            ]
+            #             self.directories['match_output_file'].format(self.region_dir, self.proc_type),
+            #             str(train[0])
+            # ]
 
             # '--settings_file', os.path.join(os.getcwd(),'learned_settings'),
 
-            launch_matching()
+            # launch_matching()
 
             df = pd.read_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type),
                              usecols=self.dedupe_cols,
@@ -144,39 +134,31 @@ class Matching(Main):
 
             print("Starting clustering...")
 
-            # cmd = ['python csvdedupe.py '
-            #        + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
-            #        + ' --field_names ' + ' '.join(src_fields) + ' '
-            #        + str(train[0])
-            #        + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir, self.proc_type)
-            #        + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)]
+            cmd = ['csvdedupe '
+                   + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
+                   + ' --field_names ' + ' '.join(src_fields) + ' '
+                   + str(train[0])
+                   + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir,
+                                                                                            self.proc_type)
+                   + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir,
+                                                                                        self.proc_type)]
 
-            # cmd = ['csvdedupe '
-            #        + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
-            #        + ' --field_names ' + ' '.join(src_fields) + ' '
-            #        + str(train[0])
-            #        + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir,
-            #                                                                                 self.proc_type)
-            #        + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir,
-            #                                                                             self.proc_type)]
+            p = subprocess.Popen(cmd, shell=True)
+            p.wait()  # wait for subprocess to finish
 
-            # p = subprocess.Popen(cmd, cwd=os.getcwd() + '/csvdedupe/csvdedupe', shell=True)
-            # p = subprocess.Popen(cmd, shell=True)
-            # p.wait()  # wait for subprocess to finish
-
-            sys.argv = [
-                        'csvdedupe',
-                        self.directories['match_output_file'].format(self.region_dir, self.proc_type),
-                        '--field_names',
-                        ' '.join(src_fields),
-                        str(train[0]),
-                        '--training_file',
-                        self.directories['cluster_training_file'].format(self.region_dir, self.proc_type),
-                        '--output_file',
-                        self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)
-                        ]
-
-            launch_clustering()
+            # sys.argv = [
+            #             'csvdedupe',
+            #             self.directories['match_output_file'].format(self.region_dir, self.proc_type),
+            #             '--field_names',
+            #             ' '.join(src_fields),
+            #             str(train[0]),
+            #             '--training_file',
+            #             self.directories['cluster_training_file'].format(self.region_dir, self.proc_type),
+            #             '--output_file',
+            #             self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)
+            #             ]
+            #
+            # launch_clustering()
 
             if not self.in_args.recycle:
                 # Copy training file to backup, so it can be found and copied into recycle phase clustering
