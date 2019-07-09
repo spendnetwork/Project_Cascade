@@ -6,6 +6,7 @@ import string
 from runfile import Main
 import pdb
 
+
 class DataProcessing(Main):
 
     def __init__(self, settings):
@@ -130,6 +131,9 @@ class ProcessSourceData(DataProcessing):
             df = pd.read_csv(raw_data, usecols=self.raw_src_data_cols,
                              dtype=self.df_dtypes)
 
+            df.rename(columns={"supplier_source_string": "src_name", "sum": "src_amount", "count": "src_count"}, inplace=True)
+            df['src_amount'] = df['src_amount'].round(2)
+
             print("Re-organising source data...")
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
@@ -139,19 +143,41 @@ class ProcessSourceData(DataProcessing):
             # Replace organisation suffixes with standardised version
             df[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
-            # # # Remove punctuation and double spacing in address
-            # adj_col = str('src_address_adj')
-            # df[adj_col] = df['src_address_streetaddress'] + ', ' + df['src_address_locality'] + ', ' + df['src_address_postalcode'] + ', ' + df['src_address_countryname']
-            # df = self.remvPunct(df, adj_col, adj_col)
-            # df = self.joinFields(df, 'src')
-            # df = df.drop(['src_address_streetaddress', 'src_address_locality', 'src_address_postalcode',
-            #               'src_address_countryname'], axis=1)
             print("...done")
             df.to_csv(adj_data, index=False)
+
+            # If flag 'split' has been used, split the source file into smaller files
+            if self.in_args.split:
+                chunksize = 1000
+                numberofchunks = len(df) // chunksize + 1
+                for i in range(numberofchunks):
+                    if i == 0:
+                        df[:(i+1)*chunksize].to_csv(os.path.join(os.getcwd(), 'Regions', str(self.in_args.region),
+                                                                 'Data_Inputs','Adj_Data','Splits',
+                                                                 str(self.in_args.src_raw_name)[:-4] + str(i) +
+                                                                 '.csv'),index=False)
+                    else:
+                        df[chunksize*i:(i+1)*chunksize].to_csv(os.path.join(os.getcwd(), 'Regions',
+                                                                            str(self.in_args.region),'Data_Inputs',
+                                                                            'Adj_Data','Splits',
+                                                                            str(self.in_args.src_raw_name)[:-4] +
+                                                                            str(i) + '.csv'),index=False)
         else:
             # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
             df = pd.read_csv(adj_data, dtype=self.df_dtypes)
+
+
         return df
+
+    def split(self):
+        '''
+        To fix out of memory issue - split input source file into smaller files with the intention of running
+        several mini-matching sessions, effectively taking some of the burden off storing large files in memory
+        '''
+        # take source input file from args
+
+        # split input file into smaller files and save these to adj_data/splits
+
 
 
 class ProcessRegistryData(DataProcessing):
@@ -174,10 +200,14 @@ class ProcessRegistryData(DataProcessing):
             print("Re-organising registry data...")
             df = pd.read_csv(raw_data,
                              dtype=self.df_dtypes,
+
                              chunksize=500000)
 
             dffullmerge = pd.DataFrame([])
+
             for chunk in df:
+
+                chunk.rename(columns={"location_name":"reg_name","location_id":"reg_id"}, inplace=True)
 
                 # Remove punctuation and double spacing
                 adj_col = str('reg_name_adj')
@@ -187,28 +217,11 @@ class ProcessRegistryData(DataProcessing):
                 # Replace organisation suffixes with standardised version
                 chunk[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
-                # # Remove punctuation and double spacing in address
-                # adj_col = str('reg_address_adj')
-                # orig_col = str('reg_address')
-                #
-                # # dfmerge = self.remvPunct(dfmerge, orig_col, adj_col)
-                # dfmerge = self.remvPunct(chunk, orig_col, adj_col)
-
-                # dfmerge = self.remvStreetNumber(dfmerge, adj_col)
-                # dfmerge = self.joinFields(dfmerge, 'reg')
-
-                # dffullmerge = pd.concat([dffullmerge, dfmerge], ignore_index=True)
                 dffullmerge = pd.concat([dffullmerge, chunk], ignore_index=True)
 
             dffullmerge.drop_duplicates(inplace=True)
             print("...done")
 
-            # dffullmerge['reg_joinfields'] = dffullmerge['reg_joinfields'].astype(str)
-            # dffullmerge['reg_source'] = dffullmerge['reg_source'].astype(str)
-            # dffullmerge['reg_created_at'] = dffullmerge['reg_created_at'].astype(str)
-            # dffullmerge['reg_scheme'] = dffullmerge['reg_scheme'].astype(str)
-            # dffullmerge['reg_id'] = dffullmerge['reg_id'].astype(str)
-            # dffullmerge['reg_address_adj'] = dffullmerge['reg_address_adj'].astype(str)
             dffullmerge.to_csv(adj_data, index=False)
             return dffullmerge
         else:

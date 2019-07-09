@@ -28,6 +28,8 @@ class Setup:
                 os.makedirs(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type))
         if not os.path.exists(self.directories['deduped_dir'].format(self.region_dir, self.proc_type)):
             os.makedirs(self.directories['deduped_dir'].format(self.region_dir, self.proc_type))
+        if not os.path.exists(self.directories['splits_outputs_dir'].format(self.region_dir, self.proc_type)):
+            os.makedirs(self.directories['splits_outputs_dir'].format(self.region_dir, self.proc_type))
         if not os.path.exists(self.directories['proc_type_train_dir'].format(self.region_dir, self.proc_type)):
             os.makedirs(self.directories['proc_type_train_dir'].format(self.region_dir, self.proc_type))
         if not os.path.exists(self.directories['proc_type_train_clust_dir'].format(self.region_dir, self.proc_type)):
@@ -38,6 +40,7 @@ class Setup:
             os.makedirs(self.directories['proc_type_matches_dir'].format(self.region_dir, self.proc_type))
         if not os.path.exists(self.directories['backups_dir'].format(self.region_dir, self.proc_type)):
             os.makedirs(self.directories['backups_dir'].format(self.region_dir, self.proc_type))
+
         if not os.path.exists(os.path.join(self.region_dir, 'Config_Files')):
             os.makedirs(os.path.join(self.region_dir, 'Config_Files'))
 
@@ -46,6 +49,8 @@ class Setup:
             os.makedirs(self.directories['raw_dir'].format(self.region_dir))
         if not os.path.exists(self.directories['adj_dir'].format(self.region_dir)):
             os.makedirs(self.directories['adj_dir'].format(self.region_dir))
+        if not os.path.exists(os.path.join(self.directories['adj_dir'].format(self.region_dir),'Splits')):
+            os.makedirs(os.path.join(self.directories['adj_dir'].format(self.region_dir),'Splits'))
 
 
 class ClearFiles(Setup):
@@ -76,8 +81,12 @@ class ClearFiles(Setup):
     @staticmethod
     def removeFiles(fp):
         files = glob.glob(fp)
-        for file in files:
-            os.remove(file)
+        for obj in files:
+            if os.path.isfile(obj):
+                os.remove(obj)
+            else:
+                # If directory then move on.
+                next
 
     def clear_unverified_matches(self):
         self.removeFiles(os.path.join(self.directories['unverified_matches_dir'].format(self.region_dir, self.proc_type), '*'))
@@ -87,10 +96,12 @@ class ClearFiles(Setup):
 
     def clear_deduped_data(self):
         self.removeFiles(os.path.join(self.directories['deduped_dir'].format(self.region_dir, self.proc_type), '*'))
+        self.removeFiles(os.path.join(self.directories['splits_outputs_dir'].format(self.region_dir, self.proc_type), '*'))
 
     def clear_raw_data(self):
         self.removeFiles(os.path.join(self.directories['raw_dir'].format(self.region_dir), '*'))
 
     def clear_adj_data(self):
         self.removeFiles(os.path.join(self.directories['adj_dir'].format(self.region_dir), '*'))
+        self.removeFiles(os.path.join(self.directories['splits_inputs_dir'].format(self.region_dir), '*'))
 

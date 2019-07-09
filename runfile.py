@@ -37,6 +37,7 @@ def getInputArgs(rootdir, args=None):
 
     parser.add_argument('--prodn_unverified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--prodn_verified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
+    parser.add_argument('--split', action='store_true', help='split source file and initiate segmented matching')
 
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
     args = parser.parse_args(args)

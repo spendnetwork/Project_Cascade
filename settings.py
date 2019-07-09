@@ -104,9 +104,6 @@ class UK_entities(UK_Settings):
                  'reg_source': np.str, 'reg_created_at': np.str, 'reg_scheme':np.str, 'src_address_adj': np.str
                  }
 
-
-
-
     runfile_mods = UK_ent_run_files
 
     # reg_data_source = 'uk_data.entity'
@@ -153,10 +150,13 @@ class CQC_settings(UK_entities):
                  'reg_name_short': np.str,
                  'leven_dist_N': np.int, 'leven_dist_NA': np.int,
                  'Manual_Match_N': np.str, 'Manual_Match_NA': np.str,
+                 'sum':np.float, 'count':np.int, 'src_amount':np.float, 'src_count':np.int
                  }
 
-    raw_src_data_cols = ['src_name']
+    raw_src_data_cols = ['supplier_source_string','sum','count']
 
-    dedupe_cols = ['src_name','src_name_adj', 'reg_name_adj', 'reg_name', 'reg_id']
+    dedupe_cols = ['src_name','src_name_adj', 'reg_name_adj', 'reg_name', 'reg_id', 'src_amount','src_count']
 
-    manual_matches_cols = ['src_name','src_name_adj', 'reg_name_adj', 'reg_name', 'reg_id']
+    manual_matches_cols = ['src_name','src_name_adj', 'reg_name_adj', 'reg_name', 'reg_id','src_amount','src_count']
+
+    dbUpload_cols = ['src_name', 'reg_name', 'leven_dist_N', 'Manual_Match_N', 'reg_id','src_amount','src_count']

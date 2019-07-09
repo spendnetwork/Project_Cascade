@@ -1,7 +1,6 @@
 import pandas as pd
 import os
 import subprocess
-import numpy as np
 from shutil import copyfile
 import pdb
 from runfile import Main
@@ -9,28 +8,33 @@ from datetime import datetime
 from csvdedupe.csvlink import launch_new_instance as launch_matching
 from csvdedupe.csvdedupe import launch_new_instance as launch_clustering
 import sys
+import glob
 
 class Matching(Main):
     def __init__(self, settings, src_df, reg_df):
         super().__init__(settings)
         self.src_df = src_df
         self.reg_df = reg_df
+        self.src_fields = None
+        self.reg_fields = None
+        self.train = None
 
     def dedupe(self):
 
         # Run dedupe for matching and clustering
         if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
+            self.src_fields = self.configs['processes'][self.proc_type][self.proc_num]['dedupe_field_names']['source_data']
+            self.reg_fields = self.configs['processes'][self.proc_type][self.proc_num]['dedupe_field_names']['registry_data']
+            self.train = ['--skip_training' if self.in_args.training else '']
 
-            src_file = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
-                self.in_args.src_adj_name)
+            if not self.in_args.split:
+                self.dedupeMatch()
+            else:
+                self.dedupeSplitMatch()
 
-            reg_df = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_reg_data'].format(
-                self.in_args.reg_adj_name)
-
-            self.dedupeMatchCluster(src_file, reg_df)
+            self.dedupeCluster()
 
         if not os.path.exists(self.directories['assigned_output_file'].format(self.region_dir, self.proc_type)):
-
             clust_df = pd.read_csv(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type), index_col=None,
                                    dtype=self.df_dtypes)
 
@@ -53,7 +57,55 @@ class Matching(Main):
 
         return clust_df
 
-    def dedupeMatchCluster(self, src_file, reg_df):
+    def dedupeSplitMatch(self):
+        '''
+        Takes all files in Adj_Data/Splits and iteratively runs them through matching process before combining into one
+        output file
+        :return:
+        '''
+        reg_df = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_reg_data'].format(
+            self.in_args.reg_adj_name)
+        files = glob.glob(os.path.join(self.directories["splits_inputs_dir"].format(self.region_dir, self.proc_type),'*'))
+        numfiles = len(files)
+        fileno = 0
+
+        for src_file in files:
+            fileno += 1
+
+            # Matching:
+            if not os.path.exists(self.directories['match_output_file'].format(self.region_dir, self.proc_type)):
+                print("Starting matching of split file " + str(fileno) + '/' + str(numfiles))
+
+                cmd = ['csvlink '
+                       + str(src_file) + ' '
+                       + str(reg_df)
+                       + ' --field_names_1 ' + ' '.join(self.src_fields)
+                       + ' --field_names_2 ' + ' '.join(self.reg_fields)
+                       + ' --training_file ' + self.directories['manual_training_file'].format(self.region_dir,
+                                                                                               self.proc_type)
+                       + ' --output_file ' + os.path.join(self.directories['splits_outputs_dir'].format(self.region_dir, self.proc_type), str(fileno) + '.csv') + ' '
+                       + str(self.train[0])
+                       + ' --inner_join'
+                       ]
+
+                p = subprocess.Popen(cmd, shell=True)
+                p.wait()
+
+        # Join files together to create one matched output file
+        files = glob.glob(os.path.join(self.directories["splits_outputs_dir"].format(self.region_dir, self.proc_type), '*'))
+        frames = []
+        # Load in each file and add to frames list
+        for file in files:
+            df = pd.read_csv(file)
+            frames.append(df)
+        # concatenate list into one df
+        df = pd.concat(frames)
+
+        # Save as normal to match outputs folder
+        df.to_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type))
+
+
+    def dedupeMatch(self):
         """
     	Deduping - first the registry and source data are matched using dedupes csvlink,
     	then the matched file is put into clusters
@@ -68,10 +120,12 @@ class Matching(Main):
     	:output : matched and clustered output file
     	"""
 
-        src_fields = self.configs['processes'][self.proc_type][self.proc_num]['dedupe_field_names']['source_data']
-        reg_fields = self.configs['processes'][self.proc_type][self.proc_num]['dedupe_field_names']['registry_data']
+        src_file = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
+            self.in_args.src_adj_name)
 
-        train = ['--skip_training' if self.in_args.training else '']
+        reg_df = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_reg_data'].format(
+            self.in_args.reg_adj_name)
+
         # Matching:
         if not os.path.exists(self.directories['match_output_file'].format(self.region_dir, self.proc_type)):
             if self.in_args.recycle:
@@ -80,24 +134,16 @@ class Matching(Main):
                 copyfile(self.directories['manual_matching_train_backup'].format(self.region_dir),
                          self.directories['manual_training_file'].format(self.region_dir, self.proc_type))
 
-            # DO NOT UNCOMMENT - CAUSES BUG
-            # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
-            # if os.path.exists('./learned_settings'):
-            #     os.remove('./learned_settings')
-            #
-            # if os.path.exists('./csvdedupe/csvdedupe/learned_settings'):
-            #     os.remove('./csvdedupe/csvdedupe/learned_settings')
-
             print("Starting matching...")
 
             cmd = ['csvlink '
                    + str(src_file) + ' '
                    + str(reg_df)
-                   + ' --field_names_1 ' + ' '.join(src_fields)
-                   + ' --field_names_2 ' + ' '.join(reg_fields)
+                   + ' --field_names_1 ' + ' '.join(self.src_fields)
+                   + ' --field_names_2 ' + ' '.join(self.reg_fields)
                    + ' --training_file ' + self.directories['manual_training_file'].format(self.region_dir, self.proc_type)
                    + ' --output_file ' + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
-                   + str(train[0])
+                   + str(self.train[0])
                    ]
 
             p = subprocess.Popen(cmd, shell=True)
@@ -125,6 +171,7 @@ class Matching(Main):
             df = df[pd.notnull(df['src_name'])]
             df.to_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type), index=False)
 
+    def dedupeCluster(self):
         # Clustering:
         if not os.path.exists(self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)):
             # Copy training file from first clustering session if recycle mode
@@ -136,8 +183,8 @@ class Matching(Main):
 
             cmd = ['csvdedupe '
                    + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
-                   + ' --field_names ' + ' '.join(src_fields) + ' '
-                   + str(train[0])
+                   + ' --field_names ' + ' '.join(self.src_fields) + ' '
+                   + str(self.train[0])
                    + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir,
                                                                                             self.proc_type)
                    + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir,

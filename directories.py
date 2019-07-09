@@ -3,6 +3,10 @@ dirs = {
             {
                   "raw_dir": "{0}/Data_Inputs/Raw_Data/",
                   "adj_dir": "{0}/Data_Inputs/Adj_Data/",
+                  "splits_inputs_dir": "{0}/Data_Inputs/Adj_Data/Splits/",
+                  "splits_outputs_dir": '{0}/Outputs/{1}/Deduped_Data/Splits/',
+
+
                   "raw_src_data": "{0}",
                   "raw_reg_data": "{0}",
 
