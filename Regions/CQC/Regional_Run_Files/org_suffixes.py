@@ -26,9 +26,9 @@ org_suffixes_dict = {
     'n f t' : 'nft',
     ' n f t ' : 'nft',
     ' n f t' : 'nft',
+
+
     }
-
-
 
 #
 # org_suffixes_dict = {

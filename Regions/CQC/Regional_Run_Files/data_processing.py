@@ -100,13 +100,9 @@ class LevDist(Main):
     def calcMatchRatio(self, row):
         """
     	Used in extractMatches() - use fuzzywuzzy to calculate levenshtein distance
-
     	:return ratio: individual levenshtein distance between the registry and source org string
     	"""
         if pd.notnull(row.src_name_short) and pd.notnull(row.reg_name_short):
-            # if pd.notnull(row.src_address_adj) and pd.notnull(row.reg_address_adj):
-            #     return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(fuzz.ratio(row.src_joinfields, row.reg_joinfields))
-            # else:
             return int(fuzz.ratio(row.src_name_short, row.reg_name_short)), int(0)
 
 
@@ -123,15 +119,16 @@ class ProcessSourceData(DataProcessing):
 
     def clean(self):
         raw_data = self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_src_data'].format(
-            self.in_args.src_raw_name)
+            self.in_args.src)
         adj_data = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
-            self.in_args.src_adj_name)
+            self.in_args.src_adj)
 
         if not os.path.exists(adj_data):
             df = pd.read_csv(raw_data, usecols=self.raw_src_data_cols,
                              dtype=self.df_dtypes)
 
-            df.rename(columns={"supplier_source_string": "src_name", "sum": "src_amount", "count": "src_count"}, inplace=True)
+            df.rename(columns={"supplier_source_string": "src_name", "sum": "src_amount", "count": "src_count"},
+                      inplace=True)
             df['src_amount'] = df['src_amount'].round(2)
 
             print("Re-organising source data...")
@@ -152,32 +149,20 @@ class ProcessSourceData(DataProcessing):
                 numberofchunks = len(df) // chunksize + 1
                 for i in range(numberofchunks):
                     if i == 0:
-                        df[:(i+1)*chunksize].to_csv(os.path.join(os.getcwd(), 'Regions', str(self.in_args.region),
-                                                                 'Data_Inputs','Adj_Data','Splits',
-                                                                 str(self.in_args.src_raw_name)[:-4] + str(i) +
-                                                                 '.csv'),index=False)
+                        df[:(i + 1) * chunksize].to_csv(os.path.join(os.getcwd(), 'Regions', str(self.in_args.region),
+                                                                     'Data_Inputs', 'Adj_Data', 'Splits',
+                                                                     str(self.in_args.src)[:-4] + str(i) +
+                                                                     '.csv'), index=False)
                     else:
-                        df[chunksize*i:(i+1)*chunksize].to_csv(os.path.join(os.getcwd(), 'Regions',
-                                                                            str(self.in_args.region),'Data_Inputs',
-                                                                            'Adj_Data','Splits',
-                                                                            str(self.in_args.src_raw_name)[:-4] +
-                                                                            str(i) + '.csv'),index=False)
+                        df[chunksize * i:(i + 1) * chunksize].to_csv(os.path.join(os.getcwd(), 'Regions',
+                                                                                  str(self.in_args.region),
+                                                                                  'Data_Inputs',
+                                                                                  'Adj_Data', 'Splits',
+                                                                                  str(self.in_args.src)[:-4] +
+                                                                                  str(i) + '.csv'), index=False)
         else:
-            # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
             df = pd.read_csv(adj_data, dtype=self.df_dtypes)
-
-
         return df
-
-    def split(self):
-        '''
-        To fix out of memory issue - split input source file into smaller files with the intention of running
-        several mini-matching sessions, effectively taking some of the burden off storing large files in memory
-        '''
-        # take source input file from args
-
-        # split input file into smaller files and save these to adj_data/splits
-
 
 
 class ProcessRegistryData(DataProcessing):
@@ -192,9 +177,9 @@ class ProcessRegistryData(DataProcessing):
     def clean(self):
 
         raw_data = self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(
-            self.in_args.reg_raw_name)
+            self.in_args.reg)
         adj_data = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_reg_data'].format(
-            self.in_args.reg_adj_name)
+            self.in_args.reg_adj)
 
         if not os.path.exists(adj_data):
             print("Re-organising registry data...")
@@ -206,8 +191,7 @@ class ProcessRegistryData(DataProcessing):
             dffullmerge = pd.DataFrame([])
 
             for chunk in df:
-
-                chunk.rename(columns={"location_name":"reg_name","location_id":"reg_id"}, inplace=True)
+                chunk.rename(columns={"location_name": "reg_name", "location_id": "reg_id"}, inplace=True)
 
                 # Remove punctuation and double spacing
                 adj_col = str('reg_name_adj')

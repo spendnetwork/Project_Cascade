@@ -22,27 +22,41 @@ class Matching(Main):
     def dedupe(self):
 
         # Run dedupe for matching and clustering
-        if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
-            self.src_fields = self.configs['processes'][self.proc_type][self.proc_num]['dedupe_field_names']['source_data']
-            self.reg_fields = self.configs['processes'][self.proc_type][self.proc_num]['dedupe_field_names']['registry_data']
-            self.train = ['--skip_training' if self.in_args.training else '']
+
+        self.src_fields = self.configs['processes'][self.proc_type][1]['dedupe_field_names']['source_data']
+        self.reg_fields = self.configs['processes'][self.proc_type][1]['dedupe_field_names']['registry_data']
+        self.train = ['--skip_training' if self.in_args.training else '']
+        # if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
+        if not os.path.exists(self.directories["match_output_file"].format(self.region_dir, self.proc_type)):
+
 
             if not self.in_args.split:
                 self.dedupeMatch()
             else:
                 self.dedupeSplitMatch()
+                # Unmatched source strings are normally kept (in in_args.split = False), and then clustered
+                # Because of file sizes of split files, these are removed. Below adds them back in
+                self.addBackUnmatchedSrcStrings()
 
+        if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
             self.dedupeCluster()
 
         if not os.path.exists(self.directories['assigned_output_file'].format(self.region_dir, self.proc_type)):
             clust_df = pd.read_csv(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type), index_col=None,
                                    dtype=self.df_dtypes)
-
-        #     # Copy registry data to high-confidence cluster records
+            # clust_df = pd.read_csv(self.directories["match_output_file"].format(self.region_dir, self.proc_type),
+            #                        index_col=None,
+            #                        dtype=self.df_dtypes)
+            #
+            # Copy registry data to high-confidence cluster records
             clust_df = self.data_processing.AssignRegDataToClusters(clust_df, self.directories[
                 'assigned_output_file'].format(self.region_dir, self.proc_type)).assign()
 
             clust_df = clust_df.fillna(value="")
+
+            # Add string length columns
+            clust_df['src_str_len'] = clust_df['src_name'].str.len().astype(int)
+            clust_df['reg_str_len'] = clust_df['reg_name'].str.len().astype(int)
 
             # Adds leven_dist column and verify matches based on config process criteria:
             clust_df = self.data_processing.LevDist(self, clust_df, self.directories["assigned_output_file"].format(
@@ -64,7 +78,7 @@ class Matching(Main):
         :return:
         '''
         reg_df = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_reg_data'].format(
-            self.in_args.reg_adj_name)
+            self.in_args.reg_adj)
         files = glob.glob(os.path.join(self.directories["splits_inputs_dir"].format(self.region_dir, self.proc_type),'*'))
         numfiles = len(files)
         fileno = 0
@@ -100,9 +114,26 @@ class Matching(Main):
             frames.append(df)
         # concatenate list into one df
         df = pd.concat(frames)
+        df = df.drop_duplicates()
 
         # Save as normal to match outputs folder
-        df.to_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type))
+        df.to_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type), index=False)
+
+    def addBackUnmatchedSrcStrings(self):
+        '''
+        When the files are split into small chunks, to avoid introducing i.e. 40k unmatched rows * number of split files
+        the unmatched rows are removed. This function serves to add those unmatched source strings back in, once, at the
+        end of the matching of the split files. This then allows clustering and subsequent increase in number of matches
+        '''
+
+        matchdf = pd.read_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type))
+
+        srcdf = pd.read_csv(self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
+            self.in_args.src_adj))
+
+        mergedf = pd.merge(matchdf, srcdf, how='right', on=['src_name','src_amount','src_count','src_name_adj'])
+
+        mergedf.to_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type), index=False)
 
 
     def dedupeMatch(self):
@@ -121,10 +152,10 @@ class Matching(Main):
     	"""
 
         src_file = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
-            self.in_args.src_adj_name)
+            self.in_args.src_adj)
 
         reg_df = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_reg_data'].format(
-            self.in_args.reg_adj_name)
+            self.in_args.reg_adj)
 
         # Matching:
         if not os.path.exists(self.directories['match_output_file'].format(self.region_dir, self.proc_type)):
@@ -166,10 +197,11 @@ class Matching(Main):
             # launch_matching()
 
             df = pd.read_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type),
-                             usecols=self.dedupe_cols,
                              dtype=self.df_dtypes)
             df = df[pd.notnull(df['src_name'])]
+            df = df.drop_duplicates()
             df.to_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type), index=False)
+
 
     def dedupeCluster(self):
         # Clustering:
@@ -185,10 +217,8 @@ class Matching(Main):
                    + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
                    + ' --field_names ' + ' '.join(self.src_fields) + ' '
                    + str(self.train[0])
-                   + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir,
-                                                                                            self.proc_type)
-                   + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir,
-                                                                                        self.proc_type)]
+                   + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir,self.proc_type)
+                   + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir,self.proc_type)]
 
             p = subprocess.Popen(cmd, shell=True)
             p.wait()  # wait for subprocess to finish
@@ -232,9 +262,8 @@ class CascadeExtraction(Main):
             levendist = str('leven_dist_N')
 
         # Round confidence scores to 2dp :
-
         clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
-
+        #
         # Filter by current match_score:
         clustdf = clustdf[clustdf[levendist] >= self.configs['processes'][self.proc_type][self.proc_num]['min_match_score']]
 
@@ -279,7 +308,9 @@ class CascadeExtraction(Main):
                 self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index_col=None, dtype=self.df_dtypes)
             extracts_file = pd.concat([extracts_file, clustdf], ignore_index=True, sort=True)
+
             extracts_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+
             extracts_file.to_csv(
                 self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index=False)
@@ -360,10 +391,8 @@ class VerificationAndUploads(Main):
             print("Saving...")
             manual_match_file.to_csv(
                 self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type, datetime.today().strftime('%Y-%m-%d')),
-                # index=False, columns=self.manual_matches_cols)
                 index=False, columns=self.dbUpload_cols)
         else:
             manual_match_file.to_csv(
                 self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type, datetime.today().strftime('%Y-%m-%d')),
-                # index=False, columns=self.manual_matches_cols)
                 index=False, columns=self.dbUpload_cols)

@@ -15,12 +15,12 @@ def getInputArgs(rootdir, args=None):
 	"""
     parser = argparse.ArgumentParser(conflict_handler='resolve') # conflict_handler allows overriding of args (for pytest purposes : see conftest.py::in_args())
     parser.add_argument('--region', default='UK_entities', type=str, help='Define the region/country (Italy/UK)')
-    parser.add_argument('--src_raw_name', default='source_data.csv', type=str,
+    parser.add_argument('--src', default='source_data.csv', type=str,
                         help='Set raw source/source datafile name')
-    parser.add_argument('--reg_raw_name', default='registry_data.csv', type=str, help='Set raw registry datafile name')
-    parser.add_argument('--src_adj_name', default='src_data_adj.csv', type=str,
+    parser.add_argument('--reg', default='registry_data.csv', type=str, help='Set raw registry datafile name')
+    parser.add_argument('--src_adj', default='src_data_adj.csv', type=str,
                         help='Set cleaned source/source datafile name')
-    parser.add_argument('--reg_adj_name', default='reg_data_adj.csv', type=str, help='Set cleaned registry datafile name')
+    parser.add_argument('--reg_adj', default='reg_data_adj.csv', type=str, help='Set cleaned registry datafile name')
     parser.add_argument('--recycle', action='store_true', help='Recycle the manual training data')
     parser.add_argument('--training', action='store_false', help='Modify/contribute to the training data')
     parser.add_argument('--config_review', action='store_true', help='Manually review/choose best config file results')
