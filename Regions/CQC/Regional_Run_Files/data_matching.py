@@ -93,6 +93,8 @@ class Matching(Main):
                        + ' --field_names_2 ' + ' '.join(self.reg_fields)
                        + ' --training_file ' + self.directories['manual_training_file'].format(self.region_dir,
                                                                                                self.proc_type)
+                       + ' --settings_file ' + self.directories['learned_settings_file'].format(self.region_dir,
+                                                                                                self.proc_type)
                        + ' --output_file ' + os.path.join(self.directories['splits_outputs_dir'].format(self.region_dir, self.proc_type), str(fileno) + '.csv') + ' '
                        + str(self.train[0])
                        + ' --inner_join'
@@ -169,6 +171,8 @@ class Matching(Main):
                    + ' --field_names_1 ' + ' '.join(self.src_fields)
                    + ' --field_names_2 ' + ' '.join(self.reg_fields)
                    + ' --training_file ' + self.directories['manual_training_file'].format(self.region_dir, self.proc_type)
+                   + ' --settings_file ' + self.directories['learned_settings_file'].format(self.region_dir,
+                                                                                            self.proc_type)
                    + ' --output_file ' + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
                    + str(self.train[0])
                    ]
@@ -214,6 +218,8 @@ class Matching(Main):
                    + ' --field_names ' + ' '.join(self.src_fields) + ' '
                    + str(self.train[0])
                    + ' --training_file ' + self.directories['cluster_training_file'].format(self.region_dir,self.proc_type)
+                   + ' --settings_file ' + self.directories['learned_settings_file'].format(self.region_dir,
+                                                                                            self.proc_type)
                    + ' --output_file ' + self.directories['cluster_output_file'].format(self.region_dir,self.proc_type)]
 
             p = subprocess.Popen(cmd, shell=True)

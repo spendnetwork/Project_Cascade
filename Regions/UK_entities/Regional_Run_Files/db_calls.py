@@ -101,7 +101,7 @@ class FetchData(DbCalls):
 
     def checkDataExists(self):
         # If registry data doesn't exist:
-        if not os.path.exists(self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg_raw_name)):
+        if not os.path.exists(self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg)):
             # Check env file exists
             env_fpath = os.path.join('.', '.env')
             if not os.path.exists(env_fpath):
@@ -112,13 +112,13 @@ class FetchData(DbCalls):
             query = self.db_calls.FetchData.createRegistryDataSQLQuery(self)
             df = self.db_calls.FetchData.fetchdata(self, query)
             df.to_csv(
-                self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg_raw_name),
+                self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg),
                 index=False)
 
         # If source data doesn't exist:
         if not os.path.exists(
                 self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_src_data'].format(
-                    self.in_args.src_raw_name)):
+                    self.in_args.src)):
 
             env_fpath = os.path.join('.', '.env')
             if not os.path.exists(env_fpath):
@@ -131,7 +131,7 @@ class FetchData(DbCalls):
             df = self.db_calls.FetchData.fetchdata(self, query)
             df.to_csv(
                 self.directories['raw_dir'].format(self.region_dir) + self.directories[
-                    'raw_src_data'].format(self.in_args.src_raw_name),
+                    'raw_src_data'].format(self.in_args.src),
                 index=False)
 
     def createRegistryDataSQLQuery(self):

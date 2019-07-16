@@ -34,7 +34,6 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--data_date', type=str,
                         default=(datetime.date.today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
                         , help='Set source data date to be downloaded from (inclusive)')
-
     parser.add_argument('--prodn_unverified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--prodn_verified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--split', action='store_true', help='split source file and initiate segmented matching')

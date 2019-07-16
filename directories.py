@@ -6,7 +6,6 @@ dirs = {
                   "splits_inputs_dir": "{0}/Data_Inputs/Adj_Data/Splits/",
                   "splits_outputs_dir": '{0}/Outputs/{1}/Deduped_Data/Splits/',
 
-
                   "raw_src_data": "{0}",
                   "raw_reg_data": "{0}",
 
@@ -30,6 +29,7 @@ dirs = {
 
                   "unverified_matches_file": "{0}/Outputs/{1}/Unverified_Matches/{2}_matches.csv",
                   "manual_training_file": "{0}/Data_Inputs/Training_Files/{1}/Matching/matching_training.json",
+                  "learned_settings_file": "{0}/Data_Inputs/Training_Files/{1}/learned_settings",
                   "manual_matching_train_backup": "{0}/Data_Inputs/Training_Files/Manual_&_Backups/manual_matching_training.json",
                   "backups_dir": "{0}/Data_Inputs/Training_Files/Manual_&_Backups",
                   "cluster_training_backup": "{0}/Data_Inputs/Training_Files/Manual_&_Backups/cluster_training_backup.json",

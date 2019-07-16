@@ -122,9 +122,9 @@ class ProcessSourceData(DataProcessing):
 
     def clean(self):
         raw_data = self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_src_data'].format(
-            self.in_args.src_raw_name)
+            self.in_args.src)
         adj_data = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
-            self.in_args.src_adj_name)
+            self.in_args.src_adj)
 
         if not os.path.exists(adj_data):
             df = pd.read_csv(raw_data, usecols=self.raw_src_data_cols,
@@ -148,8 +148,25 @@ class ProcessSourceData(DataProcessing):
                           'src_address_countryname'], axis=1)
             print("...done")
             df.to_csv(adj_data, index=False)
+
+            # If flag 'split' has been used, split the source file into smaller files
+            if self.in_args.split:
+                chunksize = 1000
+                numberofchunks = len(df) // chunksize + 1
+                for i in range(numberofchunks):
+                    if i == 0:
+                        df[:(i + 1) * chunksize].to_csv(os.path.join(os.getcwd(), 'Regions', str(self.in_args.region),
+                                                                     'Data_Inputs', 'Adj_Data', 'Splits',
+                                                                     str(self.in_args.src)[:-4] + str(i) +
+                                                                     '.csv'), index=False)
+                    else:
+                        df[chunksize * i:(i + 1) * chunksize].to_csv(os.path.join(os.getcwd(), 'Regions',
+                                                                                  str(self.in_args.region),
+                                                                                  'Data_Inputs',
+                                                                                  'Adj_Data', 'Splits',
+                                                                                  str(self.in_args.src)[:-4] +
+                                                                                  str(i) + '.csv'), index=False)
         else:
-            # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
             df = pd.read_csv(adj_data, dtype=self.df_dtypes)
         return df
 
@@ -166,9 +183,9 @@ class ProcessRegistryData(DataProcessing):
     def clean(self):
 
         raw_data = self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(
-            self.in_args.reg_raw_name)
+            self.in_args.reg)
         adj_data = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_reg_data'].format(
-            self.in_args.reg_adj_name)
+            self.in_args.reg_adj)
 
         if not os.path.exists(adj_data):
             print("Re-organising registry data...")
