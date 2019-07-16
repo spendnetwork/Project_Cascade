@@ -165,13 +165,13 @@ class Main:
                         else:
                             continue
                     # Output stats file:
-                    stat_file = self.data_analysis.StatsCalculations(self, clust_df, extracts_file, src_df).calculate()
+                    self.data_analysis.StatsCalculations(self, clust_df, extracts_file, src_df).calculate()
 
         except StopIteration:
             # Continue if no more config files found
             print("Done")
 
-        self.data_matching.VerificationAndUploads(self, stat_file).verify()
+        self.data_matching.VerificationAndUploads(self).verify()
 
         self.db_calls.AwsTransfers(self).transfer()
 

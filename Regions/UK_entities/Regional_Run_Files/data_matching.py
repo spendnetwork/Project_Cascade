@@ -257,10 +257,8 @@ class CascadeExtraction(Main):
 
 class VerificationAndUploads(Main):
 
-    def __init__(self, settings, stat_file):
+    def __init__(self, settings):
         super().__init__(settings)
-        self.stat_file = stat_file
-
 
     def verify(self):
 
@@ -278,8 +276,9 @@ class VerificationAndUploads(Main):
 
             else:
                 # ...otherwise pick best config_file based on stats file (max leven dist avg):
-                max_lev = self.stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
-                self.best_config = self.stat_file.at[max_lev, 'Config_File']
+                stat_file = pd.read_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type))
+                max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
+                self.best_config = stat_file.at[max_lev, 'Config_File']
 
             self.manualMatching()
 

@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
     s3 = boto3.resource('s3')
 
-    pdb.set_trace()
+
     data = open(
         '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/holder/Matches_Buyers_DMadj.csv',
         'rb')

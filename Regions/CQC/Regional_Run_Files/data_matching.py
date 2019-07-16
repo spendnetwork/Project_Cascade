@@ -29,7 +29,6 @@ class Matching(Main):
         # if not os.path.exists(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)):
         if not os.path.exists(self.directories["match_output_file"].format(self.region_dir, self.proc_type)):
 
-
             if not self.in_args.split:
                 self.dedupeMatch()
             else:
@@ -44,10 +43,7 @@ class Matching(Main):
         if not os.path.exists(self.directories['assigned_output_file'].format(self.region_dir, self.proc_type)):
             clust_df = pd.read_csv(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type), index_col=None,
                                    dtype=self.df_dtypes)
-            # clust_df = pd.read_csv(self.directories["match_output_file"].format(self.region_dir, self.proc_type),
-            #                        index_col=None,
-            #                        dtype=self.df_dtypes)
-            #
+
             # Copy registry data to high-confidence cluster records
             clust_df = self.data_processing.AssignRegDataToClusters(clust_df, self.directories[
                 'assigned_output_file'].format(self.region_dir, self.proc_type)).assign()
@@ -253,7 +249,6 @@ class CascadeExtraction(Main):
         """
         Import config file containing variable assignments for i.e. char length, match ratio
         Based on the 'cascading' config details, verify matches to new csv
-
         :return extracts_file: contains dataframe with possible acceptable matches
         """
         if self.in_args.recycle:
@@ -263,21 +258,24 @@ class CascadeExtraction(Main):
 
         # Round confidence scores to 2dp :
         clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
-        #
+
         # Filter by current match_score:
         clustdf = clustdf[clustdf[levendist] >= self.configs['processes'][self.proc_type][self.proc_num]['min_match_score']]
 
-        # if the earliest process, accept current clustdf as matches, if not (>min):
+        # If it's not the first process in the config_file...
         if self.proc_num > min(self.configs['processes'][self.proc_type]):
-            # If at last proc num, filter for only > min char length to capture remaining long strings
+            # If at last proc num...
             if self.proc_num == max(self.configs['processes'][self.proc_type]):
+                #  ...filter for only > min char length to capture remaining long strings
                 clustdf = clustdf[
                     clustdf.src_name_short.str.len() > self.configs['processes'][self.proc_type][self.proc_num][
                         'char_counts']]
                 clustdf = clustdf[clustdf[levendist] <= 99]
+
+            # If it's not first and not the last process...
             else:
                 try:
-                    # Filter by char count and previous count (if exists):
+                    # Filter by both char count and previous count (if exists):
                     clustdf = clustdf[
                         clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num]['char_counts']]
                     clustdf = clustdf[
@@ -288,13 +286,15 @@ class CascadeExtraction(Main):
                 except:
                     clustdf = clustdf[
                         clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num]['char_counts']]
+
+        # ...else if it is the first process in the dictionary
         else:
             if os.path.exists(self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv'):
                 # Clear any previous extraction file for this config:
                 os.remove(self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
                     self.conf_file_num) + '.csv')
 
-        # Add process number to column for calculating stats purposes:
+        # Temporarily add process number as column for calculating stats purposes
         clustdf['process_num'] = str(self.proc_num)
 
         if not os.path.exists(
@@ -302,15 +302,12 @@ class CascadeExtraction(Main):
             clustdf.to_csv(
                 self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index=False)
-            # return clustdf
         else:
             extracts_file = pd.read_csv(
                 self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index_col=None, dtype=self.df_dtypes)
             extracts_file = pd.concat([extracts_file, clustdf], ignore_index=True, sort=True)
-
             extracts_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
-
             extracts_file.to_csv(
                 self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index=False)
@@ -319,10 +316,8 @@ class CascadeExtraction(Main):
 
 class VerificationAndUploads(Main):
 
-    def __init__(self, settings, stat_file):
+    def __init__(self, settings):
         super().__init__(settings)
-        self.stat_file = stat_file
-
 
     def verify(self):
 
@@ -337,11 +332,11 @@ class VerificationAndUploads(Main):
                     (
                         "\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
                         self.proc_type))
-
             else:
                 # ...otherwise pick best config_file based on stats file (max leven dist avg):
-                max_lev = self.stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
-                self.best_config = self.stat_file.at[max_lev, 'Config_File']
+                stat_file = pd.read_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type))
+                max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
+                self.best_config = stat_file.at[max_lev, 'Config_File']
 
             self.manualMatching()
 
@@ -362,12 +357,13 @@ class VerificationAndUploads(Main):
         manual_match_file['Manual_Match_N'] = ''
         manual_match_file['Manual_Match_NA'] = ''
 
-        # Automatically confirm rows with leven dist of 100
-        for index, row in manual_match_file.iterrows():
-            if row.leven_dist_N == 100:
-                manual_match_file.at[index, 'Manual_Match_N'] = str('Y')
-            if row.leven_dist_NA == 100:
-                manual_match_file.at[index, 'Manual_Match_NA'] = str('Y')
+
+        # # Automatically confirm rows with leven dist of 100
+        # for index, row in manual_match_file.iterrows():
+        #     if row.leven_dist_N == 100:
+        #         manual_match_file.at[index, 'Manual_Match_N'] = str('Y')
+        #     if row.leven_dist_NA == 100:
+        #         manual_match_file.at[index, 'Manual_Match_NA'] = str('Y')
 
         if self.in_args.terminal_matching:
             # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
