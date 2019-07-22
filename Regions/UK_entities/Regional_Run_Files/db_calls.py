@@ -21,6 +21,9 @@ host_remote = os.environ.get("HOST_REMOTE")
 dbname_remote = os.environ.get("DBNAME_REMOTE")
 user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
+aws_access_key_id = os.environ.get("aws_access_key_id")
+aws_secret_access_key = os.environ.get("aws_secret_access_key")
+regn = os.environ.get("regn")
 
 
 class DbCalls(Main):
@@ -219,7 +222,7 @@ class AwsTransfers(Main):
 
     def process_verified_files(self):
         # Scan s3 verified folder for files
-        s3 = boto3.client('s3')
+        s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
         response = s3.list_objects(Bucket=self.bucket, Prefix='Verified_matches/')
 
         # Ignore first file entry in dict as is just the folder name. Returns a list of files
@@ -265,7 +268,7 @@ class AwsTransfers(Main):
             object_name = file_name
 
         # Upload the file
-        s3_client = boto3.client('s3')
+        s3_client = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
         try:
             response = s3_client.upload_file(file_name, bucket, object_name)
         except ClientError as e:

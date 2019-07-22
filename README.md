@@ -155,7 +155,7 @@ You can add as many config files as you like to experiment with different combin
 10. A short stats file is created so the user can see high level results of the different config files.
 11. The best config file is automatically chosen (based on the highest average Levenshtein distance) **unless** the `-config_review` flag is used when running the module. If this is done, the user will be prompted review the stats file and then enter their preferred config file in the terminal.
 12. The program will then exit, allowing the user to review the matches that have been extracted based on the chosen config file. The next stage is to manually review the 'Manual_Matches_x' file within Outputs/X/Confirmed_Matches and enter Y/N/U in the Manual_Match column. Note that these matches can be verified in the terminal if the `-terminal_matching` flag is used. In this case, the program will not exit, and instead the user will be prompted to verify the matches using the same Y/N/U responses.
-13. If the program has exited, we will then do 2 things. The first is to convert these manual confirmed matches into a json training file to be fed back into the system but using more fields in the dedupe phase (see recycling matches section below). The second is to get these confirmed matches uploaded to the database. Do this by running the command:
+13. If the program has exited, there are several options. The first is to convert these manual confirmed matches into a json training file to be fed back into the system but using more fields in the dedupe phase (see recycling matches section below). The second is to get these confirmed matches uploaded to the database. Do this by running the command:
 ```
 python runfile.py --convert_training --upload
 ```
