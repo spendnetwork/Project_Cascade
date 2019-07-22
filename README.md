@@ -18,22 +18,17 @@ The UK Entities module downloads both data sets internally from the Spend Networ
 
 ### Initial Set Up & Familiarisation
 
-1. Clone the repo:
+Clone the repo:
 ```
 git clone https://github.com/DMells/Project_Cascade
 ```
 
-2. Navigate to project directory:
+Navigate to project directory:
 ```
 cd Project_Cascade
 ```
 
-3. Clone dedupe (with slight modifications):
-```
-git clone "https://github.com/DMells/csvdedupe"
-```
-
-4. Install with pipenv and activate virtual environment:
+Install with pipenv and activate virtual environment:
 ```
 pipenv install
 pipenv shell
@@ -49,30 +44,31 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-5. Create .env file in root directory and add database credentials as per '.env template'
+Create .env file in root directory and add database credentials as per '.env template'
 
-6. Run the module
+Run the module
 ```
-python runfile.py
+python runfile.py 
 ```
 
 The module makes use of argument parsing, with the following arguments:
 ```
 --region (default: 'UK_entities')
---src_raw_name (default: 'source_data.csv')
---reg_raw_name (default: 'registry_data.csv')
---src_adj_name (default: 'source_data_adj.csv')
---reg_adj_name (default: 'registry_data_adj.csv')
+--src(default: 'source_data.csv')
+--reg (default: 'registry_data.csv')
+--src_adj (default: 'source_data_adj.csv')
+--reg_adj (default: 'registry_data_adj.csv')
 --recycle (No parameters)
 --training (No parameters)
 --config_review (No parameters)
 --terminal_matching (No parameters)
 --convert_training (No parameters)
---upload_t (No parameters)
+--upload (No parameters)
 --clear_all (No parameters) - delete all csvs and start from scratch
 --clear_adj (No parameters) - delete all except the raw files and run module from the data cleaning section
 --clear_outputs (No parameters) - re-run deduping process onwards, clearing all necessary output files
 --clear_post_matching (No parameters) - re-run quality control only (match extraction)
+--data_date ('YYYY-MM-DD') - data will be downloaded from todays date back to this date (default = 7 days prior)
 ```
 
 TBC : The `--recycle` flag is used once the module has been run and trained for the first time. When this flag is used, the module will run for a second time, but will incorporate the training data obtained from the manual matching process created in the first 'round', as  kick-start of sorts. See 5. Recycling Matches below for more info.
