@@ -261,7 +261,7 @@ class AwsTransfers(Main):
         :param object_name: S3 object name. If not specified then file_name is used
         :return: True if file was uploaded, else False
         """
-        pdb.set_trace()
+
         # If S3 object_name was not specified, use file_name
         if object_name is None:
             object_name = file_name
