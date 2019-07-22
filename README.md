@@ -103,8 +103,11 @@ Project_Cascade
     |--Outputs
         |--process_type **  # I.e. Name_Only, or Name_Address
             |--Deduped_Data
+                |--Splits
             |--Extracted_Matches
             |--Manual_Matches
+            |--Unverified_Matches
+            |--Verified_Matches
     |--Regional_Run_Files
         |--convert_training.py
         |--data_analysis.py
@@ -151,7 +154,7 @@ If any data **within a cluster** hasn't been matched to registry data , then if 
 You can add as many config files as you like to experiment with different combinations of this quality control filter system. 
 10. A short stats file is created so the user can see high level results of the different config files.
 11. The best config file is automatically chosen (based on the highest average Levenshtein distance) **unless** the `-config_review` flag is used when running the module. If this is done, the user will be prompted review the stats file and then enter their preferred config file in the terminal.
-12. The program will then exit, allowing the user to review the matches that have been extracted based on the chosen config file. The next stage is to manually review the 'Manual_Matches_x' file within Outputs/X/Confirmed_Matches and enter Y/N/U in the Manual_Match column. All matches with a Levenshtein distance of 100 (i.e. an exact match) are automatically assigned 'Y'. Note that these matches can be verified in the terminal if the `-terminal_matching` flag is used. In this case, the program will not exit, and instead the user will be prompted to verify the matches using the same Y/N/U responses.
+12. The program will then exit, allowing the user to review the matches that have been extracted based on the chosen config file. The next stage is to manually review the 'Manual_Matches_x' file within Outputs/X/Confirmed_Matches and enter Y/N/U in the Manual_Match column. Note that these matches can be verified in the terminal if the `-terminal_matching` flag is used. In this case, the program will not exit, and instead the user will be prompted to verify the matches using the same Y/N/U responses.
 13. If the program has exited, we will then do 2 things. The first is to convert these manual confirmed matches into a json training file to be fed back into the system but using more fields in the dedupe phase (see recycling matches section below). The second is to get these confirmed matches uploaded to the database. Do this by running the command:
 ```
 python runfile.py --convert_training --upload
@@ -176,4 +179,4 @@ Clustering here is important because it will affect how much of the matched data
 #### 3. Altering the config files
 Once the training has complete, this is where the config files come into play, as we are now attempting to verify the best quality matches factoring in that longer strings can have lower levenshtein ratios and still be good matches compared to shorter strings.
 
-Create a new config file as required (must follow the current naming convention) and experiment with the 'char_counts' and 'min_match_score', making sure to increase one as you decrease the other. The module will automatically register additional files and run the process and output the stats to separate csvs for you to compare. These files will be saved in `Outputs/Extracted_Matches`.
+Create new config files (some provided by default) as required (must follow the current naming convention) and experiment with the 'char_counts' and 'min_match_score', making sure to increase one as you decrease the other. The module will automatically register additional files and run the process and output the stats to separate csvs for you to compare. These files will be saved in `Outputs/Extracted_Matches`.

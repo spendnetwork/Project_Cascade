@@ -128,7 +128,7 @@ class Matching(Main):
         srcdf = pd.read_csv(self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
             self.in_args.src_adj))
 
-        mergedf = pd.merge(matchdf, srcdf, how='right', on=['src_name','src_tag','src_name_adj','src_name_adj','src_address_adj'])
+        mergedf = pd.merge(matchdf, srcdf, how='right', on=['src_name','src_tag','src_name_adj','src_name_adj','src_address_adj', 'src_joinfields'])
 
         mergedf.to_csv(self.directories['match_output_file'].format(self.region_dir, self.proc_type), index=False)
 
