@@ -12,6 +12,7 @@ import settings
 import glob
 import boto3
 from botocore.exceptions import ClientError
+# from core import database.
 
 
 # get the remote database details from .env
@@ -51,8 +52,12 @@ class DbCalls(Main):
                 # copy_expert allows access to csv methods (i.e. char escaping)
                 cur.copy_expert(
                     """COPY {}({}) from stdin (format csv)""".format(self.upload_table, headers), f)
+                conn.commit()
+            pdb.set_trace()
 
             query = self.removeTableDuplicates()
+            # database.upload_df_to_sql(df, schema, table, conn, if_exists=if_exists)
+            # pdb.set_trace()
             cur.execute(query)
             conn.commit()
 
@@ -80,9 +85,9 @@ class DbCalls(Main):
             WITH dups AS 
                 (SELECT DISTINCT ON ({}) * FROM {})
 
-            DELETE FROM {} WHERE {}.id NOT IN
+            DELETE FROM {} WHERE ({}.id) NOT IN
             (SELECT id FROM dups);
-            """.format(self.headers, self.upload_table, self.upload_table, self.upload_table)
+            """.format(self.headers, self.upload_table, self.upload_table, self.upload_table, self.upload_table)
         return query
 
 class FetchData(DbCalls):
@@ -202,7 +207,7 @@ class AwsTransfers(Main):
         Core function for the class. Checks args and either uploads to or downloads from s3 bucket
         :return: None
         '''
-
+        # Upload unverified matches to s3 bucket
         if self.in_args.prodn_unverified:
             files = glob.glob(os.path.join(self.directories['unverified_matches_dir'].format(self.region_dir, self.proc_type), '*'))
 
@@ -210,10 +215,11 @@ class AwsTransfers(Main):
                 filename = os.path.basename(filepath)
                 self.upload_file(filepath, self.bucket, 'Unverified_matches/' + filename)
 
+        # Download verified matches from s3 bucket
         if self.in_args.prodn_verified:
-            self.download_verified_files()
+            self.process_verified_files()
 
-    def download_verified_files(self):
+    def process_verified_files(self):
         # Scan s3 verified folder for files
         s3 = boto3.client('s3')
         response = s3.list_objects(Bucket=self.bucket, Prefix='Verified_matches/')
@@ -221,7 +227,7 @@ class AwsTransfers(Main):
         # Ignore first file entry in dict as is just the folder name. Returns a list of files
         files = response['Contents'][1:]
 
-        # For any files in verified - transfer them to the Uploads folder within the normal google box
+        # For any files in /s3/verified/ - transfer them to local /verified_matches/
         for i in range(len(files)):
             s3.download_file(self.bucket,
                              files[i]['Key'],
@@ -229,16 +235,22 @@ class AwsTransfers(Main):
                                                                                  self.proc_type),
                                           os.path.basename(files[i]['Key'])))
 
-            # Delete from verified folder once re-uploaded to webapps
+        # Upload all files in verified_matches_dir (downloaded from /verified in s3 bucket:
+        self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
+
+        for i in range(len(files)):
+            # Delete from s3 verified folder
             s3.delete_object(Bucket=self.bucket, Key=files[i]['Key'])
 
             try:
-                # Delete from unverified folder so team know which haven't been verified yet (located via date prefix of verified file incase of name change by team)
+                # Delete from unverified folder (if hasn't been done by team already) so team know which haven't been
+                # verified yet (located via date prefix of verified file incase of name change by team)
                 response = s3.list_objects(Bucket=self.bucket, Prefix='Unverified_matches/' + os.path.basename(files[i]['Key'])[:10])
                 file = response['Contents'][:]
                 s3.delete_object(Bucket=self.bucket, Key=file[i]['Key'])
             except:
                 pass
+
 
     @staticmethod
     def upload_file(file_name, bucket, object_name=None):

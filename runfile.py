@@ -201,5 +201,3 @@ if __name__ == '__main__':
     settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
 
     Main(settings).run_main()
-
-

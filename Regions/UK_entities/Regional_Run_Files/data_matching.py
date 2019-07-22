@@ -23,7 +23,6 @@ class Matching(Main):
     def dedupe(self):
 
         # Run dedupe for matching and clustering
-
         self.src_fields = self.configs['processes'][self.proc_type][1]['dedupe_field_names']['source_data']
         self.reg_fields = self.configs['processes'][self.proc_type][1]['dedupe_field_names']['registry_data']
         self.train = ['--skip_training' if self.in_args.training else '']
@@ -347,7 +346,11 @@ class VerificationAndUploads(Main):
                 max_lev = stat_file['Leven_Dist_Avg'].astype('float64').idxmax()
                 self.best_config = stat_file.at[max_lev, 'Config_File']
 
-            self.manualMatching()
+            files = glob.glob(os.path.join(self.directories['unverified_matches_dir'].format(self.region_dir, self.proc_type), '*'))
+
+            # if there are no files in the unverified folder, then prepare extracted matches file for manual matching:
+            if not files:
+                self.manualMatching()
 
             if self.in_args.upload:
                 # Add confirmed matches to relevant table

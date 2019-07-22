@@ -59,7 +59,7 @@
                         "char_counts": 0,
                         "min_match_score": 100,
                         "recycle_phase": True,
-                        "db_table" : "matching.uk_entities",
+                        "db_table" : "matching.matches_test",
                     },
                     2:
                         {

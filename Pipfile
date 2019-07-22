@@ -14,10 +14,11 @@ python-levenshtein = "*"
 python-dotenv = "*"
 psycopg2-binary = "*"
 pytest = "*"
-pandas = "*"
 chwrapper = "*"
 boto3 = "*"
 csvdedupe = {git = "https://www.github.com/dmells/csvdedupe"}
+# tqdm doesn't work with latest version of pandas
+pandas = "==0.24.2"
 
 [requires]
 python_version = "3.6"

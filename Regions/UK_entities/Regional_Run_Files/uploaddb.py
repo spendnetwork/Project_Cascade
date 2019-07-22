@@ -52,5 +52,25 @@ def createConnection():
     return conn, cur
 
 
+def removeTableDuplicates(self):
+        """
+        :param table_name: the database table containing duplicates
+        :param headers: the csv headers
+        :return: the sql query to be executed
+        """
+
+        print("Removing duplicates from table...")
+        query = \
+            """
+            WITH dups AS 
+                (SELECT DISTINCT ON ({}) * FROM {})
+
+            DELETE FROM {} WHERE ({}.src_name, {}.reg_name) NOT IN
+            (SELECT src_name, reg_name FROM dups);
+            """.format(self.headers, self.upload_table, self.upload_table, self.upload_table, self.upload_table)
+        return query
+
+
 if __name__ == '__main__':
-    addDataToTable()
+    conn, cur = createConnection()
+    query = removeTableDuplicates()

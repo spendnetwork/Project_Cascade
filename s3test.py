@@ -38,11 +38,12 @@ def upload_file(file_name, bucket, object_name=None):
 if __name__ == '__main__':
 
     s3 = boto3.resource('s3')
+    # s3 = boto3.client('s3')
 
+    # data = open(
+    #     '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/holder/Matches_Buyers_DMadj.csv',
+    #     'rb')
+    # s3.Bucket('sn-orgmatching').put_object(Key='Matches_Buyers_DMadj.csv', Body=data)
 
-    data = open(
-        '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/holder/Matches_Buyers_DMadj.csv',
-        'rb')
-    s3.Bucket('sn-orgmatching').put_object(Key='Matches_Buyers_DMadj.csv', Body=data)
-
-    s3.download_file('BUCKET_NAME', 'OBJECT_NAME', 'FILE_NAME')
+    s3.download_file('sn-orgmatching', 'OBJECT_NAME', 'FILE_NAME')
+    s3.Bucket('sn-orgmatching').download(Key='Matches_Buyers_DMadj.csv')
