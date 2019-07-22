@@ -53,11 +53,9 @@ class DbCalls(Main):
                 cur.copy_expert(
                     """COPY {}({}) from stdin (format csv)""".format(self.upload_table, headers), f)
                 conn.commit()
-            pdb.set_trace()
 
             query = self.removeTableDuplicates()
-            # database.upload_df_to_sql(df, schema, table, conn, if_exists=if_exists)
-            # pdb.set_trace()
+
             cur.execute(query)
             conn.commit()
 
@@ -273,6 +271,7 @@ class AwsTransfers(Main):
         except ClientError as e:
             print(e)
             return False
+        print("Upload to S3 bucket complete!")
         return True
 
 
