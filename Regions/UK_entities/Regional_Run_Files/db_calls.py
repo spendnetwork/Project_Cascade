@@ -23,7 +23,6 @@ user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
 aws_access_key_id = os.environ.get("aws_access_key_id")
 aws_secret_access_key = os.environ.get("aws_secret_access_key")
-regn = os.environ.get("regn")
 
 
 class DbCalls(Main):
@@ -201,7 +200,7 @@ class AwsTransfers(Main):
 
     def __init__(self, settings):
         super().__init__(settings)
-        self.bucket = 'sn-orgmatching'
+        self.bucket = 'org-matching'
 
     def transfer(self):
         '''
@@ -214,7 +213,7 @@ class AwsTransfers(Main):
 
             for filepath in files:
                 filename = os.path.basename(filepath)
-                self.upload_file(filepath, self.bucket, 'Unverified_matches/' + filename)
+                self.upload_file(filepath, self.bucket, 'UK_entities/Unverified_Matches/' + filename)
 
         # Download verified matches from s3 bucket
         if self.in_args.prodn_verified:
@@ -223,7 +222,7 @@ class AwsTransfers(Main):
     def process_verified_files(self):
         # Scan s3 verified folder for files
         s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
-        response = s3.list_objects(Bucket=self.bucket, Prefix='Verified_matches/')
+        response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Verified_Matches/')
 
         # Ignore first file entry in dict as is just the folder name. Returns a list of files
         files = response['Contents'][1:]
@@ -246,7 +245,7 @@ class AwsTransfers(Main):
             try:
                 # Delete from unverified folder (if hasn't been done by team already) so team know which haven't been
                 # verified yet (located via date prefix of verified file incase of name change by team)
-                response = s3.list_objects(Bucket=self.bucket, Prefix='Unverified_matches/' + os.path.basename(files[i]['Key'])[:10])
+                response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Unverified_Matches/' + os.path.basename(files[i]['Key'])[:10])
                 file = response['Contents'][:]
                 s3.delete_object(Bucket=self.bucket, Key=file[i]['Key'])
             except:
@@ -262,7 +261,7 @@ class AwsTransfers(Main):
         :param object_name: S3 object name. If not specified then file_name is used
         :return: True if file was uploaded, else False
         """
-
+        pdb.set_trace()
         # If S3 object_name was not specified, use file_name
         if object_name is None:
             object_name = file_name
