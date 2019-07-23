@@ -150,11 +150,10 @@ class CQC_settings(UK_entities):
                  'reg_name_short': np.str,
                  'leven_dist_N': np.int, 'leven_dist_NA': np.int,
                  'Manual_Match_N': np.str, 'Manual_Match_NA': np.str,
-                  # 'count':np.int, 'src_count':np.int,
-                 # 'sum': np.float, 'src_amount':np.float,
                  'src_str_len' : np.int, 'reg_str_len': np.int
                  }
 
     raw_src_data_cols = ['supplier_source_string','sum','count']
 
     dbUpload_cols = ['src_name', 'reg_name', 'src_str_len','reg_str_len', 'leven_dist_N', 'Manual_Match_N', 'reg_id','src_amount','src_count']
+

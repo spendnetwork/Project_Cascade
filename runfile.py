@@ -82,7 +82,7 @@ class Main:
         self.data_matching = self.runfile_mods.data_matching
         self.convert_training = self.runfile_mods.convert_training
         self.org_suffixes = self.runfile_mods.org_suffixes
-        self.AWS_calls = self.runfile_mods.AWS_calls
+        self.match_filtering = self.runfile_mods.match_filtering
 
         # Defined during runtime
         self.main_proc = settings.main_proc
@@ -159,21 +159,22 @@ class Main:
 
                                 # EXTRACTS FUNCTION IS TAKING ONLY LEV DIST 100 MATCHES ON THE FIRST ITERATION AND NOT ADDING ANY MORE AFTER AT
                                 # DIFFERENT CASCADE LEVELS!!
-
-                                extracts_file = self.data_matching.CascadeExtraction(self).extract(clust_df)
+                                filtered_matches = self.match_filtering.MatchFiltering(self).filter(clust_df)
                             break
                         else:
                             continue
                     # Output stats file:
-                    self.data_analysis.StatsCalculations(self, clust_df, extracts_file, src_df).calculate()
+                    self.data_analysis.StatsCalculations(self, clust_df, filtered_matches, src_df).calculate()
 
         except StopIteration:
             # Continue if no more config files found
             print("Done")
 
-        self.data_matching.VerificationAndUploads(self).verify()
+        self.match_filtering.VerificationAndUploads(self).verify()
 
-        self.AWS_calls.AwsTransfers(self).transfer()
+        if in_args.region == 'UK_entities':
+            self.AWS_calls = self.runfile_mods.AWS_calls
+            self.AWS_calls.AwsTransfers(self).transfer()
 
 if __name__ == '__main__':
 

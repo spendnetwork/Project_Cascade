@@ -104,7 +104,7 @@ Project_Cascade
         |--process_type **  # I.e. Name_Only, or Name_Address
             |--Deduped_Data
                 |--Splits
-            |--Extracted_Matches
+            |--Filtered_Matches
             |--Manual_Matches
             |--Unverified_Matches
             |--Verified_Matches
@@ -179,4 +179,4 @@ Clustering here is important because it will affect how much of the matched data
 #### 3. Altering the config files
 Once the training has complete, this is where the config files come into play, as we are now attempting to verify the best quality matches factoring in that longer strings can have lower levenshtein ratios and still be good matches compared to shorter strings.
 
-Create new config files (some provided by default) as required (must follow the current naming convention) and experiment with the 'char_counts' and 'min_match_score', making sure to increase one as you decrease the other. The module will automatically register additional files and run the process and output the stats to separate csvs for you to compare. These files will be saved in `Outputs/Extracted_Matches`.
+Create new config files (some provided by default) as required (must follow the current naming convention) and experiment with the 'char_counts' and 'min_match_score', making sure to increase one as you decrease the other. The module will automatically register additional files and run the process and output the stats to separate csvs for you to compare. These files will be saved in `Outputs/Filtered_Matches`.

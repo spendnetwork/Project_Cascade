@@ -172,29 +172,29 @@ class CascadeExtraction(Main):
                         clustdf.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num][
                             'char_counts']]
         else:
-            if os.path.exists(self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
+            if os.path.exists(self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(
                     self.conf_file_num) + '.csv'):
                 # Clear any previous extraction file for this config:
-                os.remove(self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
+                os.remove(self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(
                     self.conf_file_num) + '.csv')
 
         # Add process number to column for calculating stats purposes:
         clustdf['process_num'] = str(self.proc_num)
 
         if not os.path.exists(
-                self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv'):
+                self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv'):
             clustdf.to_csv(
-                self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
+                self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index=False)
             return clustdf
         else:
             extracts_file = pd.read_csv(
-                self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
+                self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index_col=None)
             extracts_file = pd.concat([extracts_file, clustdf], ignore_index=True, sort=True)
             extracts_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
             extracts_file.to_csv(
-                self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
+                self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index=False)
             return extracts_file
 
@@ -218,7 +218,7 @@ class VerificationAndUploads(Main):
             if self.in_args.config_review:
                 self.best_config = input(
                     (
-                        "\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
+                        "\nReview Outputs/{0}/Filtered_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
                         self.proc_type))
 
             else:
@@ -255,7 +255,7 @@ class VerificationAndUploads(Main):
     	"""
 
         manual_match_file = pd.read_csv(
-            self.directories['extract_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
+            self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
             index_col=None)
         manual_match_file['Manual_Match_N'] = ''
 
@@ -316,7 +316,7 @@ class VerificationAndUploads(Main):
 #         if in_args.config_review:
 #             best_config = input(
 #                 (
-#                     "\nReview Outputs/{0}/Extracted_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
+#                     "\nReview Outputs/{0}/Filtered_Matches/Matches_Stats_{0}.csv and choose best config file number:").format(
 #                     proc_type))
 #         else:
 #             # ...otherwise pick best config_file based on stats file (max leven dist avg):
@@ -425,23 +425,23 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #             clustdf = clustdf[
 #                 clustdf.src_name_short.str.len() <= config_files['processes'][proc_type][proc_num]['char_counts']]
 #     else:
-#         if os.path.exists(directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv'):
+#         if os.path.exists(directories['filtered_matches'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv'):
 #             # Clear any previous extraction file for this config:
-#             os.remove(directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv')
+#             os.remove(directories['filtered_matches'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv')
 #
 #     # Add process number to column for calculating stats purposes:
 #     clustdf['process_num'] = str(proc_num)
 #
-#     if not os.path.exists(directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv'):
-#         clustdf.to_csv(directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv',
+#     if not os.path.exists(directories['filtered_matches'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv'):
+#         clustdf.to_csv(directories['filtered_matches'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv',
 #                        index=False)
 #         return clustdf
 #     else:
 #         extracts_file = pd.read_csv(
-#             directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv', index_col=None)
+#             directories['filtered_matches'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv', index_col=None)
 #         extracts_file = pd.concat([extracts_file, clustdf], ignore_index=True, sort=True)
 #         extracts_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
-#         extracts_file.to_csv(directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv',
+#         extracts_file.to_csv(directories['filtered_matches'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv',
 #                              index=False)
 #         return extracts_file
 #
@@ -453,7 +453,7 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 # 	"""
 #
 #     manual_match_file = pd.read_csv(
-#         directories['extract_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv', index_col=None)
+#         directories['filtered_matches'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv', index_col=None)
 #     manual_match_file['Manual_Match_N'] = ''
 #     manual_match_file['Manual_Match_NA'] = ''
 #
