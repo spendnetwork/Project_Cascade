@@ -56,10 +56,10 @@ class DbCalls(Main):
                     """COPY {}({}) from stdin (format csv)""".format(self.upload_table, headers), f)
                 conn.commit()
 
-            # Remove any exact duplicates from db table
-            query = self.removeTableDuplicates()
-            cur.execute(query)
-            conn.commit()
+        # Remove any exact duplicates from db table
+        query = self.removeTableDuplicates()
+        cur.execute(query)
+        conn.commit()
 
 
     def createConnection(self):
