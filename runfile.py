@@ -82,6 +82,7 @@ class Main:
         self.data_matching = self.runfile_mods.data_matching
         self.convert_training = self.runfile_mods.convert_training
         self.org_suffixes = self.runfile_mods.org_suffixes
+        self.AWS_calls = self.runfile_mods.AWS_calls
 
         # Defined during runtime
         self.main_proc = settings.main_proc
@@ -172,7 +173,7 @@ class Main:
 
         self.data_matching.VerificationAndUploads(self).verify()
 
-        self.db_calls.AwsTransfers(self).transfer()
+        self.AWS_calls.AwsTransfers(self).transfer()
 
 if __name__ == '__main__':
 
