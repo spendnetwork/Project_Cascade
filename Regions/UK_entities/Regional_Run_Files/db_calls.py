@@ -39,7 +39,7 @@ class DbCalls(Main):
         '''
 
         conn, cur = self.createConnection()
-        print("Connected.")
+        print(f"Connected to {self.upload_table}")
         files = glob.glob(os.path.join(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type),'*'))
         for upload_file in files:
             with open(upload_file, 'r') as f:
@@ -56,14 +56,16 @@ class DbCalls(Main):
                     """COPY {}({}) from stdin (format csv)""".format(self.upload_table, headers), f)
                 conn.commit()
 
-            query = self.removeTableDuplicates()
-
-            cur.execute(query)
-            conn.commit()
+        # Remove any exact duplicates from db table
+        query = self.removeTableDuplicates()
+        cur.execute(query)
+        conn.commit()
 
 
     def createConnection(self):
         '''
+        Creates a connection to the database specified .env
+
         :return connection : the database connection object
         :return cur : the cursor (temporary storage for retrieved data
         '''
@@ -74,6 +76,8 @@ class DbCalls(Main):
 
     def removeTableDuplicates(self):
         """
+        Remove any exact duplicates from db table
+
         :param table_name: the database table containing duplicates
         :param headers: the csv headers
         :return: the sql query to be executed
@@ -93,7 +97,9 @@ class DbCalls(Main):
 class FetchData(DbCalls):
 
     '''
-    Checks whether a registry/source datafile exists already, and if not prompts the user to download from remote sources via .env
+    Checks whether a registry/source datafile exists already, and if not prompts the user to download from remote sources
+     via .env
+
     :param region_dir: root directory
     :param directories: dictionary containing various file/directories
     :param in_args: arguments containing variables such as file names and specific options
@@ -140,7 +146,9 @@ class FetchData(DbCalls):
                 index=False)
 
     def createRegistryDataSQLQuery(self):
-        """create query for pulling data from db"""
+        """
+        Create query for downloading registry data from db
+        """
         print("Obtaining registry data...")
         query = \
             """
@@ -157,7 +165,10 @@ class FetchData(DbCalls):
         return query
 
     def createSourceDataSQLQuery(self):
-        """create query for pulling data from db"""
+        """
+        Create query for pulling source data from db
+        """
+
         print("Obtaining source data...")
         query = \
             """
@@ -187,32 +198,12 @@ class FetchData(DbCalls):
         return query
 
     def fetchdata(self, query):
-        """ retrieve data from the db using query"""
+        """
+        Retrieve data from the db using query
+        """
+
         conn, _ = self.db_calls.DbCalls.createConnection(self)
         print('Importing data...')
         df = pd.read_sql(query, con=conn)
         conn.close()
         return df
-
-
-if __name__ == '__main__':
-    rootdir = os.path.dirname(os.path.abspath(__file__))
-    in_args, _ = runfile.getInputArgs(rootdir)
-
-    if in_args.region == 'UK_entities':
-        settings = settings.UK_entities
-
-    settings.in_args = in_args
-    settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
-
-    # Define config file variables and related data types file
-    settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
-
-    # if not in_args
-    DbCalls.addDataToTable(settings)
-
-    # import boto3
-    # >> > s3 = boto3.client('s3')
-    # response = s3.upload_file(
-    #     '/Users/davidmellor/Code/Spend_Network/Data_Projects/Project_Cascade/Regions/UK_entities/Outputs/Name_Only/holder/Matches_Buyers_DMadj.csv',
-    #     'sn-orgmatching, ' Verified_matches / lalal.csv')

@@ -58,6 +58,7 @@ class ClearFiles(Setup):
 
         if self.in_args.clear_all:
             self.clear_unverified_matches()
+            self.clear_verified_matches()
             self.clear_extract_matches()
             self.clear_deduped_data()
             self.clear_raw_data()
@@ -67,16 +68,19 @@ class ClearFiles(Setup):
             self.clear_adj_data()
             self.clear_deduped_data()
             self.clear_unverified_matches()
+            self.clear_verified_matches()
             self.clear_extract_matches()
 
         if self.in_args.clear_outputs:
             self.clear_unverified_matches()
+            self.clear_verified_matches()
             self.clear_extract_matches()
             self.clear_deduped_data()
 
         if self.in_args.clear_post_matching:
             self.clear_extract_matches()
             self.clear_unverified_matches()
+            self.clear_verified_matches()
 
     @staticmethod
     def removeFiles(fp):
@@ -90,6 +94,9 @@ class ClearFiles(Setup):
 
     def clear_unverified_matches(self):
         self.removeFiles(os.path.join(self.directories['unverified_matches_dir'].format(self.region_dir, self.proc_type), '*'))
+
+    def clear_verified_matches(self):
+        self.removeFiles(os.path.join(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type), '*'))
 
     def clear_extract_matches(self):
         self.removeFiles(os.path.join(self.directories['proc_type_matches_dir'].format(self.region_dir, self.proc_type), '*'))
