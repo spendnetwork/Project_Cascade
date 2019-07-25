@@ -94,11 +94,13 @@ class Main:
         self.best_config = settings.best_config
 
     def run_main(self):
-
+        # Build project folders
         self.setup.Setup(self).setupRawDirs()
-        # Delete csvs if required
+
+        # Delete csvs from previous runs
         self.setup.ClearFiles(self).clearFiles()
 
+        # If not using recycle mode
         if not in_args.recycle:
             try:
                 # If registry/registry data file doesn't exist, pull from database
