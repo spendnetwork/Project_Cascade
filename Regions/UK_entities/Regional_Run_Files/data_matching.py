@@ -1,9 +1,13 @@
+import sys
+
 import pandas as pd
 import os
 import subprocess
 from shutil import copyfile
 from runfile import Main
 import glob
+from csvdedupe.csvlink import launch_new_instance as launch_matching
+from csvdedupe.csvdedupe import launch_new_instance as launch_clustering
 
 
 class Matching(Main):
@@ -106,20 +110,39 @@ class Matching(Main):
             if not os.path.exists(self.matched_fp):
                 print("Starting matching of split file " + str(fileno) + '/' + str(numfiles))
 
-                cmd = ['csvlink '
-                       + str(src_fp) + ' '
-                       + str(self.reg_fp)
-                       + ' --field_names_1 ' + ' '.join(self.src_fields)
-                       + ' --field_names_2 ' + ' '.join(self.reg_fields)
-                       + ' --training_file ' + self.matches_training_file
-                       + ' --settings_file ' + self.learned_settings_file
-                       + ' --output_file ' + os.path.join(splits_output_dir, str(fileno) + '.csv') + ' '
-                       + str(self.train[0])
-                       + ' --inner_join'
-                       ]
+                # cmd = ['csvlink '
+                #        + str(src_fp) + ' '
+                #        + str(self.reg_fp)
+                #        + ' --field_names_1 ' + ' '.join(self.src_fields)
+                #        + ' --field_names_2 ' + ' '.join(self.reg_fields)
+                #        + ' --training_file ' + self.matches_training_file
+                #        + ' --settings_file ' + self.learned_settings_file
+                #        + ' --output_file ' + os.path.join(splits_output_dir, str(fileno) + '.csv') + ' '
+                #        + str(self.train[0])
+                #        + ' --inner_join'
+                #        ]
+                #
+                # p = subprocess.Popen(cmd, shell=True)
+                # p.wait()
 
-                p = subprocess.Popen(cmd, shell=True)
-                p.wait()
+                sys.argv = [
+                    'csvlink',
+                    str(src_fp),
+                    str(self.reg_fp),
+                    '--field_names_1',
+                        ' '.join(self.src_fields),
+                    '--field_names_2',
+                        ' '.join(self.reg_fields),
+                    '--training_file',
+                        self.matches_training_file,
+                    '--settings_file',
+                        self.learned_settings_file,
+                    '--output_file',
+                        os.path.join(splits_output_dir, str(fileno) + '.csv'),
+                    str(self.train[0])
+                ]
+
+                launch_matching()
 
         files = glob.glob(os.path.join(splits_output_dir, '*'))
         frames = []
@@ -176,19 +199,38 @@ class Matching(Main):
                          self.matches_training_file)
 
             print("Starting matching...")
-            cmd = ['csvlink '
-                   + str(src_fp) + ' '
-                   + str(self.reg_fp)
-                   + ' --field_names_1 ' + ' '.join(self.src_fields)
-                   + ' --field_names_2 ' + ' '.join(self.reg_fields)
-                   + ' --training_file ' + self.matches_training_file
-                   + ' --settings_file ' + self.learned_settings_file
-                   + ' --output_file ' + self.matched_fp + ' '
-                   + str(self.train[0])
-                   ]
+            # cmd = ['csvlink '
+            #        + str(src_fp) + ' '
+            #        + str(self.reg_fp)
+            #        + ' --field_names_1 ' + ' '.join(self.src_fields)
+            #        + ' --field_names_2 ' + ' '.join(self.reg_fields)
+            #        + ' --training_file ' + self.matches_training_file
+            #        + ' --settings_file ' + self.learned_settings_file
+            #        + ' --output_file ' + self.matched_fp + ' '
+            #        + str(self.train[0])
+            #        ]
+            #
+            # p = subprocess.Popen(cmd, shell=True)
+            # p.wait()
 
-            p = subprocess.Popen(cmd, shell=True)
-            p.wait()
+            sys.argv = [
+                'csvlink',
+                str(src_fp),
+                str(self.reg_fp),
+                '--field_names_1',
+                    ' '.join(self.src_fields),
+                '--field_names_2',
+                    ' '.join(self.reg_fields),
+                '--training_file',
+                    self.matches_training_file,
+                '--settings_file',
+                    self.learned_settings_file,
+                '--output_file',
+                    self.matched_fp,
+                str(self.train[0])
+            ]
+
+            launch_matching()
 
             df = pd.read_csv(self.matched_fp,dtype=self.df_dtypes)
             df = df[pd.notnull(df['src_name'])]
@@ -203,16 +245,32 @@ class Matching(Main):
                          self.cluster_training_file)
 
             print("Starting clustering...")
-            cmd = ['csvdedupe '
-                   + self.matched_fp + ' '
-                   + ' --field_names ' + ' '.join(self.src_fields) + ' '
-                   + str(self.train[0])
-                   + ' --training_file ' + self.cluster_training_file
-                   + ' --settings_file ' + self.learned_settings_file
-                   + ' --output_file ' + self.clustered_fp]
+            # cmd = ['csvdedupe '
+            #        + self.matched_fp + ' '
+            #        + ' --field_names ' + ' '.join(self.src_fields) + ' '
+            #        + str(self.train[0])
+            #        + ' --training_file ' + self.cluster_training_file
+            #        + ' --settings_file ' + self.learned_settings_file
+            #        + ' --output_file ' + self.clustered_fp]
+            #
+            # p = subprocess.Popen(cmd, shell=True)
+            # p.wait()  # wait for subprocess to finish
 
-            p = subprocess.Popen(cmd, shell=True)
-            p.wait()  # wait for subprocess to finish
+            sys.argv = [
+                'csvdedupe',
+                self.matched_fp,
+                '--field_names',
+                    ' '.join(self.src_fields),
+                str(self.train[0]),
+                '--training_file',
+                    self.cluster_training_file,
+                '--settings_file',
+                    self.learned_settings_file,
+                '--output_file',
+                    self.clustered_fp
+            ]
+
+            launch_clustering()
 
             if not self.in_args.recycle:
                 # Copy training file to backup, so it can be found and copied into recycle phase clustering

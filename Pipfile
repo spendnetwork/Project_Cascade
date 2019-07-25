@@ -19,6 +19,7 @@ boto3 = "*"
 csvdedupe = {git = "https://www.github.com/dmells/csvdedupe"}
 # tqdm doesn't work with latest version of pandas
 pandas = "==0.24.2"
+pyyaml = "*"
 
 [requires]
 python_version = "3.6"

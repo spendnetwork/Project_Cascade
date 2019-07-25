@@ -3,9 +3,10 @@ import pandas as pd
 import os
 import ast
 from pathlib import Path
-import pdb
+import yaml
 import settings
 import datetime
+import logging.config
 
 def getInputArgs(rootdir, args=None):
     """
@@ -176,7 +177,16 @@ class Main:
             self.AWS_calls = self.runfile_mods.AWS_calls
             self.AWS_calls.AwsTransfers(self).transfer()
 
+
 if __name__ == '__main__':
+
+    # Import logging configs
+    with open('config.yaml', 'r') as f:
+        config = yaml.safe_load(f.read())
+        logging.config.dictConfig(config)
+
+    # Instantiate logger
+    logger = logging.getLogger(__name__)
 
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = getInputArgs(rootdir)
