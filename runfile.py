@@ -8,6 +8,7 @@ import settings
 import datetime
 import logging.config
 import sys
+import pdb
 from logging.handlers import SysLogHandler
 from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
 
@@ -206,24 +207,22 @@ if __name__ == '__main__':
 
     # If any production flags are being called use production logger...
     if in_args.prodn_verified or in_args.prodn_unverified:
-        # logger = logging.getLogger('prodnpt')
         config_stdout_root_logger_with_papertrail(app_name='entity_matching', level=logging.DEBUG)
 
     # ...else use local logger
     else:
+        # Import logging configs
+        with open('config.yaml', 'r') as f:
+            config = yaml.safe_load(f.read())
+            logging.config.dictConfig(config)
+
         logger = logging.getLogger()
 
-    # Import logging configs
-    with open('config.yaml', 'r') as f:
-        config = yaml.safe_load(f.read())
-        logging.config.dictConfig(config)
+        def exception_handler(type, value, tb):
+            logger.exception('Uncaught exception: {0}'.format(str(value)))
 
-    # https://blog.papertrailapp.com/papertrail-for-python-logs/
-    def exception_handler(type, value, tb):
-        logger.exception('Uncaught exception: {0}'.format(str(value)))
-
-    # Install exception handler
-    sys.excepthook = exception_handler
+        # Install exception handler
+        sys.excepthook = exception_handler
 
     settings.in_args = in_args
     settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
