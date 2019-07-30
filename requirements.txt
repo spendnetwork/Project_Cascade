@@ -7,7 +7,6 @@ BTrees==4.5.1
 categorical-distance==1.9
 cffi==1.12.3
 chwrapper==0.3.0
--e git+ssh://git@github.com/spendnetwork/core.git#egg=core
 csvdedupe==0.1.18
 datetime-distance==0.1.3
 dedupe==1.9.8
