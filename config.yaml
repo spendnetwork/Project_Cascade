@@ -1,26 +1,39 @@
 version: 1
-
 formatters:
   simple:
     format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    datefmt: '%b %d %H:%M:%S'
   whatwhere:
     format: '%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)s - %(message)s'
-
 handlers:
-  console:
+  dev_console_handler:
     class: logging.StreamHandler
     level: DEBUG
     formatter: whatwhere
     stream: ext://sys.stdout
-  file_handler:
-      class: logging.FileHandler
-      level: WARNING
+  dev_file_handler:
+    class: logging.FileHandler
+    level: DEBUG
+    formatter: whatwhere
+    filename: info.log
+    mode: w
+  prodn_handler:
+      class: logging.handlers.SysLogHandler
+      level: INFO
       formatter: simple
-      filename: info.log
-      mode: w
-
+      address: ['logs4.papertrailapp.com', 10985]
+  personal_papertrail:
+    class: logging.handlers.SysLogHandler
+    level: DEBUG
+    formatter: simple
+    address: ['logs3.papertrailapp.com', 49535]
 loggers:
-  productionlogger:
-    handlers: [file_handler]
-  root:
-    handlers: [console]
+  mypapertrail:
+    handlers: [personal_papertrail]
+    propagate: no
+  prodnpt:
+    handlers: [prodn_handler]
+    propagate: no
+
+root:
+  handlers: [dev_file_handler, dev_console_handler]

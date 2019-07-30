@@ -7,6 +7,10 @@ import yaml
 import settings
 import datetime
 import logging.config
+import sys
+from logging.handlers import SysLogHandler
+from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
+
 
 def getInputArgs(rootdir, args=None):
     """
@@ -182,14 +186,6 @@ class Main:
 
 if __name__ == '__main__':
 
-    # Import logging configs
-    with open('config.yaml', 'r') as f:
-        config = yaml.safe_load(f.read())
-        logging.config.dictConfig(config)
-
-    # Instantiate logger
-    logger = logging.getLogger(__name__)
-
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = getInputArgs(rootdir)
 
@@ -207,6 +203,27 @@ if __name__ == '__main__':
 
     if in_args.region == 'CQC':
         settings = settings.CQC_settings
+
+    # If any production flags are being called use production logger...
+    if in_args.prodn_verified or in_args.prodn_unverified:
+        # logger = logging.getLogger('prodnpt')
+        config_stdout_root_logger_with_papertrail(app_name='entity_matching', level=logging.DEBUG)
+
+    # ...else use local logger
+    else:
+        logger = logging.getLogger()
+
+    # Import logging configs
+    with open('config.yaml', 'r') as f:
+        config = yaml.safe_load(f.read())
+        logging.config.dictConfig(config)
+
+    # https://blog.papertrailapp.com/papertrail-for-python-logs/
+    def exception_handler(type, value, tb):
+        logger.exception('Uncaught exception: {0}'.format(str(value)))
+
+    # Install exception handler
+    sys.excepthook = exception_handler
 
     settings.in_args = in_args
     settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
