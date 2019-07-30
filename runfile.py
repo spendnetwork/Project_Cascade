@@ -11,10 +11,7 @@ import sys
 import pdb
 from logging.handlers import SysLogHandler
 
-if sys.platform == 'linux':
-    from ..git.core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
-else:
-    from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
+from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
 
 
 def getInputArgs(rootdir, args=None):
