@@ -20,6 +20,7 @@ csvdedupe = {git = "https://www.github.com/dmells/csvdedupe"}
 # tqdm doesn't work with latest version of pandas
 pandas = "==0.24.2"
 pyyaml = "*"
+core = {editable = true,path = "/Users/davidmellor/Code/GitHub/core"}
 
 [requires]
 python_version = "3.6"
