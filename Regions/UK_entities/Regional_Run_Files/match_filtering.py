@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from runfile import Main
+from runfile import Main, logging
 from datetime import datetime
 import glob
 import pdb
@@ -128,9 +128,9 @@ class VerificationAndUploads(Main):
         if self.in_args.terminal_matching:
             # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
             for index, row in best_filtered.sample(frac=1).iterrows():
-                print("\nsource name: " + str(row.src_name_adj))
-                print("\nRegistry name: " + str(row.reg_name_adj))
-                print("\nLevenshtein distance: " + str(row.leven_dist_N))
+                logging.info("\nsource name: " + str(row.src_name_adj))
+                logging.info("\nRegistry name: " + str(row.reg_name_adj))
+                logging.info("\nLevenshtein distance: " + str(row.leven_dist_N))
                 match_options = ["y", "n", "u", "f"]
                 match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
                 while match.lower() not in match_options:
@@ -144,7 +144,7 @@ class VerificationAndUploads(Main):
 
             best_filtered.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 
-            print("Saving...")
+            logging.info("Saving...")
             best_filtered.to_csv(self.unverified_file, index=False, columns=self.dbUpload_cols)
         else:
             best_filtered.to_csv(self.unverified_file, index=False, columns=self.dbUpload_cols)

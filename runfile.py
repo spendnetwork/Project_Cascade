@@ -9,7 +9,6 @@ import datetime
 import logging.config
 import sys
 import pdb
-from logging.handlers import SysLogHandler
 
 from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
 
@@ -68,6 +67,7 @@ class Main:
         self.config_path = settings.config_path
         self.settings = settings
 
+
         # Defined in settings file
         self.df_dtypes = settings.df_dtypes
         self.stats_cols = settings.stats_cols
@@ -100,6 +100,7 @@ class Main:
         self.best_config = settings.best_config
 
     def run_main(self):
+
         # Build project folders
         self.setup.Setup(self).setupRawDirs()
 
@@ -166,8 +167,6 @@ class Main:
                                 else:
                                     clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
 
-                                # EXTRACTS FUNCTION IS TAKING ONLY LEV DIST 100 MATCHES ON THE FIRST ITERATION AND NOT ADDING ANY MORE AFTER AT
-                                # DIFFERENT CASCADE LEVELS!!
                                 filtered_matches = self.match_filtering.MatchFiltering(self).filter(clust_df)
                             break
                         else:
@@ -217,10 +216,8 @@ if __name__ == '__main__':
             config = yaml.safe_load(f.read())
             logging.config.dictConfig(config)
 
-        logger = logging.getLogger()
-
         def exception_handler(type, value, tb):
-            logger.exception('Uncaught exception: {0}'.format(str(value)))
+            logging.exception('Uncaught exception: {0}'.format(str(value)))
 
         # Install exception handler
         sys.excepthook = exception_handler

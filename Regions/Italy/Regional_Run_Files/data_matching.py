@@ -4,7 +4,7 @@ import subprocess
 import numpy as np
 from shutil import copyfile
 import pdb
-from runfile import Main
+from runfile import Main, logging
 
 
 class Matching(Main):
@@ -82,7 +82,7 @@ class Matching(Main):
                 os.remove('./csvdedupe/csvdedupe/learned_settings')
 
 
-            print("Starting matching...")
+            logging.info("Starting matching...")
 
             cmd = ['csvlink '
                    + str(src_file) + ' '
@@ -110,7 +110,7 @@ class Matching(Main):
                 copyfile(self.directories['cluster_training_backup'].format(self.region_dir),
                          self.directories['cluster_training_file'].format(self.region_dir, self.proc_type))
 
-            print("Starting clustering...")
+            logging.info("Starting clustering...")
             cmd = ['python csvdedupe.py '
                    + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
                    + ' --field_names ' + ' '.join(src_fields) + ' '
@@ -267,9 +267,9 @@ class VerificationAndUploads(Main):
         if self.in_args.terminal_matching:
             # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
             for index, row in manual_match_file.sample(frac=1).iterrows():
-                print("\nsource name: " + str(row.src_name_adj))
-                print("\nRegistry name: " + str(row.reg_name_adj))
-                print("\nLevenshtein distance: " + str(row.leven_dist_N))
+                logging.info("\nsource name: " + str(row.src_name_adj))
+                logging.info("\nRegistry name: " + str(row.reg_name_adj))
+                logging.info("\nLevenshtein distance: " + str(row.leven_dist_N))
                 match_options = ["y", "n", "u", "f"]
                 match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
                 while match.lower() not in match_options:
@@ -283,7 +283,7 @@ class VerificationAndUploads(Main):
 
             manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 
-            print("Saving...")
+            logging.info("Saving...")
             manual_match_file.to_csv(
                 self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
@@ -299,7 +299,7 @@ class VerificationAndUploads(Main):
             # return manual_match_file
 
         if not self.in_args.upload:
-            print(
+            logging.info(
                 "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
                     self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
                         self.best_config) + '.csv'))
@@ -366,7 +366,7 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
         # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
         if os.path.exists('./learned_settings'):
             os.remove('./learned_settings')
-        print("Starting matching...")
+        logging.info("Starting matching...")
 
         cmd = ['csvlink '
                + str(src_file) + ' '
@@ -473,15 +473,15 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #         # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
 #         for index, row in manual_match_file.sample(frac=1).iterrows():
 #             if choice.lower() == 'n':
-#                 print("\nsource name: " + str(row.src_name_adj))
-#                 print("\nRegistry name: " + str(row.reg_name_adj))
-#                 print("\nLevenshtein distance: " + str(row.leven_dist_N))
+#                 logging.info("\nsource name: " + str(row.src_name_adj))
+#                 logging.info("\nRegistry name: " + str(row.reg_name_adj))
+#                 logging.info("\nLevenshtein distance: " + str(row.leven_dist_N))
 #             else:
-#                 print("\nsource name: " + str(row.src_name_adj))
-#                 print("source address: " + str(row.src_address_adj))
-#                 print("\nRegistry name: " + str(row.reg_name_adj))
-#                 print("Registry address: " + str(row.reg_address_adj))
-#                 print("\nLevenshtein distance : " + str(row.leven_dist_NA))
+#                 logging.info("\nsource name: " + str(row.src_name_adj))
+#                 logging.info("source address: " + str(row.src_address_adj))
+#                 logging.info("\nRegistry name: " + str(row.reg_name_adj))
+#                 logging.info("Registry address: " + str(row.reg_address_adj))
+#                 logging.info("\nLevenshtein distance : " + str(row.leven_dist_NA))
 #
 #             match_options = ["y", "n", "u", "f"]
 #             match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
@@ -497,7 +497,7 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #
 #         manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 #
-#         print("Saving...")
+#         logging.info("Saving...")
 #         manual_match_file.to_csv(directories['unverified_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
 #                                  index=False,
 #                                  # columns=['reg_id', 'id', 'reg_name',
@@ -517,11 +517,11 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #                                           'reg_address','src_name', 'src_name_adj', 'src_address', 'src_address_adj', 'reg_address_adj', 'Manual_Match_N','Manual_Match_NA', 'srcjoinfields', 'regjoinfields'])
 #         if not in_args.recycle:
 #             if not in_args.upload:
-#                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
+#                 logging.info("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
 #                 directories['unverified_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'))
 #         else:
 #             if not in_args.upload:
-#                 print("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --recycle --upload".format(
+#                 logging.info("\nIf required, please perform manual matching process in {} and then run 'python runfile.py --recycle --upload".format(
 #                     directories['unverified_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv'))
 
 
@@ -585,7 +585,7 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #         # Remove learned_settings (created from previous runtime) file as causes dedupe to hang sometimes, but isn't required
 #         if os.path.exists('./learned_settings'):
 #             os.remove('./learned_settings')
-#         print("Starting matching...")
+#         logging.info("Starting matching...")
 #
 #         cmd = ['csvlink '
 #                + str(src_file) + ' '
@@ -614,7 +614,7 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #         if in_args.recycle:
 #             copyfile(directories['cluster_training_backup'].format(region_dir), directories['cluster_training_file'].format(region_dir, proc_type))
 #
-#         print("Starting clustering...")
+#         logging.info("Starting clustering...")
 #         cmd = ['python csvdedupe.py '
 #                + directories['match_output_file'].format(region_dir, proc_type) + ' '
 #                + ' --field_names ' + ' '.join(src_fields) + ' '

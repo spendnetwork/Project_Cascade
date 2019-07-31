@@ -7,7 +7,7 @@ from dotenv import load_dotenv, find_dotenv
 import os
 from pathlib import Path
 import runfile
-from runfile import Main
+from runfile import Main, logging
 import settings
 import glob
 import boto3
@@ -62,7 +62,7 @@ class DbCalls(Main):
         :return connection : the database connection object
         :return cur : the cursor (temporary storage for retrieved data
         '''
-        print('Connecting to database...')
+        logging.info('Connecting to database...')
         conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
         cur = conn.cursor()
         return conn, cur
@@ -74,7 +74,7 @@ class DbCalls(Main):
         :return: the sql query to be executed
         """
 
-        print("Removing duplicates from table...")
+        logging.info("Removing duplicates from table...")
         query = \
             """
             WITH dups AS 
@@ -106,7 +106,7 @@ class FetchData(DbCalls):
             # Check env file exists
             env_fpath = os.path.join('.', '.env')
             if not os.path.exists(env_fpath):
-                print("Database credentials not found. Please complete the .env file using the '.env template'")
+                logging.info("Database credentials not found. Please complete the .env file using the '.env template'")
                 sys.exit()
 
             # Load registry data
@@ -123,7 +123,7 @@ class FetchData(DbCalls):
 
             env_fpath = os.path.join('.', '.env')
             if not os.path.exists(env_fpath):
-                print(
+                logging.info(
                     "Database credentials not found. Please complete the .env file using the '.env template'")
                 sys.exit()
 
@@ -137,7 +137,7 @@ class FetchData(DbCalls):
 
     def createRegistryDataSQLQuery(self):
         """create query for pulling data from db"""
-        print("Obtaining registry data...")
+        logging.info("Obtaining registry data...")
         query = \
             """
             SELECT
@@ -151,7 +151,7 @@ class FetchData(DbCalls):
 
     def createSourceDataSQLQuery(self):
         """create query for pulling data from db"""
-        print("Obtaining source data...")
+        logging.info("Obtaining source data...")
         query = \
             """
             SELECT            
@@ -183,7 +183,7 @@ class FetchData(DbCalls):
     def fetchdata(self, query):
         """ retrieve data from the db using query"""
         conn, _ = self.db_calls.DbCalls.createConnection(self)
-        print('Importing data...')
+        logging.info('Importing data...')
         df = pd.read_sql(query, con=conn)
         conn.close()
         return df
@@ -257,7 +257,7 @@ class AwsTransfers(Main):
         try:
             response = s3_client.upload_file(file_name, bucket, object_name)
         except ClientError as e:
-            print(e)
+            logging.info(e)
             return False
         return True
 

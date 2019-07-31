@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import subprocess
 from shutil import copyfile
-from runfile import Main
+from runfile import Main, logging
 import glob
 from csvdedupe.csvlink import launch_new_instance as launch_matching
 from csvdedupe.csvdedupe import launch_new_instance as launch_clustering
@@ -108,7 +108,7 @@ class Matching(Main):
             fileno += 1
 
             if not os.path.exists(self.matched_fp):
-                print("Starting matching of split file " + str(fileno) + '/' + str(numfiles))
+                logging.info("Starting matching of split file " + str(fileno) + '/' + str(numfiles))
 
                 # cmd = ['csvlink '
                 #        + str(src_fp) + ' '
@@ -198,7 +198,7 @@ class Matching(Main):
                 copyfile(self.directories['manual_matching_train_backup'].format(self.region_dir),
                          self.matches_training_file)
 
-            print("Starting matching...")
+            logging.info("Starting matching...")
             # cmd = ['csvlink '
             #        + str(src_fp) + ' '
             #        + str(self.reg_fp)
@@ -244,7 +244,7 @@ class Matching(Main):
                 copyfile(self.directories['cluster_training_backup'].format(self.region_dir),
                          self.cluster_training_file)
 
-            print("Starting clustering...")
+            logging.info("Starting clustering...")
             # cmd = ['csvdedupe '
             #        + self.matched_fp + ' '
             #        + ' --field_names ' + ' '.join(self.src_fields) + ' '

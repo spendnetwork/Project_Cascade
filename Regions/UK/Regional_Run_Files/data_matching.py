@@ -10,7 +10,7 @@ from tqdm import tqdm
 import pandas as pd
 import pdb
 from fuzzywuzzy import fuzz
-from runfile import Main
+from runfile import Main, logging
 # import settings
 
 load_dotenv(find_dotenv())
@@ -71,7 +71,7 @@ class Matching(Main):
         for chunk in np.array_split(org_strings,
                                     math.ceil(len(org_strings) / 500), axis=0):
 
-            print("\nProcessing companies house batch of size: " + str(len(chunk)))
+            logging.info("\nProcessing companies house batch of size: " + str(len(chunk)))
 
             # For each org_string in the sub-array of org_strings
             # pull org data from companies house
@@ -113,7 +113,7 @@ class Matching(Main):
                     logger.error("Error requesting CH data: %s %s",
                                  response.status_code, response.reason)
             chunk_propn += int(len(chunk))
-            print("\nProgress: " + str(chunk_propn) + " of " +
+            logging.info("\nProgress: " + str(chunk_propn) + " of " +
                   str(len(org_strings)))
 
             df['CH_name'] = df['src_name'].map(ch_name_dict)
@@ -154,7 +154,7 @@ class Matching(Main):
         if not os.path.exists(self.directories['cluster_output_file'].format(self.region_dir, self.proc_type)):
             # Copy training file from first clustering session if recycle mode
 
-            print("Starting clustering...")
+            logging.info("Starting clustering...")
             cmd = ['python csvdedupe.py '
                    + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '
                    + ' --field_names ' + ' '.join(src_fields) + ' '
@@ -233,9 +233,9 @@ class VerificationAndUploads(Main):
         if self.in_args.terminal_matching:
             # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
             for index, row in manual_match_file.sample(frac=1).iterrows():
-                print("\nsource name: " + str(row.src_name_adj))
-                print("\nRegistry name: " + str(row.reg_name_adj))
-                print("\nLevenshtein distance: " + str(row.leven_dist_N))
+                logging.info("\nsource name: " + str(row.src_name_adj))
+                logging.info("\nRegistry name: " + str(row.reg_name_adj))
+                logging.info("\nLevenshtein distance: " + str(row.leven_dist_N))
                 match_options = ["y", "n", "u", "f"]
                 match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
                 while match.lower() not in match_options:
@@ -249,7 +249,7 @@ class VerificationAndUploads(Main):
 
             manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 
-            print("Saving...")
+            logging.info("Saving...")
             manual_match_file.to_csv(
                 self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(self.best_config) + '.csv',
                 index=False, columns=self.manual_matches_cols)
@@ -262,7 +262,7 @@ class VerificationAndUploads(Main):
             # return manual_match_file
 
         if not self.in_args.upload:
-            print(
+            logging.info(
                 "\nIf required, please perform manual matching process in {} and then run 'python runfile.py --convert_training --upload".format(
                     self.directories['unverified_matches_file'].format(self.region_dir, self.proc_type) + '_' + str(
                         self.best_config) + '.csv'))

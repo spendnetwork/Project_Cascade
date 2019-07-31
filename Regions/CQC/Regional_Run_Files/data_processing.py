@@ -3,7 +3,7 @@ import os
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
 import string
-from runfile import Main
+from runfile import Main, logging
 import pdb
 
 
@@ -131,7 +131,7 @@ class ProcessSourceData(DataProcessing):
                       inplace=True)
             df['src_amount'] = df['src_amount'].round(2)
 
-            print("Re-organising source data...")
+            logging.info("Re-organising source data...")
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
             orig_col = str('src_name')
@@ -140,7 +140,7 @@ class ProcessSourceData(DataProcessing):
             # Replace organisation suffixes with standardised version
             df[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
 
-            print("...done")
+            logging.info("...done")
             df.to_csv(adj_data, index=False)
 
             # If flag 'split' has been used, split the source file into smaller files
@@ -182,7 +182,7 @@ class ProcessRegistryData(DataProcessing):
             self.in_args.reg_adj)
 
         if not os.path.exists(adj_data):
-            print("Re-organising registry data...")
+            logging.info("Re-organising registry data...")
             df = pd.read_csv(raw_data,
                              dtype=self.df_dtypes,
 
@@ -204,7 +204,7 @@ class ProcessRegistryData(DataProcessing):
                 dffullmerge = pd.concat([dffullmerge, chunk], ignore_index=True)
 
             dffullmerge.drop_duplicates(inplace=True)
-            print("...done")
+            logging.info("...done")
 
             dffullmerge.to_csv(adj_data, index=False)
             return dffullmerge
@@ -231,7 +231,7 @@ class AssignRegDataToClusters:
         self.df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
         self.df.reset_index(drop=True, inplace=True)
         tqdm.pandas()
-        print("Assigning close matches within clusters...")
+        logging.info("Assigning close matches within clusters...")
         self.df = self.df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
         self.df.to_csv(self.assigned_file, index=False)
         return self.df

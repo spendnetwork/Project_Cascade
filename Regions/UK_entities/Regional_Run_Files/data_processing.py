@@ -3,7 +3,7 @@ import os
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
 import string
-from runfile import Main, logger
+from runfile import Main, logging
 import pdb
 
 class DataProcessing(Main):
@@ -130,7 +130,7 @@ class ProcessSourceData(DataProcessing):
             df = pd.read_csv(raw_data, usecols=self.raw_src_data_cols,
                              dtype=self.df_dtypes)
 
-            logger.info("Re-organising source data...")
+            logging.info("Re-organising source data...")
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
             orig_col = str('src_name')
@@ -146,7 +146,7 @@ class ProcessSourceData(DataProcessing):
             df = self.joinFields(df, 'src')
             df = df.drop(['src_address_streetaddress', 'src_address_locality', 'src_address_postalcode',
                           'src_address_countryname'], axis=1)
-            print("...done")
+            logging.info("...done")
             df.to_csv(adj_data, index=False)
 
             # If flag 'split' has been used, split the source file into smaller files
@@ -188,7 +188,7 @@ class ProcessRegistryData(DataProcessing):
             self.in_args.reg_adj)
 
         if not os.path.exists(adj_data):
-            print("Re-organising registry data...")
+            logging.info("Re-organising registry data...")
             df = pd.read_csv(raw_data,
                              dtype=self.df_dtypes,
                              chunksize=500000)
@@ -217,7 +217,7 @@ class ProcessRegistryData(DataProcessing):
                 dffullmerge = pd.concat([dffullmerge, dfmerge], ignore_index=True)
 
             dffullmerge.drop_duplicates(inplace=True)
-            print("...done")
+            logging.info("...done")
 
             dffullmerge['reg_joinfields'] = dffullmerge['reg_joinfields'].astype(str)
             dffullmerge['reg_source'] = dffullmerge['reg_source'].astype(str)
@@ -250,7 +250,7 @@ class AssignRegDataToClusters:
         self.df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
         self.df.reset_index(drop=True, inplace=True)
         tqdm.pandas()
-        print("Assigning close matches within clusters...")
+        logging.info("Assigning close matches within clusters...")
         self.df = self.df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
         self.df.to_csv(self.assigned_file, index=False)
         return self.df

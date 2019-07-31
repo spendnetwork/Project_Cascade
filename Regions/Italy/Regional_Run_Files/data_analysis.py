@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import numpy as np
-from runfile import Main
+from runfile import Main, logging
 
 
 class StatsCalculations(Main):

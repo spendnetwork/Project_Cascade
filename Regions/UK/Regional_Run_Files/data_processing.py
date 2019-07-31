@@ -5,7 +5,7 @@ from tqdm import tqdm
 import string
 import pdb
 import numpy as np
-from runfile import Main
+from runfile import Main, logging
 
 
 class DataProcessing(Main):
@@ -105,7 +105,7 @@ class AssignRegDataToClusters:
         self.df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
         self.df.reset_index(drop=True, inplace=True)
         tqdm.pandas()
-        print("Assigning close matches within clusters...")
+        logging.info("Assigning close matches within clusters...")
         self.df = self.df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
         self.df.to_csv(self.assigned_file, index=False)
         return self.df
@@ -145,7 +145,7 @@ class ProcessSourceData(DataProcessing):
 
         if not os.path.exists(adj_data):
             df = pd.read_csv(raw_data, dtype=self.df_dtypes)
-            print("Re-organising source data...")
+            logging.info("Re-organising source data...")
 
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
@@ -156,7 +156,7 @@ class ProcessSourceData(DataProcessing):
             df[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
             df['src_name_short'] = df.src_name_adj.apply(self.shortenName)
 
-            print("...done")
+            logging.info("...done")
             df.to_csv(adj_data, index=False)
         else:
             # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:

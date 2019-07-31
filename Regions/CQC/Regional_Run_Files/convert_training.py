@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-from runfile import Main
+from runfile import Main, logging
 import pdb
 
 class ConvertToTraining(Main):

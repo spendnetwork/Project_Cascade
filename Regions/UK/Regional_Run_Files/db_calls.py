@@ -5,7 +5,7 @@ import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
 # from .data_matching import VerificationAndUploads
-from runfile import Main
+from runfile import Main, logging
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -52,7 +52,7 @@ class DbCalls(Main):
             # copy_expert allows access to csv methods (i.e. char escaping)
             cur.copy_expert(
                 """COPY {}({}) from stdin (format csv)""".format(self.upload_table, self.headers), f)
-            print("Data uploaded succesfully...")
+            logging.info("Data uploaded succesfully...")
 
         query = self.removeTableDuplicates()
         cur.execute(query)
@@ -64,7 +64,7 @@ class DbCalls(Main):
         :return connection : the database connection object
         :return cur : the cursor (temporary storage for retrieved data
         '''
-        print('Connecting to database...')
+        logging.info('Connecting to database...')
         conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
         cur = conn.cursor()
         return conn, cur
@@ -76,7 +76,7 @@ class DbCalls(Main):
         :return: the sql query to be executed
         """
 
-        print("Removing duplicates from table...")
+        logging.info("Removing duplicates from table...")
         query = \
             """
             WITH dups AS 

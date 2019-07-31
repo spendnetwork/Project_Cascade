@@ -1,6 +1,6 @@
 import pdb
 import os
-from runfile import Main
+from runfile import Main, logging
 
 
 class Setup(Main):

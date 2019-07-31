@@ -37,3 +37,4 @@ loggers:
 
 root:
   handlers: [dev_file_handler, dev_console_handler]
+#  handlers: [dev_file_handler]

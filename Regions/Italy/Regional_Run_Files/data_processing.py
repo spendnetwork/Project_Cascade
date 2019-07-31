@@ -6,7 +6,7 @@ import numpy as np
 from Regions.Italy.Regional_Run_Files import org_suffixes
 import string
 import pdb
-from runfile import Main
+from runfile import Main, logging
 
 
 class DataProcessing(Main):
@@ -130,7 +130,7 @@ class ProcessSourceData(DataProcessing):
             df = pd.read_csv(raw_data, usecols=['id', 'source_name', 'source_streetadd'],
                              dtype={'source_name': np.str, 'source_streetadd': np.str})
             df.rename(columns={'source_name': 'src_name', 'source_streetadd': 'src_address'}, inplace=True)
-            print("Re-organising source data...")
+            logging.info("Re-organising source data...")
 
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
@@ -149,7 +149,7 @@ class ProcessSourceData(DataProcessing):
 
             df = self.joinFields(df, 'src')
 
-            print("...done")
+            logging.info("...done")
             df.to_csv(adj_data, index=False)
         else:
             # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
@@ -176,7 +176,7 @@ class ProcessRegistryData(DataProcessing):
             self.in_args.reg_adj_name)
 
         if not os.path.exists(adj_data):
-            print("Re-organising registry data...")
+            logging.info("Re-organising registry data...")
             df = pd.read_csv(raw_data,
                              usecols={'reg_name', 'street_address1', 'street_address2', 'street_address3', 'reg_id'},
                              dtype={'reg_name': np.str, 'street_address1': np.str, 'street_address2': np.str,
@@ -216,7 +216,7 @@ class ProcessRegistryData(DataProcessing):
 
                 dffullmerge = pd.concat([dffullmerge, dfmerge], ignore_index=True)
             dffullmerge.drop_duplicates(inplace=True)
-            print("...done")
+            logging.info("...done")
 
             dffullmerge.to_csv(adj_data, index=False)
 
@@ -240,7 +240,7 @@ class AssignRegDataToClusters:
         self.df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
         self.df.reset_index(drop=True, inplace=True)
         tqdm.pandas()
-        print("Assigning close matches within clusters...")
+        logging.info("Assigning close matches within clusters...")
         self.df = self.df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
         self.df.to_csv(self.assigned_file, index=False)
         return self.df
@@ -278,7 +278,7 @@ class AssignRegDataToClusters:
 #         df = pd.read_csv(raw_data, usecols=['id', 'source_name', 'source_streetadd'],
 #                          dtype={'source_name': np.str, 'source_streetadd': np.str})
 #         df.rename(columns={'source_name': 'src_name', 'source_streetadd': 'src_address'}, inplace=True)
-#         print("Re-organising source data...")
+#         logging.info("Re-organising source data...")
 #
 #         # Remove punctuation and double spacing in name
 #         adj_col = str('src_name_adj')
@@ -297,7 +297,7 @@ class AssignRegDataToClusters:
 #
 #         df = joinFields(df, 'src')
 #
-#         print("...done")
+#         logging.info("...done")
 #         df.to_csv(adj_data, index=False)
 #     else:
 #         # Specify usecols and  dtypes to prevent mixed dtypes error and remove 'unnamed' cols:
@@ -319,7 +319,7 @@ class AssignRegDataToClusters:
 #     adj_data = directories['adj_dir'].format(region_dir) + directories['adj_reg_data'].format(in_args.reg_adj_name)
 #
 #     if not os.path.exists(adj_data):
-#         print("Re-organising registry data...")
+#         logging.info("Re-organising registry data...")
 #         df = pd.read_csv(raw_data,
 #                          usecols={'reg_name', 'street_address1', 'street_address2', 'street_address3', 'reg_id'},
 #                          dtype={'reg_name': np.str, 'street_address1': np.str, 'street_address2': np.str,
@@ -359,7 +359,7 @@ class AssignRegDataToClusters:
 #
 #             dffullmerge = pd.concat([dffullmerge, dfmerge], ignore_index=True)
 #         dffullmerge.drop_duplicates(inplace=True)
-#         print("...done")
+#         logging.info("...done")
 #
 #         dffullmerge.to_csv(adj_data, index=False)
 
@@ -425,7 +425,7 @@ class AssignRegDataToClusters:
 #     df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
 #     df.reset_index(drop=True, inplace=True)
 #     tqdm.pandas()
-#     print("Assigning close matches within clusters...")
+#     logging.info("Assigning close matches within clusters...")
 #     df = df.groupby(['Cluster ID']).progress_apply(get_max_id)
 #     df.to_csv(assigned_file, index=False)
 #     return df

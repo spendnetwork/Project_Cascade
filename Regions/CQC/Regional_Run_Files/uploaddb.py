@@ -46,7 +46,7 @@ def createConnection():
     :return connection : the database connection object
     :return cur : the cursor (temporary storage for retrieved data
     '''
-    print('Connecting to database...')
+    logging.info('Connecting to database...')
     conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
     cur = conn.cursor()
     return conn, cur

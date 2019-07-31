@@ -5,7 +5,7 @@ import pandas as pd
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
-from runfile import Main
+from runfile import Main, logging
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -54,7 +54,7 @@ class Db_Calls(Main):
             # copy_expert allows access to csv methods (i.e. char escaping)
             cur.copy_expert(
                 """COPY {}({}) from stdin (format csv)""".format(self.upload_table, self.headers), f)
-            print("Data uploaded succesfully...")
+            logging.info("Data uploaded succesfully...")
 
         query = self.removeTableDuplicates()
         cur.execute(query)
@@ -65,7 +65,7 @@ class Db_Calls(Main):
         :return connection : the database connection object
         :return cur : the cursor (temporary storage for retrieved data
         '''
-        print('Connecting to database...')
+        logging.info('Connecting to database...')
         conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
         cur = conn.cursor()
         return conn, cur
@@ -77,7 +77,7 @@ class Db_Calls(Main):
         :return: the sql query to be executed
         """
 
-        print("Removing duplicates from table...")
+        logging.info("Removing duplicates from table...")
         query = \
             """
             WITH dups AS 
@@ -110,7 +110,7 @@ def checkDataExists(region_dir, directories, in_args, data_source):
                 # Check env file exists
                 env_fpath = os.path.join('.', '.env')
                 if not os.path.exists(env_fpath):
-                    print("Database credentials not found. Please complete the .env file using the '.env template'")
+                    logging.info("Database credentials not found. Please complete the .env file using the '.env template'")
                     sys.exit()
 
                 # Load registry data
@@ -120,7 +120,7 @@ def checkDataExists(region_dir, directories, in_args, data_source):
                     directories['raw_dir'].format(region_dir) + directories['raw_reg_data'].format(in_args.reg_raw_name),
                     index=False)
             else:
-                print("Registry/Registry data required - please copy in data csv to Data_Inputs\
+                logging.info("Registry/Registry data required - please copy in data csv to Data_Inputs\
                 /Raw_Data or load from database")
                 sys.exit()
 
@@ -146,7 +146,7 @@ def createRegistryDataSQLQuery(source):
 def fetchData(query):
     """ retrieve data from the db using query"""
     conn, _ = Db_Calls.createConnection()
-    print('Importing data...')
+    logging.info('Importing data...')
     df = pd.read_sql(query, con=conn)
     conn.close()
     return df
@@ -184,7 +184,7 @@ def fetchData(query):
 #         # copy_expert allows access to csv methods (i.e. char escaping)
 #         cur.copy_expert(
 #             """COPY {}({}) from stdin (format csv)""".format(table_name, headers), f)
-#         print("Data uploaded succesfully...")
+#         logging.info("Data uploaded succesfully...")
 #
 #     query = removeTableDuplicates(table_name, headers)
 #     cur.execute(query)

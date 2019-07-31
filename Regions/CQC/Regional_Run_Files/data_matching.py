@@ -3,7 +3,7 @@ import os
 import subprocess
 from shutil import copyfile
 import pdb
-from runfile import Main
+from runfile import Main, logging
 from datetime import datetime
 from csvdedupe.csvlink import launch_new_instance as launch_matching
 from csvdedupe.csvdedupe import launch_new_instance as launch_clustering
@@ -84,7 +84,7 @@ class Matching(Main):
 
             # Matching:
             if not os.path.exists(self.directories['match_output_file'].format(self.region_dir, self.proc_type)):
-                print("Starting matching of split file " + str(fileno) + '/' + str(numfiles))
+                logging.info("Starting matching of split file " + str(fileno) + '/' + str(numfiles))
 
                 cmd = ['csvlink '
                        + str(src_file) + ' '
@@ -163,7 +163,7 @@ class Matching(Main):
                 copyfile(self.directories['manual_matching_train_backup'].format(self.region_dir),
                          self.directories['manual_training_file'].format(self.region_dir, self.proc_type))
 
-            print("Starting matching...")
+            logging.info("Starting matching...")
 
             cmd = ['csvlink '
                    + str(src_file) + ' '
@@ -211,7 +211,7 @@ class Matching(Main):
                 copyfile(self.directories['cluster_training_backup'].format(self.region_dir),
                          self.directories['cluster_training_file'].format(self.region_dir, self.proc_type))
 
-            print("Starting clustering...")
+            logging.info("Starting clustering...")
 
             cmd = ['csvdedupe '
                    + self.directories['match_output_file'].format(self.region_dir, self.proc_type) + ' '

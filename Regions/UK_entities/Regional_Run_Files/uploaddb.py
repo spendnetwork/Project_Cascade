@@ -46,7 +46,7 @@ def createConnection():
     :return connection : the database connection object
     :return cur : the cursor (temporary storage for retrieved data
     '''
-    print('Connecting to database...')
+    logging.info('Connecting to database...')
     conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
     cur = conn.cursor()
     return conn, cur
@@ -59,7 +59,7 @@ def removeTableDuplicates(self):
         :return: the sql query to be executed
         """
 
-        print("Removing duplicates from table...")
+        logging.info("Removing duplicates from table...")
         query = \
             """
             WITH dups AS 
