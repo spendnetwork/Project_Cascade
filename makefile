@@ -3,4 +3,4 @@ install_core:
 
 install: install_core
 	pipenv install
-	pip install -e ../core
+	pipenv install -e ../core
