@@ -12,9 +12,9 @@ import pdb
 from logging.handlers import SysLogHandler
 
 if sys.platform == 'linux':
-    from ..git.core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
+    from ..core.logging_config import config_stdout_root_logger_with_papertrail
 else:
-    from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
+    from core.logging_config import config_stdout_root_logger_with_papertrail
 
 
 def getInputArgs(rootdir, args=None):
@@ -169,8 +169,6 @@ class Main:
                                 else:
                                     clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
 
-                                # EXTRACTS FUNCTION IS TAKING ONLY LEV DIST 100 MATCHES ON THE FIRST ITERATION AND NOT ADDING ANY MORE AFTER AT
-                                # DIFFERENT CASCADE LEVELS!!
                                 filtered_matches = self.match_filtering.MatchFiltering(self).filter(clust_df)
                             break
                         else:
@@ -180,7 +178,7 @@ class Main:
 
         except StopIteration:
             # Continue if no more config files found
-            print("Done")
+            logger.info("Done")
 
         self.match_filtering.VerificationAndUploads(self).verify()
 

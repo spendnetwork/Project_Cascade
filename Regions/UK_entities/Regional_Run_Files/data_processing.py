@@ -3,7 +3,7 @@ import os
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
 import string
-from runfile import Main
+from runfile import Main, logger
 import pdb
 
 class DataProcessing(Main):
@@ -130,7 +130,7 @@ class ProcessSourceData(DataProcessing):
             df = pd.read_csv(raw_data, usecols=self.raw_src_data_cols,
                              dtype=self.df_dtypes)
 
-            print("Re-organising source data...")
+            logger.info("Re-organising source data...")
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
             orig_col = str('src_name')

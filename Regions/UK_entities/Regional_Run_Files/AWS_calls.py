@@ -1,6 +1,6 @@
 from dotenv import load_dotenv, find_dotenv
 import os
-from runfile import Main
+from runfile import Main, logger
 import glob
 import boto3
 from botocore.exceptions import ClientError
@@ -110,7 +110,7 @@ class AwsTransfers(Main):
         try:
             response = s3_client.upload_file(file_name, bucket, object_name)
         except ClientError as e:
-            print(e)
+            logger.exception(e)
             return False
-        print("Upload to S3 bucket complete!")
+        logger.info("Upload to S3 bucket complete!")
         return True

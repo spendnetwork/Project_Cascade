@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "79a1adfea4879fe9c9b87e9d28bafe16bd604001e830c3aa6ffc7fbdb33cc331"
+            "sha256": "ee4225da68fbb2cfa8c668530f8130b024a662862b01474c0a13205620b5ce4b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -51,6 +51,9 @@
             ],
             "index": "pypi",
             "version": "==0.3.0"
+        },
+        "core": {
+            "path": "/Users/davidmellor/Code/GitHub/core"
         },
         "csvdedupe": {
             "git": "https://www.github.com/dmells/csvdedupe",
