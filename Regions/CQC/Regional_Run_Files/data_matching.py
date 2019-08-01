@@ -84,7 +84,7 @@ class Matching(Main):
 
             # Matching:
             if not os.path.exists(self.directories['match_output_file'].format(self.region_dir, self.proc_type)):
-                logging.info("Starting matching of split file " + str(fileno) + '/' + str(numfiles))
+                logging.info(f"Starting matching of split file {str(fileno)} / {str(numfiles)}")
 
                 cmd = ['csvlink '
                        + str(src_file) + ' '

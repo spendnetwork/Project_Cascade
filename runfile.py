@@ -67,7 +67,6 @@ class Main:
         self.config_path = settings.config_path
         self.settings = settings
 
-
         # Defined in settings file
         self.df_dtypes = settings.df_dtypes
         self.stats_cols = settings.stats_cols

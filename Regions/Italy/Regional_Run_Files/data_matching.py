@@ -267,9 +267,9 @@ class VerificationAndUploads(Main):
         if self.in_args.terminal_matching:
             # Iterate over the file, shuffled with sample, as best matches otherwise would show first:
             for index, row in manual_match_file.sample(frac=1).iterrows():
-                logging.info("\nsource name: " + str(row.src_name_adj))
-                logging.info("\nRegistry name: " + str(row.reg_name_adj))
-                logging.info("\nLevenshtein distance: " + str(row.leven_dist_N))
+                logging.info(f"\nsource name: {str(row.src_name_adj)}")
+                logging.info(f"\nRegistry name: {str(row.reg_name_adj)}")
+                logging.info(f"\nLevenshtein distance: {str(row.leven_dist_N)}")
                 match_options = ["y", "n", "u", "f"]
                 match = input("\nMatch? Yes, No, Unsure, Finished (Y/N/U/F):")
                 while match.lower() not in match_options:

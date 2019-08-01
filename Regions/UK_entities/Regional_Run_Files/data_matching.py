@@ -108,7 +108,7 @@ class Matching(Main):
             fileno += 1
 
             if not os.path.exists(self.matched_fp):
-                logging.info("Starting matching of split file " + str(fileno) + '/' + str(numfiles))
+                logging.info(f"Starting matching of split file {str(fileno)} / {str(numfiles)}")
 
                 # cmd = ['csvlink '
                 #        + str(src_fp) + ' '
