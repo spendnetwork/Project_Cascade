@@ -10,8 +10,8 @@
                 "char_counts" : 0,
                 "min_match_score" : 100,
                 "recycle_phase" : False,
-                # "db_table" : 'matching.gb_coh'
-                "db_table" : 'matching.testtable',
+                # "upload_table" : 'matching.gb_coh'
+                "upload_table" : 'matching.testtable',
               },
         2 :
               {

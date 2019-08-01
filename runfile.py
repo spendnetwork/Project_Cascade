@@ -96,6 +96,7 @@ class Main:
         self.conf_file_num = settings.conf_file_num
         self.proc_num = settings.proc_num
         self.upload_table = settings.upload_table
+        self.transfer_table = settings.transfer_table
         self.best_config = settings.best_config
 
     def run_main(self):
@@ -148,7 +149,8 @@ class Main:
                         main_proc_num = min(configs['processes'][proc_type].keys())
                         main_proc_configs = configs['processes'][proc_type][main_proc_num]
 
-                        self.upload_table = main_proc_configs['db_table']
+                        self.upload_table = main_proc_configs['upload_table']
+                        self.transfer_table = main_proc_configs['transfer_table']
 
                         # If args.recycle matches the recycle setting for the first process type
                         if in_args.recycle == main_proc_configs['recycle_phase']:
@@ -224,7 +226,7 @@ if __name__ == '__main__':
     settings.in_args = in_args
     settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
 
-    # Define config file variables and related data types file
+    # Define config file variables and attach to settings object
     settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
 
     Main(settings).run_main()

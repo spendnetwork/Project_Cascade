@@ -8,6 +8,7 @@ from runfile import Main, logging
 import glob
 from csvdedupe.csvlink import launch_new_instance as launch_matching
 from csvdedupe.csvdedupe import launch_new_instance as launch_clustering
+import pdb
 
 
 class Matching(Main):
@@ -77,6 +78,14 @@ class Matching(Main):
             clust_df['src_str_len'] = clust_df['src_name'].str.len().astype(int)
             clust_df['reg_str_len'] = clust_df['reg_name'].str.len().astype(int)
 
+            # Add match date column
+            clust_df['match_date'] = pd.to_datetime('today')
+
+            # Add blank match_by column
+            clust_df['match_by'] = ' '
+            clust_df.reg_source = clust_df.reg_source.replace(r'^\s*$', '.', regex=True)
+            clust_df.reg_scheme = clust_df.reg_scheme.replace(r'^\s*$', '.', regex=True)
+
             # Add levenshtein distance to measure the quality of the matches
             clust_df = self.data_processing.LevDist(self, clust_df, self.assigned_fp).addLevDist()
 
@@ -109,21 +118,6 @@ class Matching(Main):
 
             if not os.path.exists(self.matched_fp):
                 logging.info(f"Starting matching of split file {str(fileno)} / {str(numfiles)}")
-
-                # cmd = ['csvlink '
-                #        + str(src_fp) + ' '
-                #        + str(self.reg_fp)
-                #        + ' --field_names_1 ' + ' '.join(self.src_fields)
-                #        + ' --field_names_2 ' + ' '.join(self.reg_fields)
-                #        + ' --training_file ' + self.matches_training_file
-                #        + ' --settings_file ' + self.learned_settings_file
-                #        + ' --output_file ' + os.path.join(splits_output_dir, str(fileno) + '.csv') + ' '
-                #        + str(self.train[0])
-                #        + ' --inner_join'
-                #        ]
-                #
-                # p = subprocess.Popen(cmd, shell=True)
-                # p.wait()
 
                 sys.argv = [
                     'csvlink',
@@ -199,19 +193,6 @@ class Matching(Main):
                          self.matches_training_file)
 
             logging.info("Starting matching...")
-            # cmd = ['csvlink '
-            #        + str(src_fp) + ' '
-            #        + str(self.reg_fp)
-            #        + ' --field_names_1 ' + ' '.join(self.src_fields)
-            #        + ' --field_names_2 ' + ' '.join(self.reg_fields)
-            #        + ' --training_file ' + self.matches_training_file
-            #        + ' --settings_file ' + self.learned_settings_file
-            #        + ' --output_file ' + self.matched_fp + ' '
-            #        + str(self.train[0])
-            #        ]
-            #
-            # p = subprocess.Popen(cmd, shell=True)
-            # p.wait()
 
             sys.argv = [
                 'csvlink',
@@ -245,16 +226,6 @@ class Matching(Main):
                          self.cluster_training_file)
 
             logging.info("Starting clustering...")
-            # cmd = ['csvdedupe '
-            #        + self.matched_fp + ' '
-            #        + ' --field_names ' + ' '.join(self.src_fields) + ' '
-            #        + str(self.train[0])
-            #        + ' --training_file ' + self.cluster_training_file
-            #        + ' --settings_file ' + self.learned_settings_file
-            #        + ' --output_file ' + self.clustered_fp]
-            #
-            # p = subprocess.Popen(cmd, shell=True)
-            # p.wait()  # wait for subprocess to finish
 
             sys.argv = [
                 'csvdedupe',

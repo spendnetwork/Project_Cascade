@@ -80,6 +80,7 @@ class UK_Settings:
     configs = dict
     main_proc = int
     upload_table = str
+    transfer_table = str
     best_config = int
 
     directories = directories.dirs["dirs"]
@@ -101,7 +102,8 @@ class UK_entities(UK_Settings):
                  'leven_dist_N': np.int, 'leven_dist_NA': np.int,
                  'Manual_Match_N':np.str,  'Manual_Match_NA': np.str,
                  'src_joinfields':np.str, 'reg_joinfields': np.str, 'src_tag':np.str,
-                 'reg_source': np.str, 'reg_created_at': np.str, 'reg_scheme':np.str, 'src_address_adj': np.str
+                 'reg_source': np.str, 'reg_created_at': np.str, 'reg_scheme':np.str, 'src_address_adj': np.str,
+                 'match_by': np.str, 'match_date':np.str
                  }
 
     runfile_mods = UK_ent_run_files
@@ -116,7 +118,7 @@ class UK_entities(UK_Settings):
 
     raw_src_data_cols = ['src_name','src_tag','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress']
 
-    dbUpload_cols = ['src_name', 'reg_name','leven_dist_N',  'Manual_Match_N', 'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA', 'reg_id',  'src_tag', 'src_id', 'reg_source', 'reg_created_at', 'reg_scheme']
+    dbUpload_cols = ['src_name', 'reg_name','leven_dist_N',  'Manual_Match_N', 'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA', 'reg_id',  'src_tag', 'src_id', 'reg_source', 'reg_created_at', 'reg_scheme','match_date', 'match_by']
 
     manual_matches_cols = [ 'src_name','src_tag',  'reg_name', 'Manual_Match_N', 'leven_dist_N',
                            'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA',
@@ -129,7 +131,10 @@ class UK_entities(UK_Settings):
                             'reg_joinfields',
                             'reg_source',
                             'reg_created_at',
-                            'reg_scheme']
+                            'reg_scheme',
+                            'match_by',
+                            'match_date'
+                            ]
 
 
 class CQC_settings(UK_entities):
@@ -150,10 +155,12 @@ class CQC_settings(UK_entities):
                  'reg_name_short': np.str,
                  'leven_dist_N': np.int, 'leven_dist_NA': np.int,
                  'Manual_Match_N': np.str, 'Manual_Match_NA': np.str,
-                 'src_str_len' : np.int, 'reg_str_len': np.int
+                 'src_str_len' : np.int, 'reg_str_len': np.int,
+                 'match_by': np.str, 'match_date': np.str
+
                  }
 
     raw_src_data_cols = ['supplier_source_string','sum','count']
 
-    dbUpload_cols = ['src_name', 'reg_name', 'src_str_len','reg_str_len', 'leven_dist_N', 'Manual_Match_N', 'reg_id','src_amount','src_count']
+    dbUpload_cols = ['src_name', 'reg_name', 'src_str_len','reg_str_len', 'leven_dist_N', 'Manual_Match_N', 'reg_id','src_amount','src_count','match_date', 'match_by']
 

@@ -338,7 +338,7 @@ class VerificationAndUploads(Main):
 #
 #         if in_args.upload:
 #             # Add confirmed matches to relevant table
-#             db_calls.addDataToTable(region_dir, main_proc['db_table'], directories, proc_type, in_args, settings)
+#             db_calls.addDataToTable(region_dir, main_proc['upload_table'], directories, proc_type, in_args, settings)
 
 
 def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, proc_type, proc_num, in_args):

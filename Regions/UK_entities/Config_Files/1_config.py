@@ -10,7 +10,9 @@
                         "char_counts": 0,
                         "min_match_score": 100,
                         "recycle_phase": False,
-                        "db_table" : "matching.uk_entities",
+                        "upload_table" : "matching.matches_test",
+                        "transfer_table" : "matching.test_orgs_lookup"
+
                     },
                     2:
                         {
@@ -59,7 +61,7 @@
                         "char_counts": 0,
                         "min_match_score": 100,
                         "recycle_phase": True,
-                        "db_table" : "matching.matches_test",
+                        "upload_table" : "matching.matches_test",
                     },
                     2:
                         {

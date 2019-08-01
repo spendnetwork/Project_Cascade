@@ -10,7 +10,7 @@
                         "char_counts": 0,
                         "min_match_score": 100,
                         "recycle_phase": False,
-                        "db_table" : "matching.None",
+                        "upload_table" : "matching.None",
                     },
                 2:
                     {

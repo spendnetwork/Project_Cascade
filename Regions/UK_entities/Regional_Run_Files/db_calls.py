@@ -5,14 +5,8 @@ import pandas as pd
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
-from pathlib import Path
-import runfile
 from runfile import Main, logging
-import settings
 import glob
-import boto3
-from botocore.exceptions import ClientError
-# from core import database.
 
 
 # get the remote database details from .env
@@ -21,7 +15,6 @@ host_remote = os.environ.get("HOST_REMOTE")
 dbname_remote = os.environ.get("DBNAME_REMOTE")
 user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
-
 
 
 class DbCalls(Main):
@@ -45,7 +38,6 @@ class DbCalls(Main):
             with open(upload_file, 'r') as f:
                 # Get headers dynamically
                 reader = csv.reader(f)
-
                 headers = next(reader, None)
                 headers = ", ".join(headers)
                 self.headers = headers
@@ -58,6 +50,11 @@ class DbCalls(Main):
 
         # Remove any exact duplicates from db table
         query = self.removeTableDuplicates()
+        cur.execute(query)
+        conn.commit()
+        #
+        # Also transfer matches to transfer table
+        query = self.transferMatches()
         cur.execute(query)
         conn.commit()
 
@@ -93,6 +90,19 @@ class DbCalls(Main):
             (SELECT id FROM dups);
             """.format(self.headers, self.upload_table, self.upload_table, self.upload_table, self.upload_table)
         return query
+
+    def transferMatches(self):
+        logging.info(f"Tranferring new matches from {self.upload_table} to {self.transfer_table}.")
+        query = \
+        """
+        INSERT INTO {}
+            SELECT DISTINCT src_name, reg_scheme, reg_id, reg_name, reg_source, match_date, match_by, reg_created_at FROM {} m
+
+            WHERE
+                 NOT EXISTS (SELECT src_name, reg_name FROM {} t WHERE m.src_name = t.org_string)
+        """.format(self.transfer_table, self.upload_table, self.transfer_table)
+        return query
+
 
 class FetchData(DbCalls):
 
