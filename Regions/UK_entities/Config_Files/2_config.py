@@ -10,8 +10,6 @@
                 "char_counts" : 0,
                 "min_match_score" : 100,
                 "recycle_phase" : False,
-                "upload_table" : "matching.matches_test",
-                "transfer_table" : "matching.test_orgs_lookup"
               },
         2 :
               {

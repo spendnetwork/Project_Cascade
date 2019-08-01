@@ -149,9 +149,6 @@ class Main:
                         main_proc_num = min(configs['processes'][proc_type].keys())
                         main_proc_configs = configs['processes'][proc_type][main_proc_num]
 
-                        self.upload_table = main_proc_configs['upload_table']
-                        self.transfer_table = main_proc_configs['transfer_table']
-
                         # If args.recycle matches the recycle setting for the first process type
                         if in_args.recycle == main_proc_configs['recycle_phase']:
 
