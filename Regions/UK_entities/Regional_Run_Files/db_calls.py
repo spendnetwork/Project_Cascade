@@ -200,11 +200,12 @@ class FetchData(DbCalls):
               OR (source = 'ted_notices' AND countryname = 'United Kingdom')
               )
               AND t.releasedate >= {1}
+              AND t.releasedate <= {2}
                --AND t.json -> 'releases' -> 0 -> 'tag' ? 'tender'
                --AND t.json -> 'releases' -> 0 -> 'tag' ? 'award'
             ;
     
-            """.format(self.src_data_source, "'" + self.in_args.data_date + "'")
+            """.format(self.src_data_source, "'" + self.in_args.data_from_date + "'", "'" + self.in_args.data_to_date + "'")
         return query
 
     def fetchdata(self, query):

@@ -21,6 +21,7 @@ class AwsTransfers(Main):
     def __init__(self, settings):
         super().__init__(settings)
         self.bucket = 'org-matching'
+        self.unverified_file = None
 
     def transfer(self):
         """
@@ -36,6 +37,12 @@ class AwsTransfers(Main):
                 filename = os.path.basename(filepath)
                 # Upload each file to S3 bucket folder
                 self.upload_file(filepath, self.bucket, 'UK_entities/Unverified_Matches/' + filename)
+                self.unverified_file = filename
+
+            # Write stats file to archive folder too
+            stats_fp = glob.glob(os.path.join(self.directories['stats_file'].format(self.region_dir, self.proc_type)))[0]
+            filename = self.unverified_file[:10] + "_matches_stats.zip"
+            self.upload_file(stats_fp, self.bucket, 'UK_entities/Archive/' + filename)
 
         # Download verified matches from s3 bucket if prodn_verified argument (production only)
         if self.in_args.prodn_verified:
@@ -46,7 +53,6 @@ class AwsTransfers(Main):
         Establishes connection to S3 bucket using boto3 library and credentials found in .env
         Takes verified matches files placed in /verified_matches in S3 bucket and uploads them to the db table
         Files are then archived in S3 bucket as zip files, and then removed from S3 bucket/verified
-
         """
         # Scan s3 verified folder for files
         s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)

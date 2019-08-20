@@ -12,7 +12,6 @@ import pdb
 
 from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
 
-
 def getInputArgs(rootdir, args=None):
     """
 	Assign arguments including defaults to pass to the python call
@@ -37,9 +36,10 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--clear_adj', action='store_true', help='Clear all files except raw data')
     parser.add_argument('--clear_outputs', action='store_true', help='Clear all files except inputs')
     parser.add_argument('--clear_post_matching', action='store_true', help='Clear all files after matching phase')
-    parser.add_argument('--data_date', type=str,
+    parser.add_argument('--data_from_date', type=str,
                         default=(datetime.date.today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
-                        , help='Set source data date to be downloaded from (inclusive)')
+                        , help='Set source data start date to be downloaded from (inclusive)')
+    parser.add_argument('--data_to_date', type=str, default = datetime.date.today().strftime('%Y-%m-%d'), help='Set source data end date to be downloaded (inclusive)')
     parser.add_argument('--prodn_unverified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--prodn_verified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--split', action='store_true', help='split source file and initiate segmented matching')

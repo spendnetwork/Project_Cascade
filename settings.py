@@ -106,6 +106,9 @@ class UK_entities(UK_Settings):
                  'match_by': np.str, 'match_date':np.str
                  }
 
+    stats_cols = ['Config_File', 'Total_Src_Rows','Original_Matches', 'Pct_Orig_Matches', 'Filtered_Matches', 'Pct_Filtered_Matches', 'Pct_Precision',
+                  'Pct_Recall', 'Leven_Dist_Avg']
+
     runfile_mods = UK_ent_run_files
 
     # reg_data_source = 'uk_data.entity'
