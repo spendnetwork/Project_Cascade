@@ -25,6 +25,7 @@ dirs = {
                   "assigned_output_file": '{0}/Outputs/{1}/Deduped_Data/{1}_matched_clust_assigned.csv',
 
                   "filtered_matches": "{0}/Outputs/{1}/Filtered_Matches/Filtered_Matches",
+                  "excluded_matches": "{0}/Outputs/{1}/Filtered_Matches/Excluded_Matches",
                   "stats_file": "{0}/Outputs/{1}/Filtered_Matches/Matches_Stats_{1}.csv",
 
                   "unverified_matches_file": "{0}/Outputs/{1}/Unverified_Matches/{2}_matches.csv",

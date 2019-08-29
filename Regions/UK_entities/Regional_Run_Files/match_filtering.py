@@ -11,6 +11,8 @@ class MatchFiltering(Main):
         super().__init__(settings)
         self.filtered_matches = self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' \
                                 + str(self.conf_file_num) + '.csv'
+        self.excluded_matches = self.directories['excluded_matches'].format(self.region_dir, self.proc_type) + '_' \
+                                + str(self.conf_file_num) + '.csv'
 
     def filter(self, df):
         """
@@ -69,9 +71,76 @@ class MatchFiltering(Main):
         else:
             filtered_file = pd.read_csv(self.filtered_matches, index_col=None, dtype=self.df_dtypes)
             filtered_file = pd.concat([filtered_file, df], ignore_index=True, sort=True)
-            filtered_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+            filtered_file = filtered_file[
+                ['src_name', 'reg_name', 'src_name_short', 'reg_name_short', 'leven_dist_N', 'Cluster ID',
+                 'Confidence Score', 'leven_dist_NA', 'match_by', 'match_date', 'process_num', 'reg_address',
+                 'reg_address_adj', 'reg_created_at', 'reg_id', 'reg_joinfields', 'reg_name_adj', 'reg_scheme',
+                 'reg_source', 'reg_str_len', 'src_address_adj', 'src_joinfields', 'src_name_adj', 'src_str_len',
+                 'src_tag']]
+            filtered_file.sort_values(by=['leven_dist_N'], inplace=True, axis=0, ascending=False)
             filtered_file.to_csv(self.filtered_matches, index=False)
             return filtered_file
+
+
+    def getExcludedandNonMatches(self, df):
+        '''
+        Peforms the reverse of filter() so we can see which records aren't being matched for introspection purposes.
+        Outputs an 'excluded_matches_x' csv file and includes 'filtered-out' matches and unmatched rows.
+        '''
+
+        if self.in_args.recycle:
+            levendist = str('leven_dist_NA')
+        else:
+            levendist = str('leven_dist_N')
+
+        # Round confidence scores to 2dp :
+        df['Confidence Score'] = df['Confidence Score'].map(lambda x: round(x, 2))
+
+        # To get excluded matches, this time select rows less than the minimum match score
+        df = df[df[levendist] < self.configs['processes'][self.proc_type][self.proc_num]['min_match_score']]
+
+        # If it's not the first process in the config_file...
+        if self.proc_num > min(self.configs['processes'][self.proc_type]):
+            # If at last proc num...
+            if self.proc_num == max(self.configs['processes'][self.proc_type]):
+                #  ...filter for only > min char length to capture remaining long strings
+                df = df[df.src_name_short.str.len() > self.configs['processes'][self.proc_type][self.proc_num]
+                ['char_counts']]
+                df = df[df[levendist] <= 99]
+
+            # If it's not first and not the last process...
+            else:
+                try:
+                    # Filter by both char count and previous count (if exists):
+                    df = df[df.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num][
+                            'char_counts']]
+                    df = df[df.src_name_short.str.len() > self.configs['processes'][self.proc_type][self.proc_num - 1]
+                    ['char_counts']]
+                    # Filter by < 99 as first self.proc_num includes all lengths leading to duplicates
+                    df = df[df[levendist] <= 99]
+                except:
+                    df = df[df.src_name_short.str.len() <= self.configs['processes'][self.proc_type][self.proc_num][
+                            'char_counts']]
+
+        # ...else if it is the first process in the dictionary, return none as first process always includes 100 levdist
+        else:
+            return None
+
+        # Temporarily add process number as column for calculating stats purposes
+        df['process_num'] = str(self.proc_num)
+
+        if not os.path.exists(self.excluded_matches):
+            df.to_csv(self.excluded_matches, index=False)
+        else:
+            excluded_file = pd.read_csv(self.excluded_matches, index_col=None, dtype=self.df_dtypes)
+            excluded_file = pd.concat([excluded_file, df], ignore_index=True, sort=True)
+            excluded_file = excluded_file[['src_name', 'reg_name', 'src_name_short', 'reg_name_short', 'leven_dist_N', 'Cluster ID',
+                     'Confidence Score', 'leven_dist_NA', 'match_by', 'match_date', 'process_num', 'reg_address',
+                     'reg_address_adj', 'reg_created_at', 'reg_id', 'reg_joinfields', 'reg_name_adj', 'reg_scheme',
+                     'reg_source', 'reg_str_len', 'src_address_adj', 'src_joinfields', 'src_name_adj', 'src_str_len',
+                     'src_tag']]
+            excluded_file.sort_values(by=['leven_dist_N'], inplace=True, axis=0, ascending=False)
+            excluded_file.to_csv(self.excluded_matches, index=False)
 
 
 class VerificationAndUploads(Main):

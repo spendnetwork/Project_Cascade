@@ -166,6 +166,8 @@ class Main:
                                     clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
 
                                 filtered_matches = self.match_filtering.MatchFiltering(self).filter(clust_df)
+
+                                self.match_filtering.MatchFiltering(self).getExcludedandNonMatches(clust_df)
                             break
                         else:
                             continue
