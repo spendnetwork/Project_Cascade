@@ -133,10 +133,10 @@ class Main:
 
                     # Clean registry and source datasets for linking
                     # source df needed in memory for stats
-                    src_df = self.data_processing.ProcessSourceData(self).clean()
+                    self.data_processing.ProcessSourceData(self).clean()
 
                     try:
-                        reg_df = self.data_processing.ProcessRegistryData(self).clean()
+                        self.data_processing.ProcessRegistryData(self).clean()
                     except FileNotFoundError:
                         # Skip if registry data not downloaded yet (i.e. UK)
                         next
@@ -160,19 +160,16 @@ class Main:
                                 self.proc_num = proc_num
 
                                 # Run dedupe for matching and calculate related stats for comparison
-                                if in_args.region == 'UK':
-                                    clust_df = self.data_matching.Matching(self, src_df).dedupe()
-                                else:
-                                    clust_df = self.data_matching.Matching(self, src_df, reg_df).dedupe()
+                                self.data_matching.Matching(self).dedupe()
 
-                                filtered_matches = self.match_filtering.MatchFiltering(self).filter(clust_df)
+                                self.match_filtering.MatchFiltering(self).filter()
 
-                                self.match_filtering.MatchFiltering(self).getExcludedandNonMatches(clust_df)
+                                self.match_filtering.MatchFiltering(self).getExcludedandNonMatches()
                             break
                         else:
                             continue
                     # Output stats file:
-                    self.data_analysis.StatsCalculations(self, clust_df, filtered_matches, src_df).calculate()
+                    self.data_analysis.StatsCalculations(self).calculate()
 
         except StopIteration:
             # Continue if no more config files found

@@ -13,13 +13,16 @@ class MatchFiltering(Main):
                                 + str(self.conf_file_num) + '.csv'
         self.excluded_matches = self.directories['excluded_matches'].format(self.region_dir, self.proc_type) + '_' \
                                 + str(self.conf_file_num) + '.csv'
+        self.clustered_fp = self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)
 
-    def filter(self, df):
+    def filter(self):
         """
         Import config file containing variable assignments for i.e. char length, match ratio
         Based on the 'cascading' config details, verify matches to new csv
         :return extracts_file: contains dataframe with possible acceptable matches
         """
+
+        df = pd.read_csv(self.clustered_fp, index_col=None, dtype=self.df_dtypes)
 
         if self.in_args.recycle:
             levendist = str('leven_dist_NA')
@@ -79,14 +82,16 @@ class MatchFiltering(Main):
                  'src_tag']]
             filtered_file.sort_values(by=['leven_dist_N'], inplace=True, axis=0, ascending=False)
             filtered_file.to_csv(self.filtered_matches, index=False)
-            return filtered_file
 
 
-    def getExcludedandNonMatches(self, df):
+
+    def getExcludedandNonMatches(self):
         '''
-        Peforms the reverse of filter() so we can see which records aren't being matched for introspection purposes.
+        Loads in clustered file and peforms the reverse of filter() so we can see which records aren't being matched for introspection purposes.
         Outputs an 'excluded_matches_x' csv file and includes 'filtered-out' matches and unmatched rows.
         '''
+
+        df = pd.read_csv(self.clustered_fp, index_col=None, dtype=self.df_dtypes)
 
         if self.in_args.recycle:
             levendist = str('leven_dist_NA')

@@ -166,9 +166,10 @@ class ProcessSourceData(DataProcessing):
                                                                                   'Adj_Data', 'Splits',
                                                                                   str(self.in_args.src)[:-4] +
                                                                                   str(i) + '.csv'), index=False)
-        else:
-            df = pd.read_csv(adj_data, dtype=self.df_dtypes)
-        return df
+
+        # else:
+        #     df = pd.read_csv(adj_data, dtype=self.df_dtypes)
+        # return df
 
 
 class ProcessRegistryData(DataProcessing):

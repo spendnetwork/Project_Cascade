@@ -12,10 +12,8 @@ import pdb
 
 
 class Matching(Main):
-    def __init__(self, settings, src_df, reg_df):
+    def __init__(self, settings):
         super().__init__(settings)
-        self.src_df = src_df
-        self.reg_df = reg_df
         self.reg_fp = self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_reg_data'].format(
             self.in_args.reg_adj)
         self.src_fields = self.configs['processes'][self.proc_type][1]['dedupe_field_names']['source_data']
@@ -48,7 +46,9 @@ class Matching(Main):
             # For larger files, split arg can be used to break the file into several smaller csvs to then run multiple
             # consecutive matching/clustering sessions
             if not self.in_args.split:
+
                 self.dedupeMatch()
+
             else:
                 self.dedupeSplitMatch()
 
@@ -89,15 +89,20 @@ class Matching(Main):
             # Add levenshtein distance to measure the quality of the matches
             clust_df = self.data_processing.LevDist(self, clust_df, self.assigned_fp).addLevDist()
 
-        else:
-            # If the assigned file does exist, load it into memory to be returned
-            clust_df = pd.read_csv(self.assigned_fp,
-                                   dtype=self.df_dtypes)
+            # Filter rows for non-blank source name
+            clust_df = clust_df[pd.notnull(clust_df['src_name'])]
 
-        # Filter rows for non-blank source name
-        clust_df = clust_df[pd.notnull(clust_df['src_name'])]
+            clust_df.to_csv(self.clustered_fp, index=False)
 
-        return clust_df
+        # else:
+        #     # If the assigned file does exist, load it into memory to be returned
+        #     clust_df = pd.read_csv(self.assigned_fp,
+        #                            dtype=self.df_dtypes)
+
+        # # Filter rows for non-blank source name
+        # clust_df = clust_df[pd.notnull(clust_df['src_name'])]
+
+        # return clust_df
 
     def dedupeSplitMatch(self):
         '''
@@ -171,7 +176,7 @@ class Matching(Main):
         """
     	Deduping - first the registry and source data are matched using dedupes csvlink,
     	then the matched file is put into clusters
-        :param reg_df:
+
         :param src_file:
     	:param directories: file/folder locations
     	:param  config_files: the main config files
