@@ -1,5 +1,4 @@
 import sys
-
 import pandas as pd
 import os
 import subprocess
@@ -9,6 +8,8 @@ import glob
 from csvdedupe.csvlink import launch_new_instance as launch_matching
 from csvdedupe.csvdedupe import launch_new_instance as launch_clustering
 import pdb
+from dateutil.tz import gettz
+import datetime as dt
 
 
 class Matching(Main):
@@ -79,7 +80,8 @@ class Matching(Main):
             clust_df['reg_str_len'] = clust_df['reg_name'].str.len().astype(int)
 
             # Add match date column
-            clust_df['match_date'] = pd.to_datetime('today')
+            # clust_df['match_date'] = pd.to_datetime('today')
+            clust_df['match_date'] = dt.datetime.now(gettz()).isoformat()
 
             # Add blank match_by column
             clust_df['match_by'] = ' '

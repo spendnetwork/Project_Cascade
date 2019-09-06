@@ -30,7 +30,6 @@ class DbCalls(Main):
         :param upload_file: the dataframe containing the data
         :return: None
         '''
-
         conn, cur = self.createConnection()
         logging.info(f"Connected to {self.upload_table}")
         files = glob.glob(os.path.join(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type),'*'))

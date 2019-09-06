@@ -61,16 +61,14 @@ class AwsTransfers(Main):
         # Ignore first file entry in dict as is just the folder name. Returns a list of files
         files = response['Contents'][1:]
 
-        # For any files in /s3/verified/ - download them to local /verified_matches/
+        # # For any files in /s3/verified/ - download them to local /verified_matches/
         for i in range(len(files)):
 
             s3.download_file(self.bucket,
                              files[i]['Key'],
-                             os.path.join(self.directories['verified_matches_dir'].format(self.region_dir,
-                                                                                 self.proc_type),
-                                          os.path.basename(files[i]['Key'])))
+                             os.path.join(self.directories['verified_matches_dir'].format(self.region_dir,self.proc_type),os.path.basename(files[i]['Key'])))
 
-        # Upload all files in verified_matches_dir to our database:
+        # # Upload all files in verified_matches_dir to our database:
         self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
         for i in range(len(files)):
@@ -114,9 +112,10 @@ class AwsTransfers(Main):
         # Upload the file
         s3_client = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
         try:
-            response = s3_client.upload_file(file_name, bucket, object_name)
+            s3_client.upload_file(file_name, bucket, object_name)
         except ClientError as e:
             logging.exception(e)
             return False
         logging.info("Upload to S3 bucket complete!")
+
         return True
