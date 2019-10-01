@@ -15,3 +15,7 @@ def test_temp_root_exists(createTempProjectDirectory):
 def test_settings_obj_exists(create_settings_obj):
     assert create_settings_obj
 
+def test_raw_files_dirs_exist(transfer_data_files):
+
+    assert 1
+

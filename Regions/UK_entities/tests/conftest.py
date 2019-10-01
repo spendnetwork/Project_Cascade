@@ -76,40 +76,43 @@ def create_settings_obj(adjust_default_args, createTempProjectDirectory):
     return settings
 
 
-# @pytest.fixture(scope='session', autouse=True)
-# def transfer_data_files(create_settings_obj):
-#     settings = create_settings_obj
-#     tmp_root = createTempProjectDirectory
-#
-#     setup.Setup(settings).setupRawDirs()
-#
-#     setup.Setup(settings).SetupDirs()
-#     assert 1
-#
-#     print("\n\nTemporary testing directories constructed at {}".format(str(tmp_root)))
-#
-#     print("\n Copying over raw sample files/training files.")
-#
-#     copyfile(str(testdir) + '/test_data/src_data_raw_test.csv',
-#              str(tmp_root) + '/Data_Inputs/Raw_Data/src_data_raw_test.csv')
-#     copyfile(str(testdir) + '/test_data/reg_data_raw_test.csv',
-#              str(tmp_root) + '/Data_Inputs/Raw_Data/reg_data_raw_test.csv')
-#
-#     copyfile(str(testdir) + '/test_data/src_data_adj_test.csv',
-#              str(tmp_root) + '/Data_Inputs/Adj_Data/src_data_adj_test.csv')
-#     copyfile(str(testdir) + '/test_data/reg_data_adj_test.csv',
-#              str(tmp_root) + '/Data_Inputs/Adj_Data/reg_data_adj_test.csv')
-#
-#     copyfile(str(testdir) + '/test_data/cluster_training.json',
-#              str(tmp_root) + '/Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json')
-#     copyfile(str(testdir) + '/test_data/matching_training.json',
-#              str(tmp_root) + '/Data_Inputs/Training_Files/Name_Only/Matching/matching_training.json')
-#
-#     copyfile(str(testdir) + '/test_data/test_clustered_assigned.csv',
-#              str(tmp_root) + '/Outputs/Name_Only/Deduped_Data/Name_Only_matched_clust_assigned.csv')
-#     copyfile(str(testdir) + '/test_data/testconfig.py', str(tmp_root) + '/Config_Files/1_config.py')
-#     return tmp_root
-#
+@pytest.fixture(scope='session', autouse=True)
+def transfer_data_files(create_settings_obj, createTempProjectDirectory):
+
+    settings = create_settings_obj
+    tmp_root = createTempProjectDirectory
+
+    setup.Setup(settings).setupRawDirs()
+    setup.Setup(settings).SetupDirs()
+
+    print("\n\nTemporary testing directories constructed at {}".format(str(tmp_root)))
+
+    copyfile(str(testdir) + '/test_data/src_data_raw_test.csv',
+             os.path.join(settings.directories['raw_dir'].format(settings.region_dir),'src_data_raw_test.csv'))
+
+    copyfile(str(testdir) + '/test_data/reg_data_raw_test.csv',
+             os.path.join(settings.directories['raw_dir'].format(settings.region_dir), 'reg_data_raw_test.csv'))
+
+    copyfile(str(testdir) + '/test_data/src_data_adj_test.csv',
+             os.path.join(settings.directories['adj_dir'].format(settings.region_dir), 'src_data_adj_test.csv'))
+
+    copyfile(str(testdir) + '/test_data/reg_data_adj_test.csv',
+             os.path.join(settings.directories['adj_dir'].format(settings.region_dir), 'reg_data_adj_test.csv'))
+
+    copyfile(str(testdir) + '/test_data/cluster_training.json',
+             os.path.join(settings.directories['proc_type_train_clust_dir'].format(settings.region_dir, settings.proc_type), 'clustering_training.json'))
+
+    copyfile(str(testdir) + '/test_data/matching_training.json',
+             os.path.join(settings.directories['proc_type_train_match_dir'].format(settings.region_dir, settings.proc_type),
+                          'matching_training.json'))
+
+    copyfile(str(testdir) + '/test_data/test_clustered_assigned.csv',
+             settings.directories['assigned_output_file'].format(settings.region_dir, settings.proc_type))
+
+    copyfile(str(testdir) + '/test_data/testconfig.py', os.path.join(settings.region_dir, 'Config_Files', '1_config.py'))
+
+    return tmp_root
+
 #
 #
 #
