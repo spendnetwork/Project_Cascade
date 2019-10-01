@@ -16,9 +16,9 @@ class StatsCalculations(Main):
 	"""
     def __init__(self, settings, clustdf, extractdf, srcdf):
         Main.__init__(self, settings)
-        self.clustdf = clustdf
-        self.extractdf = extractdf
-        self.srcdf = srcdf
+        clustdf = clustdf
+        filterdf = extractdf
+        srcdf = srcdf
 
 
     def calculate(self):
@@ -31,20 +31,20 @@ class StatsCalculations(Main):
 
         # Overall matches, including poor quality:
         statdf.at[self.conf_file_num, 'Config_File'] = self.conf_file_num
-        statdf.at[self.conf_file_num, 'Total_Matches'] = len(self.clustdf[pd.notnull(self.clustdf['CH_id'])])
-        statdf.at[self.conf_file_num, 'Percent_Matches'] = round(len(self.clustdf[pd.notnull(self.clustdf['CH_id'])]) / len(self.srcdf) * 100,2)
+        statdf.at[self.conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['CH_id'])])
+        statdf.at[self.conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['CH_id'])]) / len(srcdf) * 100,2)
         # Overall optimised matches :
-        statdf.at[self.conf_file_num, 'Optim_Matches'] = len(self.extractdf)
+        statdf.at[self.conf_file_num, 'Optim_Matches'] = len(filterdf)
         # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
         # This is the size of the extracted matches divided by the total number of
-        statdf.at[self.conf_file_num, 'Percent_Precision'] = round(len(self.extractdf) / len(self.clustdf) * 100, 2)
+        statdf.at[self.conf_file_num, 'Percent_Precision'] = round(len(filterdf) / len(clustdf) * 100, 2)
         # Recall - how many relevant items have been selected from the entire original source data (TP/TP+FN)
-        statdf.at[self.conf_file_num, 'Percent_Recall'] = round(len(self.extractdf) / len(self.srcdf) * 100, 2)
+        statdf.at[self.conf_file_num, 'Percent_Recall'] = round(len(filterdf) / len(srcdf) * 100, 2)
 
         if self.in_args.recycle:
-            statdf.at[self.conf_file_num, 'Leven_Dist_Avg'] = np.average(self.extractdf.leven_dist_NA)
+            statdf.at[self.conf_file_num, 'Leven_Dist_Avg'] = np.average(filterdf.leven_dist_NA)
         else:
-            statdf.at[self.conf_file_num, 'Leven_Dist_Avg'] = np.average(self.extractdf.leven_dist_N)
+            statdf.at[self.conf_file_num, 'Leven_Dist_Avg'] = np.average(filterdf.leven_dist_N)
         # if statsfile doesnt exist, create it
         if not os.path.exists(self.directories['stats_file'].format(self.region_dir, self.proc_type)):
             statdf.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type, index=False))

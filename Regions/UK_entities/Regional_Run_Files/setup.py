@@ -11,6 +11,7 @@ class Setup:
         self.proc_type = settings.proc_type
         self.in_args = settings.in_args
 
+
     def SetupDirs(self):
         '''
         Establishes the directories required as specified by the config dirs file

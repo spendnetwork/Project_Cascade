@@ -12,6 +12,50 @@ import pdb
 
 from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
 
+
+def createSettingsObj(rootdir, in_args, settings):
+
+    # Silence warning for df['process_num'] = str(proc_num)
+    pd.options.mode.chained_assignment = None
+
+    if in_args.region == 'Italy':
+        settings = settings.Italy_Settings
+
+    if in_args.region == 'UK':
+        settings = settings.UK_Settings
+
+    if in_args.region == 'UK_entities':
+        settings = settings.UK_entities
+
+    if in_args.region == 'CQC':
+        settings = settings.CQC_settings
+
+    # If any production flags are being called use production logger...
+    if in_args.prodn_verified or in_args.prodn_unverified:
+        config_stdout_root_logger_with_papertrail(app_name='entity_matching', level=logging.DEBUG)
+
+    # ...else use local logger
+    else:
+        # Import logging configs
+        with open('config.yaml', 'r') as f:
+            config = yaml.safe_load(f.read())
+            logging.config.dictConfig(config)
+
+        def exception_handler(type, value, tb):
+            logging.exception('Uncaught exception: {0}'.format(str(value)))
+
+        # Install exception handler
+        sys.excepthook = exception_handler
+
+    settings.in_args = in_args
+    settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
+
+    # Define config file variables and attach to settings object
+    settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
+
+    return settings
+
+
 def getInputArgs(rootdir, args=None):
     """
 	Assign arguments including defaults to pass to the python call
@@ -53,7 +97,8 @@ def getInputArgs(rootdir, args=None):
         print("Dedupe training files do not exist - running with --training flag to initiate training process")
         parser.add_argument('--training', action='store_true', help='Modify/contribute to the training data')
 
-    args = parser.parse_args()
+    args = parser.parse_args([])
+
 
     return args, parser
 
@@ -183,46 +228,11 @@ class Main:
 
 
 if __name__ == '__main__':
+    pdb.set_trace()
 
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = getInputArgs(rootdir)
 
-    # Silence warning for df['process_num'] = str(proc_num)
-    pd.options.mode.chained_assignment = None
+    settingsobj = createSettingsObj(rootdir, in_args, settings)
 
-    if in_args.region == 'Italy':
-        settings = settings.Italy_Settings
-
-    if in_args.region == 'UK':
-        settings = settings.UK_Settings
-
-    if in_args.region == 'UK_entities':
-        settings = settings.UK_entities
-
-    if in_args.region == 'CQC':
-        settings = settings.CQC_settings
-
-    # If any production flags are being called use production logger...
-    if in_args.prodn_verified or in_args.prodn_unverified:
-        config_stdout_root_logger_with_papertrail(app_name='entity_matching', level=logging.DEBUG)
-
-    # ...else use local logger
-    else:
-        # Import logging configs
-        with open('config.yaml', 'r') as f:
-            config = yaml.safe_load(f.read())
-            logging.config.dictConfig(config)
-
-        def exception_handler(type, value, tb):
-            logging.exception('Uncaught exception: {0}'.format(str(value)))
-
-        # Install exception handler
-        sys.excepthook = exception_handler
-
-    settings.in_args = in_args
-    settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
-
-    # Define config file variables and attach to settings object
-    settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
-
-    Main(settings).run_main()
+    Main(settingsobj).run_main()
