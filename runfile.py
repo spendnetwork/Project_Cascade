@@ -9,7 +9,6 @@ import datetime
 import logging.config
 import sys
 import pdb
-
 from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
 
 

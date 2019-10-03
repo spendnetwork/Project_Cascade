@@ -4,16 +4,17 @@ import pandas as pd
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
+
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Table, Column, MetaData, String, Integer, DateTime, func
+
 import directories
 from Regions.UK_entities.Regional_Run_Files import setup
 import runfile
 import pdb
 from pathlib import Path
+import pytest_pgsql
 
-'''
-Need to create in_args first as this sets default settings region
-Then create settings object passing in in_args
-'''
 
 # get the remote database details from .env
 load_dotenv(find_dotenv())
@@ -24,6 +25,7 @@ password_remote = os.environ.get("PASSWORD_REMOTE")
 
 # establish filepath to current test directory
 testdir = os.path.dirname(os.path.abspath(__file__))
+
 
 @pytest.fixture(scope='session', autouse=True)
 def createTempProjectDirectory(tmpdir_factory):
@@ -48,10 +50,9 @@ def adjust_default_args(createTempProjectDirectory):
 
 
 @pytest.fixture(scope='session')
-def create_settings_obj(adjust_default_args, createTempProjectDirectory):
+def settings(adjust_default_args, createTempProjectDirectory):
 
     import settings
-
     # settings = runfile.createSettingsObj(createTempProjectDirectory, adjust_default_args, settings)
     in_args = adjust_default_args
 
@@ -77,9 +78,8 @@ def create_settings_obj(adjust_default_args, createTempProjectDirectory):
 
 
 @pytest.fixture(scope='session', autouse=True)
-def transfer_data_files(create_settings_obj, createTempProjectDirectory):
+def transfer_data_files(settings, createTempProjectDirectory):
 
-    settings = create_settings_obj
     tmp_root = createTempProjectDirectory
 
     setup.Setup(settings).setupRawDirs()
@@ -92,12 +92,12 @@ def transfer_data_files(create_settings_obj, createTempProjectDirectory):
 
     copyfile(str(testdir) + '/test_data/reg_data_raw_test.csv',
              os.path.join(settings.directories['raw_dir'].format(settings.region_dir), 'reg_data_raw_test.csv'))
-
-    copyfile(str(testdir) + '/test_data/src_data_adj_test.csv',
-             os.path.join(settings.directories['adj_dir'].format(settings.region_dir), 'src_data_adj_test.csv'))
-
-    copyfile(str(testdir) + '/test_data/reg_data_adj_test.csv',
-             os.path.join(settings.directories['adj_dir'].format(settings.region_dir), 'reg_data_adj_test.csv'))
+    #
+    # copyfile(str(testdir) + '/test_data/src_data_adj_test.csv',
+    #          os.path.join(settings.directories['adj_dir'].format(settings.region_dir), 'src_data_adj_test.csv'))
+    #
+    # copyfile(str(testdir) + '/test_data/reg_data_adj_test.csv',
+    #          os.path.join(settings.directories['adj_dir'].format(settings.region_dir), 'reg_data_adj_test.csv'))
 
     copyfile(str(testdir) + '/test_data/cluster_training.json',
              os.path.join(settings.directories['proc_type_train_clust_dir'].format(settings.region_dir, settings.proc_type), 'clustering_training.json'))
@@ -113,27 +113,84 @@ def transfer_data_files(create_settings_obj, createTempProjectDirectory):
 
     return tmp_root
 
-#
-#
-#
-#
-#
-#
-# # @pytest.fixture()
-# def test_src_df(tmp_root):
-#     pdb.set_trace()
-#     df = pd.DataFrame()
-#     df['src_name'] = pd.Series(["Ditta ABBOTT VASCULAR Knoll-Ravizza S.p.A."])
-#     df['src_address'] = pd.Series(["3 Lala Street"])
-#     return df
-#     # assert df
-#
-#
-# @pytest.fixture()
-# def connection():
-#     conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
-#     cur = conn.cursor()
-#     return conn # CHECK THIS - SHOULD IT BE RETURN CUR???
-#
-#
-#
+
+@pytest.fixture()
+def connection():
+    conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
+    cur = conn.cursor()
+    return conn # CHECK THIS - SHOULD IT BE RETURN CUR???
+
+@pytest.fixture()
+def create_reg_table(postgresql_db):
+    # Combination of SQLAlchemy to define classes in python which get converted to an sql schema, and pytest_pgsql to
+    # make use of postgresql_db to create and delete tables when testing
+    class orgs_ocds_test(declarative_base()):
+        __tablename__ = 'orgs_ocds_test'
+
+        scheme = Column(String)
+        id = Column(String)
+        uri = Column(String)
+        legalname = Column(String)
+        source = Column(String)
+        created_at = Column(DateTime(timezone=True), server_default=func.now()) # https://stackoverflow.com/questions/13370317/sqlalchemy-default-datetime
+        orgs_ocds_scheme_id_idx = Column(Integer, primary_key=True)
+
+    postgresql_db.create_table(orgs_ocds_test)
+
+    postgresql_db.load_csv('test_data/orgs_ocds_test_data.csv', orgs_ocds_test)
+    orgs_ocds_test = postgresql_db.get_table('orgs_ocds_test')
+
+    return orgs_ocds_test
+
+@pytest.fixture()
+def create_src_table(postgresql_db):
+    # Combination of SQLAlchemy to define classes in python which get converted to an sql schema, and pytest_pgsql to
+    # make use of postgresql_db to create and delete tables when testing
+    class ocds_tenders_test(declarative_base()):
+        __tablename__ = 'ocds_tenders_test'
+        src_name = Column(String)
+        src_tag = Column(String)
+        src_address_locality = Column(String)
+        src_address_postalcode = Column(String)
+        src_address_countryname = Column(String)
+        src_address_streetaddress = Column(String)
+        source = Column(String)
+        id_idx = Column(Integer, primary_key=True)
+
+    postgresql_db.create_table(ocds_tenders_test)
+
+    postgresql_db.load_csv('test_data/src_data_raw_test.csv', ocds_tenders_test)
+    ocds_tenders_test = postgresql_db.get_table('ocds_tenders_test')
+
+    return ocds_tenders_test
+
+@pytest.fixture()
+def create_upload_table(postgresql_db):
+    # Combination of SQLAlchemy to define classes in python which get converted to an sql schema, and pytest_pgsql to
+    # make use of postgresql_db to create and delete tables when testing
+    class upload_table_test(declarative_base()):
+        __tablename__ = 'upload_table_test'
+
+        src_name = Column(String)
+        reg_name = Column(String)
+        leven_dist_n = Column(Integer)
+        manual_match_n = Column(String)
+        src_address_adj = Column(String)
+        reg_address_adj = Column(String)
+        manual_match_na = Column(String)
+        leven_dist_na = Column(Integer)
+        reg_id = Column(String)
+        src_tag = Column(String)
+        src_id = Column(String)
+        reg_source = Column(String)
+        reg_created_at = Column(String)
+        reg_scheme = Column(String)
+        id = Column(Integer, primary_key=True)
+        created_at = Column(DateTime(timezone=True), server_default=func.now())
+        match_by = Column(String)
+
+    postgresql_db.create_table(upload_table_test)
+
+    upload_table_test = postgresql_db.get_table('upload_table_test')
+
+    return upload_table_test
