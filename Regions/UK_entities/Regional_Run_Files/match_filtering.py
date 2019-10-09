@@ -84,7 +84,6 @@ class MatchFiltering(Main):
             filtered_file.to_csv(self.filtered_matches, index=False)
 
 
-
     def getExcludedandNonMatches(self):
         '''
         Loads in clustered file and peforms the reverse of filter() so we can see which records aren't being matched for introspection purposes.

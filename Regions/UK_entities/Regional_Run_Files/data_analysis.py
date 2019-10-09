@@ -6,7 +6,6 @@ from runfile import Main, logging
 
 
 class StatsCalculations(Main):
-
     """
 	For each process outlined in the config file, after each process is completed
 	verify the matches that meet the match % criteria into a new file

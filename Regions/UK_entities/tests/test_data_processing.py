@@ -2,56 +2,80 @@ import os
 import pandas as pd
 import pytest
 from pandas.util.testing import assert_frame_equal
-from ..Regional_Run_Files.data_processing import DataProcessing
+from ..Regional_Run_Files.data_processing import DataProcessing, LevDist, AssignRegDataToClusters, ProcessSourceData, ProcessRegistryData
 import pdb
+
+#------------- UNIT TESTS ----------------
 
 @pytest.fixture()
 def test_src_df():
     # pdb.set_trace()
     df = pd.DataFrame()
     df['src_name'] = pd.Series(["Ditta ABBOTT VASCULAR Knoll-Ravizza S.p.A."])
-    df['src_address'] = pd.Series(["3 Lala Street"])
     return df
-    # assert df
 
 
 @pytest.mark.parametrize("test_input, expected", [
-    ("Ditta ABBOTT VASCULAR Knoll-Ravizza S.p.A.", "ditta abbott vascular knollravizza spa")
-])
-
+    ("Ditta ABBOTT VASCULAR Knoll-Ravizza S.p.A.", "ditta abbott vascular knollravizza spa")])
 def test_remvPunct(test_src_df, test_input, expected):
-    # Tests remvPunct ensure all punctuation removed and strings lowered
+    pdb.set_trace()
     input_index = test_src_df.src_name.str.find(test_input)
-    test_src_df['src_name_adj'] = DataProcessing.remvPunct(test_src_df, 'src_name','src_name_adj')
+    test_src_df = DataProcessing.remvPunct('', test_src_df, 'src_name','src_name_adj')
     assert test_src_df.loc[input_index[0]].src_name_adj == expected
 
 
 @pytest.mark.parametrize("test_input, expected", [
-    ("ditta abbott vascular knollravizza spa", "ditta abbott vascular knollravizza"),
-    ("test-org srl", "test org"),
-    ("test srl org", "test org")])
-
-
-def test_shorten_name(test_input, expected):
-    assert data_processing.shorten_name(test_input) == expected
+    ("ditta abbott vascular knollravizza ltd", "ditta abbott vascular knollravizza"),
+    ("test-org plc", "test org"),
+    ("test llp org", "test org")])
+def test_shorten_name(settings, test_input, expected):
+    # Names by this point have already been standardised (i.e. l.l.p = llp) therefore parametrized values are written as such
+    assert LevDist.shortenName(settings.runfile_mods, test_input) == expected
 
 
 @pytest.fixture()
-def test_clustered_df():
-    filepath = os.path.join(testdir, "{}")
+def test_clustered_df(settings):
+    filepath = os.path.join(settings.testdir, "{}")
     df_unassigned = pd.read_csv(filepath.format('/test_data/test_clustered.csv'))
     df_assigned = pd.read_csv(filepath.format('/test_data/test_clustered_assigned.csv'))
     return df_unassigned, df_assigned
 
 
-def test_orgids_assigned_to_clusters(test_clustered_df):
+def test_orgids_assigned_to_clusters(settings, test_clustered_df):
     # Tests that any cluster containing rows that have both a match and a none match gets
     # the match data copied over to the non match rows (highest confidence score)
-    df_processed = data_processing.assign_reg_data_to_clusters(test_clustered_df[0])
+    pdb.set_trace()
+    df_processed = AssignRegDataToClusters.assign(settings, test_clustered_df[0])
+    df_processed.to_csv('./df_processed.csv',index=False)
     assert_frame_equal(df_processed, test_clustered_df[1])
 
 
-def test_addlevdist(test_clustered_df):
+def test_addlevdist(settings, test_clustered_df):
     # Assert the levenshtein distance column can be added and populated
-    levadded = data_processing.add_lev_dist(test_clustered_df[1], None)
-    assert pd.notnull(levadded.at[0, 'leven_dist'])
+    pdb.set_trace()
+    levadded = LevDist(settings, test_clustered_df[1]).addLevDist()
+    assert pd.notnull(levadded.at[0, 'leven_dist_N'])
+
+
+def test_joinfields():
+    # Not needed as only used when using Addresses too (i.e. joins string to addresses in one field)
+    pass
+
+# ------------- OVERALL TESTS ----------------
+
+def test_srcdataprocessing(settings, createTempProjectDirectory, adjust_default_args):
+    ''' tests src data cleaning correctly saves file to adj_data dir'''
+    in_args = adjust_default_args
+    tmp_root = createTempProjectDirectory
+    ProcessSourceData(settings).clean()
+    assert os.path.exists(os.path.join(tmp_root,settings.directories['adj_dir'].format(settings.region_dir),in_args.src_adj))
+
+def test_regdataprocessing(settings, createTempProjectDirectory, adjust_default_args):
+    ''' tests reg data cleaning correctly saves file to adj_data dir'''
+    in_args = adjust_default_args
+    tmp_root = createTempProjectDirectory
+    ProcessRegistryData(settings).clean()
+    assert os.path.exists(os.path.join(tmp_root,settings.directories['adj_dir'].format(settings.region_dir),in_args.reg_adj))
+
+
+

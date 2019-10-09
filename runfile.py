@@ -227,8 +227,6 @@ class Main:
 
 
 if __name__ == '__main__':
-    pdb.set_trace()
-
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = getInputArgs(rootdir)
 

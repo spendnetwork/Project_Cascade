@@ -4,16 +4,14 @@ import pandas as pd
 import psycopg2 as psy
 from dotenv import load_dotenv, find_dotenv
 import os
-
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, Column, MetaData, String, Integer, DateTime, func
-
+from sqlalchemy import Column, String, Integer, DateTime, func
 import directories
 from Regions.UK_entities.Regional_Run_Files import setup
 import runfile
 import pdb
 from pathlib import Path
-import pytest_pgsql
+
 
 
 # get the remote database details from .env
@@ -22,9 +20,6 @@ host_remote = os.environ.get("HOST_REMOTE")
 dbname_remote = os.environ.get("DBNAME_REMOTE")
 user_remote = os.environ.get("USER_REMOTE")
 password_remote = os.environ.get("PASSWORD_REMOTE")
-
-# establish filepath to current test directory
-testdir = os.path.dirname(os.path.abspath(__file__))
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -38,10 +33,10 @@ def createTempProjectDirectory(tmpdir_factory):
 def adjust_default_args(createTempProjectDirectory):
     ''' Create arg_parser from runfile but also add additional arguments necessary to locate the test files '''
     args, parser = runfile.getInputArgs(createTempProjectDirectory,[])
-    parser.add_argument('--src_raw_name', default='Data_Inputs/Raw_Data/src_data_raw_test.csv', type=str)
-    parser.add_argument('--reg_raw_name', default='Data_Inputs/Raw_Data/reg_data_raw_test.csv', type=str)
-    parser.add_argument('--src_adj_name', default='Data_Inputs/Adj_Data/src_data_adj_test.csv', type=str)
-    parser.add_argument('--reg_adj_name', default='Data_Inputs/Adj_Data/reg_data_adj_test.csv', type=str)
+    parser.add_argument('--src', default='src_data_raw_test.csv', type=str)
+    parser.add_argument('--reg', default='reg_data_raw_test.csv', type=str)
+    parser.add_argument('--src_adj', default='src_data_adj_test.csv', type=str)
+    parser.add_argument('--reg_adj', default='reg_data_adj_test.csv', type=str)
     parser.add_argument('--assigned_file', default='Outputs/Name_Only/Deduped_Data/Name_Only_matched_clust_assigned.csv', type=str)
     # Empty list as param below to avoid i.e. 'test_setup.py' being passed as an argument
     # https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
@@ -74,6 +69,9 @@ def settings(adjust_default_args, createTempProjectDirectory):
     # Define config file variables and attach to settings object
     settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
 
+    # establish filepath to current test directory
+    settings.testdir = os.path.dirname(os.path.abspath(__file__))
+
     return settings
 
 
@@ -81,7 +79,7 @@ def settings(adjust_default_args, createTempProjectDirectory):
 def transfer_data_files(settings, createTempProjectDirectory):
 
     tmp_root = createTempProjectDirectory
-
+    testdir = settings.testdir
     setup.Setup(settings).setupRawDirs()
     setup.Setup(settings).SetupDirs()
 
@@ -194,3 +192,29 @@ def create_upload_table(postgresql_db):
     upload_table_test = postgresql_db.get_table('upload_table_test')
 
     return upload_table_test
+
+
+@pytest.fixture()
+def test_create_reg_table(postgresql_db):
+    # Combination of SQLAlchemy to define classes in python which get converted to an sql schema, and pytest_pgsql to
+    # make use of postgresql_db to create and delete tables when testing
+    class orgs_ocds_test(declarative_base()):
+        __tablename__ = 'orgs_ocds_test'
+
+        scheme = Column(String)
+        id = Column(String)
+        uri = Column(String)
+        legalname = Column(String)
+        source = Column(String)
+        created_at = Column(DateTime(timezone=True), server_default=func.now()) # https://stackoverflow.com/questions/13370317/sqlalchemy-default-datetime
+        orgs_ocds_scheme_id_idx = Column(Integer, primary_key=True)
+
+
+    postgresql_db.create_table(orgs_ocds_test)
+
+    postgresql_db.load_csv('test_data/orgs_ocds_test_data.csv', orgs_ocds_test)
+
+    orgs_ocds_test = postgresql_db.get_table('orgs_ocds_test')
+
+    return postgresql_db, orgs_ocds_test
+
