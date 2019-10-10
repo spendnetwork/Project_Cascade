@@ -11,7 +11,7 @@ from Regions.UK_entities.Regional_Run_Files import setup
 import runfile
 import pdb
 from pathlib import Path
-
+import sys
 
 
 # get the remote database details from .env
@@ -38,8 +38,10 @@ def adjust_default_args(createTempProjectDirectory):
     parser.add_argument('--src_adj', default='src_data_adj_test.csv', type=str)
     parser.add_argument('--reg_adj', default='reg_data_adj_test.csv', type=str)
     parser.add_argument('--assigned_file', default='Outputs/Name_Only/Deduped_Data/Name_Only_matched_clust_assigned.csv', type=str)
+
     # Empty list as param below to avoid i.e. 'test_setup.py' being passed as an argument
     # https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
+
     args = parser.parse_args([])
     return args
 
@@ -82,6 +84,7 @@ def transfer_data_files(settings, createTempProjectDirectory):
     testdir = settings.testdir
     setup.Setup(settings).setupRawDirs()
     setup.Setup(settings).SetupDirs()
+    settings.tmp_root = tmp_root
 
     print("\n\nTemporary testing directories constructed at {}".format(str(tmp_root)))
 

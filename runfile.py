@@ -88,18 +88,18 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--split', action='store_true', help='split source file and initiate segmented matching')
 
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
-    args = parser.parse_args(args)
-
+    pargs = parser.parse_args(args)
     # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
     # Force an error and prompt user to add the training flag
-    if args.training == True and not os.path.exists(os.path.join(rootdir,"Regions",args.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
+    if pargs.training == True and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
         print("Dedupe training files do not exist - running with --training flag to initiate training process")
         parser.add_argument('--training', action='store_true', help='Modify/contribute to the training data')
 
-    args = parser.parse_args([])
+    pargs = parser.parse_args(args)
 
 
-    return args, parser
+
+    return pargs, parser
 
 
 class Main:
