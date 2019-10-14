@@ -39,10 +39,26 @@ class AwsTransfers(Main):
                 self.upload_file(filepath, self.bucket, 'UK_entities/Unverified_Matches/' + filename)
                 self.unverified_file = filename
 
-            # Write stats file to archive folder too
-            stats_fp = glob.glob(os.path.join(self.directories['stats_file'].format(self.region_dir, self.proc_type)))[0]
-            filename = self.unverified_file[:10] + "_matches_stats.zip"
-            self.upload_file(stats_fp, self.bucket, 'UK_entities/Archive/' + filename)
+            # Zip file creation - note will only work for latest unverified file. Above loop is added just incase
+            # any residual files get added manually to S3 bucket.
+
+            # Get filepaths of stats file, filtered and excluded matches files
+            stats_fp = self.directories['stats_file'].format(self.region_dir, self.proc_type)
+            filtered_matches_fp = self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + \
+                                  str(self.best_config) + '.csv'
+
+            excluded_matches_fp = self.directories['excluded_matches'].format(self.region_dir, self.proc_type) + '_' + \
+                                  str(self.best_config) + '.csv'
+
+            # Assign zip file which will contain above files
+            files_zip = self.unverified_file[:10] + "_files.zip"
+
+            with ZipFile(files_zip, 'w') as myzip:
+                myzip.write(stats_fp)
+                myzip.write(filtered_matches_fp)
+                myzip.write(excluded_matches_fp)
+
+            self.upload_file(files_zip, self.bucket, 'UK_entities/Archive/' + files_zip)
 
         # Download verified matches from s3 bucket if prodn_verified argument (production only)
         if self.in_args.prodn_verified:
@@ -54,6 +70,7 @@ class AwsTransfers(Main):
         Takes verified matches files placed in /verified_matches in S3 bucket and uploads them to the db table
         Files are then archived in S3 bucket as zip files, and then removed from S3 bucket/verified
         """
+
         # Scan s3 verified folder for files
         s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
         response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Verified_Matches/')
@@ -83,10 +100,13 @@ class AwsTransfers(Main):
 
             # Convert file to zip file for archiving
             zip_fp = os.path.join(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type)
-                                        , os.path.basename(files[i]['Key'][:-4] + '.zip'))
+                                    , os.path.basename(files[i]['Key'][:-4] + '.zip'))
+
+            file = os.path.join(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type)
+                                  , os.path.basename(files[i]['Key']))
 
             with ZipFile(zip_fp, 'w') as myzip:
-                myzip.write(zip_fp)
+                myzip.write(file)
 
             # Upload zip file to S3 Archive
             self.upload_file(zip_fp, self.bucket, 'UK_entities/Archive/' + os.path.basename(zip_fp))

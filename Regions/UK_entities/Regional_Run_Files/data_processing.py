@@ -134,7 +134,8 @@ class ProcessSourceData(DataProcessing):
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
             orig_col = str('src_name')
-            df = self.remvPunct(df, orig_col, adj_col)
+
+            df = DataProcessing.remvPunct(self, df, orig_col, adj_col)
 
             # Replace organisation suffixes with standardised version
             df[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
@@ -142,8 +143,8 @@ class ProcessSourceData(DataProcessing):
             # # Remove punctuation and double spacing in address
             adj_col = str('src_address_adj')
             df[adj_col] = df['src_address_streetaddress'] + ', ' + df['src_address_locality'] + ', ' + df['src_address_postalcode'] + ', ' + df['src_address_countryname']
-            df = self.remvPunct(df, adj_col, adj_col)
-            df = self.joinFields(df, 'src')
+            df = DataProcessing.remvPunct(self, df, adj_col, adj_col)
+            df = DataProcessing.joinFields(self, df, 'src')
             df = df.drop(['src_address_streetaddress', 'src_address_locality', 'src_address_postalcode',
                           'src_address_countryname'], axis=1)
             logging.info("...done")
@@ -200,7 +201,7 @@ class ProcessRegistryData(DataProcessing):
                 # Remove punctuation and double spacing
                 adj_col = str('reg_name_adj')
                 orig_col = str('reg_name')
-                chunk = self.remvPunct(chunk, orig_col, adj_col)
+                chunk = DataProcessing.remvPunct(self, chunk, orig_col, adj_col)
 
                 # Replace organisation suffixes with standardised version
                 chunk[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
@@ -210,10 +211,10 @@ class ProcessRegistryData(DataProcessing):
                 orig_col = str('reg_address')
 
                 # dfmerge = self.remvPunct(dfmerge, orig_col, adj_col)
-                dfmerge = self.remvPunct(chunk, orig_col, adj_col)
+                dfmerge = DataProcessing.remvPunct(self, chunk, orig_col, adj_col)
 
                 # dfmerge = self.remvStreetNumber(dfmerge, adj_col)
-                dfmerge = self.joinFields(dfmerge, 'reg')
+                dfmerge = DataProcessing.joinFields(self, dfmerge, 'reg')
 
                 dffullmerge = pd.concat([dffullmerge, dfmerge], ignore_index=True)
 
@@ -243,18 +244,18 @@ class AssignRegDataToClusters:
 	:return altered df
 	"""
 
-    def __init__(self, df, assigned_file=None):
-        self.df = df
-        self.assigned_file = assigned_file
+    # def __init__(self, df, assigned_file=None):
+        # self.df = df
+        # self.assigned_file = assigned_file
 
-    def assign(self):
-        self.df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
-        self.df.reset_index(drop=True, inplace=True)
+    def assign(self, df, assigned_file=None):
+        df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+        df.reset_index(drop=True, inplace=True)
         tqdm.pandas()
         logging.info("Assigning close matches within clusters...")
-        self.df = self.df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
-        self.df.to_csv(self.assigned_file, index=False)
-        return self.df
+        df = df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
+        df.to_csv(assigned_file, index=False)
+        return df
 
     def getMaxId(group):
         """
@@ -275,5 +276,7 @@ class AssignRegDataToClusters:
                 group.at[index, 'reg_name'] = group['reg_name'][max_conf_idx]
                 group.at[index, 'reg_address'] = group['reg_address'][max_conf_idx]
                 group.at[index, 'reg_address_adj'] = group['reg_address_adj'][max_conf_idx]
-
+                group.at[index, 'reg_scheme'] = group['reg_scheme'][max_conf_idx]
+                group.at[index, 'reg_source'] = group['reg_source'][max_conf_idx]
+                group.at[index, 'reg_created_at'] = group['reg_created_at'][max_conf_idx]
         return group

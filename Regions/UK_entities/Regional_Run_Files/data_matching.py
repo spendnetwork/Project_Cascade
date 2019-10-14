@@ -70,7 +70,7 @@ class Matching(Main):
             clust_df = pd.read_csv(self.clustered_fp, index_col=None, dtype=self.df_dtypes)
 
             # Assign matches within clusters
-            clust_df = self.data_processing.AssignRegDataToClusters(clust_df, self.assigned_fp).assign()
+            clust_df = self.data_processing.AssignRegDataToClusters().assign(clust_df, self.assigned_fp)
 
             # Convert NaNs to empty strings
             clust_df = clust_df.fillna(value="")

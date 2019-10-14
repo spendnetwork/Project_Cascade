@@ -15,11 +15,10 @@ class StatsCalculations(Main):
 	:return : None
 	:output : a short stats file for each config file for manual comparison to see which is better
 	"""
-    def __init__(self, settings, clustdf, extractdf, srcdf):
+    def __init__(self, settings, clustdf, extractdf):
         super().__init__(settings)
-        self.clustdf = clustdf
-        self.extractdf = extractdf
-        self.srcdf = srcdf
+        clustdf = clustdf
+        filterdf = extractdf
 
     def calculate(self):
         # Remove old stats file if exists and if first iteration over config files:
@@ -27,24 +26,28 @@ class StatsCalculations(Main):
             if self.conf_file_num == 1:
                 os.remove(self.directories['stats_file'].format(self.region_dir, self.proc_type))
 
+        srcdf = pd.read_csv(
+            self.directories['adj_dir'].format(self.region_dir) + self.directories['adj_src_data'].format(
+                self.in_args.src_adj))
+
         statdf = pd.DataFrame(columns=self.stats_cols)
 
         # Overall matches, including poor quality:
         statdf.at[self.conf_file_num, 'Config_File'] = self.conf_file_num
-        statdf.at[self.conf_file_num, 'Total_Matches'] = len(self.clustdf[pd.notnull(self.clustdf['reg_name'])])
-        statdf.at[self.conf_file_num, 'Percent_Matches'] = round(len(self.clustdf[pd.notnull(self.clustdf['reg_name'])]) / len(self.srcdf) * 100,2)
+        statdf.at[self.conf_file_num, 'Total_Matches'] = len(clustdf[pd.notnull(clustdf['reg_name'])])
+        statdf.at[self.conf_file_num, 'Percent_Matches'] = round(len(clustdf[pd.notnull(clustdf['reg_name'])]) / len(srcdf) * 100,2)
         # Overall optimised matches :
-        statdf.at[self.conf_file_num, 'Optim_Matches'] = len(self.extractdf)
+        statdf.at[self.conf_file_num, 'Optim_Matches'] = len(filterdf)
         # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
         # This is the size of the extracted matches divided by the total number of
-        statdf.at[self.conf_file_num, 'Percent_Precision'] = round(len(self.extractdf) / len(self.clustdf) * 100, 2)
+        statdf.at[self.conf_file_num, 'Percent_Precision'] = round(len(filterdf) / len(clustdf) * 100, 2)
         # Recall - how many relevant items have been selected from the entire original source data (TP/TP+FN)
-        statdf.at[self.conf_file_num, 'Percent_Recall'] = round(len(self.extractdf) / len(self.srcdf) * 100, 2)
+        statdf.at[self.conf_file_num, 'Percent_Recall'] = round(len(filterdf) / len(srcdf) * 100, 2)
 
         if self.in_args.recycle:
-            statdf.at[self.conf_file_num, 'Leven_Dist_Avg'] = np.average(self.extractdf.leven_dist_NA)
+            statdf.at[self.conf_file_num, 'Leven_Dist_Avg'] = np.average(filterdf.leven_dist_NA)
         else:
-            statdf.at[self.conf_file_num, 'Leven_Dist_Avg'] = np.average(self.extractdf.leven_dist_N)
+            statdf.at[self.conf_file_num, 'Leven_Dist_Avg'] = np.average(filterdf.leven_dist_N)
         # if statsfile doesnt exist, create it
         if not os.path.exists(self.directories['stats_file'].format(self.region_dir, self.proc_type)):
             statdf.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type, index=False))

@@ -9,8 +9,51 @@ import datetime
 import logging.config
 import sys
 import pdb
-
 from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
+
+
+def createSettingsObj(rootdir, in_args, settings):
+
+    # Silence warning for df['process_num'] = str(proc_num)
+    pd.options.mode.chained_assignment = None
+
+    if in_args.region == 'Italy':
+        settings = settings.Italy_Settings
+
+    if in_args.region == 'UK':
+        settings = settings.UK_Settings
+
+    if in_args.region == 'UK_entities':
+        settings = settings.UK_entities
+
+    if in_args.region == 'CQC':
+        settings = settings.CQC_settings
+
+    # If any production flags are being called use production logger...
+    if in_args.prodn_verified or in_args.prodn_unverified:
+        config_stdout_root_logger_with_papertrail(app_name='entity_matching', level=logging.DEBUG)
+
+    # ...else use local logger
+    else:
+        # Import logging configs
+        with open('config.yaml', 'r') as f:
+            config = yaml.safe_load(f.read())
+            logging.config.dictConfig(config)
+
+        def exception_handler(type, value, tb):
+            logging.exception('Uncaught exception: {0}'.format(str(value)))
+
+        # Install exception handler
+        sys.excepthook = exception_handler
+
+    settings.in_args = in_args
+    settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
+
+    # Define config file variables and attach to settings object
+    settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
+
+    return settings
+
 
 def getInputArgs(rootdir, args=None):
     """
@@ -45,17 +88,18 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--split', action='store_true', help='split source file and initiate segmented matching')
 
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
-    args = parser.parse_args(args)
-
+    pargs = parser.parse_args(args)
     # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
     # Force an error and prompt user to add the training flag
-    if args.training == True and not os.path.exists(os.path.join(rootdir,"Regions",args.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
+    if pargs.training == True and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
         print("Dedupe training files do not exist - running with --training flag to initiate training process")
         parser.add_argument('--training', action='store_true', help='Modify/contribute to the training data')
 
-    args = parser.parse_args()
+    pargs = parser.parse_args(args)
 
-    return args, parser
+
+
+    return pargs, parser
 
 
 class Main:
@@ -175,7 +219,7 @@ class Main:
             # Continue if no more config files found
             print("Done")
 
-        self.match_filtering.VerificationAndUploads(self).verify()
+        self.best_config = self.match_filtering.VerificationAndUploads(self).verify()
 
         if in_args.region == 'UK_entities':
             self.AWS_calls = self.runfile_mods.AWS_calls
@@ -183,46 +227,9 @@ class Main:
 
 
 if __name__ == '__main__':
-
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = getInputArgs(rootdir)
 
-    # Silence warning for df['process_num'] = str(proc_num)
-    pd.options.mode.chained_assignment = None
+    settingsobj = createSettingsObj(rootdir, in_args, settings)
 
-    if in_args.region == 'Italy':
-        settings = settings.Italy_Settings
-
-    if in_args.region == 'UK':
-        settings = settings.UK_Settings
-
-    if in_args.region == 'UK_entities':
-        settings = settings.UK_entities
-
-    if in_args.region == 'CQC':
-        settings = settings.CQC_settings
-
-    # If any production flags are being called use production logger...
-    if in_args.prodn_verified or in_args.prodn_unverified:
-        config_stdout_root_logger_with_papertrail(app_name='entity_matching', level=logging.DEBUG)
-
-    # ...else use local logger
-    else:
-        # Import logging configs
-        with open('config.yaml', 'r') as f:
-            config = yaml.safe_load(f.read())
-            logging.config.dictConfig(config)
-
-        def exception_handler(type, value, tb):
-            logging.exception('Uncaught exception: {0}'.format(str(value)))
-
-        # Install exception handler
-        sys.excepthook = exception_handler
-
-    settings.in_args = in_args
-    settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
-
-    # Define config file variables and attach to settings object
-    settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
-
-    Main(settings).run_main()
+    Main(settingsobj).run_main()

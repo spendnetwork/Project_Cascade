@@ -51,7 +51,7 @@ class DbCalls(Main):
         query = self.removeTableDuplicates()
         cur.execute(query)
         conn.commit()
-        #
+
         # Also transfer matches to transfer table
         query = self.transferMatches()
         cur.execute(query)
@@ -206,6 +206,7 @@ class FetchData(DbCalls):
     
             """.format(self.src_data_source, "'" + self.in_args.data_from_date + "'", "'" + self.in_args.data_to_date + "'")
         return query
+
 
     def fetchdata(self, query):
         """

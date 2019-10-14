@@ -21,6 +21,7 @@ csvdedupe = {git = "https://www.github.com/dmells/csvdedupe"}
 pandas = "==0.24.2"
 pyyaml = "*"
 core = {editable = true,path = "./../core"}
+pytest-pgsql = "*"
 
 [requires]
 python_version = "3.6"
