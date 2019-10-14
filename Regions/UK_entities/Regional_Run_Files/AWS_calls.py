@@ -37,6 +37,7 @@ class AwsTransfers(Main):
                 filename = os.path.basename(filepath)
                 # Upload each file to S3 bucket folder
                 self.upload_file(filepath, self.bucket, 'UK_entities/Unverified_Matches/' + filename)
+                self.unverified_file = filename
 
             # Zip file creation - note will only work for latest unverified file. Above loop is added just incase
             # any residual files get added manually to S3 bucket.
