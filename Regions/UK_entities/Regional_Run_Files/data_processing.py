@@ -197,7 +197,7 @@ class ProcessRegistryData(DataProcessing):
 
             dffullmerge = pd.DataFrame([])
             for chunk in df:
-                pdb.set_trace()
+
                 # Remove punctuation and double spacing
                 adj_col = str('reg_name_adj')
                 orig_col = str('reg_name')

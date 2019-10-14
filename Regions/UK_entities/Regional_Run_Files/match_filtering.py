@@ -188,6 +188,8 @@ class VerificationAndUploads(Main):
                 # Add confirmed matches to relevant table
                 self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
+        return self.best_config
+
     def manualMatching(self):
         """
         Provides user-input functionality for manual matching based on the extracted records

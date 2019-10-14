@@ -11,7 +11,6 @@ def test_isConnected(connection):
 
 #---------- Test creation of actual test tables--------
 def test_create_regDBschema(create_reg_table):
-    pdb.set_trace()
     orgs_ocds_test = create_reg_table
     # Create assertion that data exists in the table too (below just asserts table exists) tablesample?
     assert orgs_ocds_test.exists()
@@ -27,12 +26,13 @@ def test_create_uploadDBschema(create_upload_table):
 
 
 def test_createRegistryDataSQLQuery(settings):
-    assert settings.reg_data_source
-    query = db_calls.FetchData.createRegistryDataSQLQuery(settings)
-    print(pgsanity.ecpg.check_syntax("select * from;"))
-    print(pgsanity.ecpg.check_syntax('ldgflerffe;'))
-    # both work??
+    # assert settings.reg_data_source
+    # query = db_calls.FetchData.createRegistryDataSQLQuery(settings)
+    # print(pgsanity.ecpg.check_syntax("select * from;"))
+    # print(pgsanity.ecpg.check_syntax('ldgflerffe;'))
+    # # both work??
     #https: // stackoverflow.com / questions / 8271606 / postgresql - syntax - check - without - running - the - query
+    pass
 
 
 def test_fetchregData(settings, test_create_reg_table):

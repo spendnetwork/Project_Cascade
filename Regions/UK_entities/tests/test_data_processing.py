@@ -9,7 +9,7 @@ import pdb
 
 @pytest.fixture()
 def test_src_df():
-    # pdb.set_trace()
+
     df = pd.DataFrame()
     df['src_name'] = pd.Series(["Ditta ABBOTT VASCULAR Knoll-Ravizza S.p.A."])
     return df
@@ -18,7 +18,7 @@ def test_src_df():
 @pytest.mark.parametrize("test_input, expected", [
     ("Ditta ABBOTT VASCULAR Knoll-Ravizza S.p.A.", "ditta abbott vascular knollravizza spa")])
 def test_remvPunct(test_src_df, test_input, expected):
-    pdb.set_trace()
+
     input_index = test_src_df.src_name.str.find(test_input)
     test_src_df = DataProcessing.remvPunct('', test_src_df, 'src_name','src_name_adj')
     assert test_src_df.loc[input_index[0]].src_name_adj == expected
@@ -44,7 +44,7 @@ def test_clustered_df(settings):
 def test_orgids_assigned_to_clusters(settings, test_clustered_df):
     # Tests that any cluster containing rows that have both a match and a none match gets
     # the match data copied over to the non match rows (highest confidence score)
-    pdb.set_trace()
+
     df_processed = AssignRegDataToClusters.assign(settings, test_clustered_df[0])
     df_processed.to_csv('./df_processed.csv',index=False)
     assert_frame_equal(df_processed, test_clustered_df[1])
@@ -52,7 +52,7 @@ def test_orgids_assigned_to_clusters(settings, test_clustered_df):
 
 def test_addlevdist(settings, test_clustered_df):
     # Assert the levenshtein distance column can be added and populated
-    pdb.set_trace()
+
     levadded = LevDist(settings, test_clustered_df[1]).addLevDist()
     assert pd.notnull(levadded.at[0, 'leven_dist_N'])
 

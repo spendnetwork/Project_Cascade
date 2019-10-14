@@ -219,7 +219,7 @@ class Main:
             # Continue if no more config files found
             print("Done")
 
-        self.match_filtering.VerificationAndUploads(self).verify()
+        self.best_config = self.match_filtering.VerificationAndUploads(self).verify()
 
         if in_args.region == 'UK_entities':
             self.AWS_calls = self.runfile_mods.AWS_calls
