@@ -61,8 +61,14 @@ class AwsTransfers(Main):
             self.upload_file(files_zip, self.bucket, 'UK_entities/Archive/' + files_zip)
 
         # Download verified matches from s3 bucket if prodn_verified argument (production only)
-        if self.in_args.prodn_verified:
-            self.process_verified_files()
+        # if self.in_args.prodn_verified:
+        #     self.process_verified_files()
+
+        # Add confirmed matches/non-matches to training file
+        pdb.set_trace()
+        if self.in_args.convert_training:
+            self.runfile_mods.convert_training.ConvertToTraining.convert(self)
+            # self.runfile_mods.convert_training(self).convert()
 
     def process_verified_files(self):
         """
@@ -85,7 +91,7 @@ class AwsTransfers(Main):
                              files[i]['Key'],
                              os.path.join(self.directories['verified_matches_dir'].format(self.region_dir,self.proc_type),os.path.basename(files[i]['Key'])))
 
-        # # Upload all files in verified_matches_dir to our database:
+        # Upload all files in verified_matches_dir to our database:
         self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
         for i in range(len(files)):

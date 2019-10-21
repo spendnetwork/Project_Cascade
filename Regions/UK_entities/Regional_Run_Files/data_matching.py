@@ -19,7 +19,8 @@ class Matching(Main):
             self.in_args.reg_adj)
         self.src_fields = self.configs['processes'][self.proc_type][1]['dedupe_field_names']['source_data']
         self.reg_fields = self.configs['processes'][self.proc_type][1]['dedupe_field_names']['registry_data']
-        self.train = ['--skip_training' if self.in_args.training else '']
+        self.mtrain = ['--skip_training' if self.in_args.mtraining else '']
+        self.ctrain = ['--skip_training' if self.in_args.ctraining else '']
         self.matched_fp = self.directories["match_output_file"].format(self.region_dir, self.proc_type)
         self.clustered_fp = self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)
         self.manual_clustered_fp = self.directories["mancluster_output_file"].format(self.region_dir, self.proc_type)
@@ -116,7 +117,7 @@ class Matching(Main):
                         self.learned_settings_file,
                     '--output_file',
                         os.path.join(splits_output_dir, str(fileno) + '.csv'),
-                    str(self.train[0])
+                    str(self.mtrain[0])
                 ]
 
                 launch_matching()
@@ -191,7 +192,7 @@ class Matching(Main):
                     self.learned_settings_file,
                 '--output_file',
                     self.matched_fp,
-                str(self.train[0])
+                str(self.mtrain[0])
             ]
 
             launch_matching()
@@ -215,7 +216,7 @@ class Matching(Main):
                 self.matched_fp,
                 '--field_names',
                     ' '.join(self.src_fields),
-                str(self.train[0]),
+                str(self.ctrain[0]),
                 '--training_file',
                     self.cluster_training_file,
                 '--settings_file',

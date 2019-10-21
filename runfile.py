@@ -70,10 +70,12 @@ def getInputArgs(rootdir, args=None):
                         help='Set cleaned source/source datafile name')
     parser.add_argument('--reg_adj', default='reg_data_adj.csv', type=str, help='Set cleaned registry datafile name')
     parser.add_argument('--recycle', action='store_true', help='Recycle the manual training data')
-    parser.add_argument('--training', action='store_false', help='Modify/contribute to the training data')
+    parser.add_argument('--mtraining', action='store_false', help='Modify/contribute to the matching training data')
+    parser.add_argument('--ctraining', action='store_false', help='Modify/contribute to the clustering training data')
+    parser.add_argument('--convert_training', action='store_true',
+                        help='Convert confirmed matches to training file for recycle phase')
     parser.add_argument('--config_review', action='store_true', help='Manually review/choose best config file results')
     parser.add_argument('--terminal_matching', action='store_true', help='Perform manual matching in terminal')
-    parser.add_argument('--convert_training', action='store_true', help='Convert confirmed matches to training file for recycle phase')
     parser.add_argument('--upload', action='store_true' , help='Add confirmed matches to database')
     parser.add_argument('--clear_all', action='store_true', help='Clear all datafiles')
     parser.add_argument('--clear_adj', action='store_true', help='Clear all files except raw data')
@@ -93,13 +95,15 @@ def getInputArgs(rootdir, args=None):
     pargs = parser.parse_args(args)
     # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
     # Force an error and prompt user to add the training flag
-    if pargs.training == True and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
+    if pargs.ctraining == True and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
         print("Dedupe training files do not exist - running with --training flag to initiate training process")
-        parser.add_argument('--training', action='store_true', help='Modify/contribute to the training data')
+        parser.add_argument('--ctraining', action='store_true', help='Modify/contribute to the cluster training data')
+
+    if pargs.mtraining == True and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Matching/matching_training.json")):
+        print("Dedupe training files do not exist - running with --training flag to initiate training process")
+        parser.add_argument('--mtraining', action='store_true', help='Modify/contribute to the matching training data')
 
     pargs = parser.parse_args(args)
-
-
 
     return pargs, parser
 

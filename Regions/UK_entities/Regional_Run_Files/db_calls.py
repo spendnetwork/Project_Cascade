@@ -213,7 +213,6 @@ class FetchData(DbCalls):
         """
         Retrieve data from the db using query
         """
-
         conn, _ = self.db_calls.DbCalls.createConnection(self)
         logging.info('Importing data...')
         df = pd.read_sql(query, con=conn)
