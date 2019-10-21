@@ -10,6 +10,7 @@ dirs = {
                   "raw_reg_data": "{0}",
 
                   "adj_src_data": "{0}",
+                  "adj_src_data1": "src_adj_adjonly.csv",
                   "adj_reg_data": "{0}",
                   "proc_type_dir": '{0}/Outputs/{1}',
                   "proc_type_matches_dir": '{0}/Outputs/{1}/Filtered_Matches',
@@ -21,6 +22,7 @@ dirs = {
 
                   "cluster_training_file": '{0}/Data_Inputs/Training_Files/{1}/Clustering/cluster_training.json',
                   "cluster_output_file": '{0}/Outputs/{1}/Deduped_Data/{1}_matched_clustered.csv',
+                  "mancluster_output_file":'{0}/Outputs/{1}/Deduped_Data/{1}_matched_clustered_manually.csv',
 
                   "assigned_output_file": '{0}/Outputs/{1}/Deduped_Data/{1}_matched_clust_assigned.csv',
 

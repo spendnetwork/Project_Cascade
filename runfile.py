@@ -78,7 +78,9 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--clear_all', action='store_true', help='Clear all datafiles')
     parser.add_argument('--clear_adj', action='store_true', help='Clear all files except raw data')
     parser.add_argument('--clear_outputs', action='store_true', help='Clear all files except inputs')
-    parser.add_argument('--clear_post_matching', action='store_true', help='Clear all files after matching phase')
+    parser.add_argument('--clear_filtered', action='store_true', help='Clear all files after manual clustering phase')
+    parser.add_argument('--clear_clustered', action='store_true', help='Clear all files after matching phase')
+    parser.add_argument('--clear_manclustered', action='store_true', help='Clear all files after entire dedupe phase')
     parser.add_argument('--data_from_date', type=str,
                         default=(datetime.date.today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
                         , help='Set source data start date to be downloaded from (inclusive)')

@@ -4,6 +4,7 @@ from fuzzywuzzy import fuzz
 from tqdm import tqdm
 import string
 from runfile import Main, logging
+import html
 import pdb
 
 class DataProcessing(Main):
@@ -18,7 +19,6 @@ class DataProcessing(Main):
         :param adj_col: the orig_col with removed punctuation and standardised org_suffixes
         :return: adjusted dataframe
         """
-
         df[adj_col] = df[orig_col].str.translate(
             str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
         return df
@@ -38,6 +38,39 @@ class DataProcessing(Main):
         df[adj_col] = df[adj_col].str.replace('\d+', '').str.strip()
         return df
 
+    def duplicaterowscontainingand(self, df, adj_col):
+        # Dedupe might already take care of this, but for statistics purposes we need to join
+
+        # Use deep copy so new df variable doesn't point to original df, otherwise will just change original df data.
+        df_dup = df.copy(deep=True)
+
+        # Filter copy df for all rows containing 'and'. Using src_name_adj instead of src_name because src_name_adj
+        # has html entities converted and don't want to overwrite.
+        df_dup = df_dup[df_dup[adj_col].str.contains(" and ")]
+
+        # Rename string
+        df_dup[adj_col] = df_dup[adj_col].str.replace(" and ", " & ")
+        df_adj = pd.concat([df,df_dup]).sort_index().reset_index(drop=True)
+
+        # WONT ALL &'S BE REMOVED IN REMOVEPUNCT? THEREFORE REDUCING DIRECT MATCHES TO ORGS LOOKUP. IS REMOVEPUNCT NEEDED?
+        return df_adj
+
+    def duplicaterowscontainingampersand(self, df, adj_col):
+        # Dedupe might already take care of this, but for statistics purposes we need to join to orgs lookup
+
+        # Use deep copy so new df variable doesn't point to original df, otherwise will just change original df data.
+        df_dup = df.copy(deep=True)
+
+        # Filter copy df for all rows containing '&'. Using src_name_adj instead of src_name because src_name_adj
+        # has html entities converted and don't want to overwrite.
+        df_dup = df_dup[df_dup[adj_col].str.contains(" & ")]
+
+        # Rename string
+        df_dup[adj_col] = df_dup[adj_col].str.replace(" & ", " and ")
+        df_adj = pd.concat([df,df_dup]).sort_index().reset_index(drop=True)
+
+        # WONT ALL &'S BE REMOVED IN REMOVEPUNCT? THEREFORE REDUCING DIRECT MATCHES TO ORGS LOOKUP. IS REMOVEPUNCT NEEDED?
+        return df_adj
 
 class LevDist(Main):
     '''
@@ -135,7 +168,24 @@ class ProcessSourceData(DataProcessing):
             adj_col = str('src_name_adj')
             orig_col = str('src_name')
 
-            df = DataProcessing.remvPunct(self, df, orig_col, adj_col)
+
+            # Decode html entities i.e. "&amp;" into "&"
+            df[adj_col] = df[orig_col].apply(html.unescape)
+            #
+            # # Convert "&" to "and"
+            # df[adj_col] = df[adj_col].str.replace('&', 'and')
+
+            # Duplicate rows containing 'and' then convert to &
+            df1 = DataProcessing.duplicaterowscontainingand(self, df, adj_col)
+
+            # Duplicate rows containing '&' and convert to 'and'
+            df2 = DataProcessing.duplicaterowscontainingampersand(self, df, adj_col)
+
+            # Concatenate the two together
+            df = pd.concat([df1,df2]).sort_index().reset_index(drop=True)
+
+            # df = DataProcessing.remvPunct(self, df, orig_col, adj_col)
+            # df = DataProcessing.remvPunct(self, df, adj_col, adj_col)
 
             # Replace organisation suffixes with standardised version
             df[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
@@ -201,7 +251,20 @@ class ProcessRegistryData(DataProcessing):
                 # Remove punctuation and double spacing
                 adj_col = str('reg_name_adj')
                 orig_col = str('reg_name')
+
+                # chunk[adj_col] = ''
                 chunk = DataProcessing.remvPunct(self, chunk, orig_col, adj_col)
+
+                # # Duplicate rows containing 'and' then convert to &
+                # chunk1 = DataProcessing.duplicaterowscontainingand(self, df, adj_col)
+                #
+                # # Duplicate rows containing '&' and convert to 'and'
+                # chunk2 = DataProcessing.duplicaterowscontainingampersand(self, df, adj_col)
+                #
+                # # Concatenate the two together
+                # chunk = pd.concat([chunk1, chunk2]).sort_index().reset_index(drop=True)
+
+                # Above gives 'Uncaught exception: 'TextFileReader' object has no attribute 'copy''
 
                 # Replace organisation suffixes with standardised version
                 chunk[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
@@ -253,6 +316,7 @@ class AssignRegDataToClusters:
         df.reset_index(drop=True, inplace=True)
         tqdm.pandas()
         logging.info("Assigning close matches within clusters...")
+
         df = df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
         df.to_csv(assigned_file, index=False)
         return df
@@ -267,7 +331,15 @@ class AssignRegDataToClusters:
         :return group: the amended cluster to be updated into the main df
         """
 
-        max_conf_idx = group['Confidence Score'].idxmax()
+        # PREVIOUSLY WAS JUST TAKING THE HIGHEST CONFIDENCE SCORE (EVEN IF NO REG_ID ETC). NEED TO TAKE THE HIGHEST SCORE OF ONLY THOSE IN THE GROUP
+        # THAT HAVE A REG_ID
+        reg_group = group[pd.notnull(group['reg_id'])]
+        try:
+            max_conf_idx = reg_group['Confidence Score'].idxmax()
+
+        except:
+            return group
+
         for index, row in group.iterrows():
             # If the row is unmatched (has no registry id):
             if pd.isnull(row.reg_id):

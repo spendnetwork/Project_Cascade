@@ -1,1431 +1,719 @@
 {
-  "distinct": [
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "foodbuy, a trading division of compass contract services (uk) ltd, acting as agent on behalf of supply chain coordination ltd (\"sccl\") who are the management function of nhs supply chain on behalf of the department of health",
-          "src_tag": "['planning']",
-          "src_name_adj": "foodbuy a trading division of compass contract services uk ltd acting as agent on behalf of supply chain coordination ltd sccl who are the management function of nhs supply chain on behalf of the department of health",
-          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
-          "src_joinfields": "foodbuy a trading division of compass contract services uk ltd acting as agent on behalf of supply chain coordination ltd sccl who are the management function of nhs supply chain on behalf of the department of health co skipton house 80 london road london se1 6lh united kingdom"
-        },
-        {
-          "src_name_adj": "deutsche leasing uk ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "tower hamlets ccg pediatric audiology services for children and young people at tier 3 level",
-          "src_tag": "['planning']",
-          "src_name_adj": "tower hamlets ccg pediatric audiology services for children and young people at tier 3 level",
-          "src_address_adj": "tower hamlets ccg alderney building mile end hospital london e1 4dg united kingdom",
-          "src_joinfields": "tower hamlets ccg pediatric audiology services for children and young people at tier 3 level tower hamlets ccg alderney building mile end hospital london e1 4dg united kingdom"
-        },
-        {
-          "src_name_adj": "tower publishing ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "wirral borough council",
-          "src_tag": "['tenderamendment']",
-          "src_name_adj": "wirral borough council",
-          "src_address_adj": "old market house hamilton street birkenhead ch41 5al england",
-          "src_joinfields": "wirral borough council old market house hamilton street birkenhead ch41 5al england"
-        },
-        {
-          "src_name_adj": "la phyzz marketing ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": null,
-          "src_tag": "['tender']",
-          "src_name_adj": null,
-          "src_address_adj": "royal stoke university hospital newcastle road stoke on trent staffordshire st4 6qg united kingdom",
-          "src_joinfields": null
-        },
-        {
-          "src_name_adj": "business gas ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "the london borough of barnet",
-          "src_tag": "['tender']",
-          "src_name_adj": "the london borough of barnet",
-          "src_address_adj": "north london business park london barnet n11 1np united kingdom",
-          "src_joinfields": "the london borough of barnet north london business park london barnet n11 1np united kingdom"
-        },
-        {
-          "src_name_adj": "park management services ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "perins school",
-          "src_tag": "['tender']",
-          "src_name_adj": "perins school",
-          "src_address_adj": "pound hill alresford so24 9bs united kingdom",
-          "src_joinfields": "perins school pound hill alresford so24 9bs united kingdom"
-        },
-        {
-          "src_name_adj": "rsk stats ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "thame town council",
-          "src_tag": "['tender']",
-          "src_name_adj": "thame town council",
-          "src_address_adj": "thame town council town hall high street thame ox9 3dp england",
-          "src_joinfields": "thame town council thame town council town hall high street thame ox9 3dp england"
-        },
-        {
-          "src_name_adj": "k2 architects ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "framework agreement for catering services - yorkshire collaborative academy trust, north yorkshire",
-          "src_tag": "['tender']",
-          "src_name_adj": "framework agreement for catering services yorkshire collaborative academy trust north yorkshire",
-          "src_address_adj": "yorkshire collaborative academy trust bilton grange primary school bilton lane harrogate hg1 3ba united kingdom",
-          "src_joinfields": "framework agreement for catering services yorkshire collaborative academy trust north yorkshire yorkshire collaborative academy trust bilton grange primary school bilton lane harrogate hg1 3ba united kingdom"
-        },
-        {
-          "src_name_adj": "north carr collaborative academy trust"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "n h s shared business services ltd",
-          "src_tag": "['award']",
-          "src_name_adj": "n h s shared business services ltd",
-          "src_address_adj": "north star house north star avenue swindon sn2 1ff england",
-          "src_joinfields": "n h s shared business services ltd north star house north star avenue swindon sn2 1ff england"
-        },
-        {
-          "src_name_adj": "obriens business services ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "rochdale metropolitan borough council and rochdale clinical commissioning group",
-          "src_tag": "['tender']",
-          "src_name_adj": "rochdale metropolitan borough council and rochdale clinical commissioning group",
-          "src_address_adj": "4th floor waterside house waterside plaza sale m33 7zf england",
-          "src_joinfields": "rochdale metropolitan borough council and rochdale clinical commissioning group 4th floor waterside house waterside plaza sale m33 7zf england"
-        },
-        {
-          "src_name_adj": "wirral metropolitan borough council"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "police and crime commissioner for hampshire and iow",
-          "src_tag": "['planning']",
-          "src_name_adj": "police and crime commissioner for hampshire and iow",
-          "src_address_adj": "st georges chambers st georges street winchester so23 6aj united kingdom",
-          "src_joinfields": "police and crime commissioner for hampshire and iow st georges chambers st georges street winchester so23 6aj united kingdom"
-        },
-        {
-          "src_name_adj": "dyfed powys police and crime commissioner"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "manchester 1",
-          "src_tag": "['award']",
-          "src_name_adj": "manchester 1",
-          "src_address_adj": "lovell house hulme manchester manchester m42af england",
-          "src_joinfields": "manchester 1 lovell house hulme manchester manchester m42af england"
-        },
-        {
-          "src_name_adj": "manchester city galleries development company ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "east of england nhs collaborative hub c/o west suffolk hospitals nhs foundation trust",
-          "src_tag": "['tender']",
-          "src_name_adj": "east of england nhs collaborative hub co west suffolk hospitals nft",
-          "src_address_adj": "victoria house capital park fulbourn cambridge cb21 5xb united kingdom",
-          "src_joinfields": "east of england nhs collaborative hub co west suffolk hospitals nft victoria house capital park fulbourn cambridge cb21 5xb united kingdom"
-        },
-        {
-          "src_name_adj": "east of england trading standards association ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "royal borough of kingston-upon-thames",
-          "src_tag": "['tender']",
-          "src_name_adj": "royal borough of kingstonuponthames",
-          "src_address_adj": "guildhall 2high street kingston upon thames kt19zy england",
-          "src_joinfields": "royal borough of kingstonuponthames guildhall 2high street kingston upon thames kt19zy england"
-        },
-        {
-          "src_name_adj": "royal borough of greenwich destination management company cic"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "the warriner multi academy trust and southfield primary academy",
-          "src_tag": "['tender']",
-          "src_name_adj": "the warriner multi academy trust and southfield primary academy",
-          "src_address_adj": "co the warriner school bloxham ox15 4lj united kingdom",
-          "src_joinfields": "the warriner multi academy trust and southfield primary academy co the warriner school bloxham ox15 4lj united kingdom"
-        },
-        {
-          "src_name_adj": "the queen katherine school multi academy trust"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "balshaw&#039;s church of england high school",
-          "src_tag": "['tender']",
-          "src_name_adj": "balshaw039s church of england high school",
-          "src_address_adj": "co watson lennard and payne ltd artillery business park oswestry sy10 9dh england",
-          "src_joinfields": "balshaw039s church of england high school co watson lennard and payne ltd artillery business park oswestry sy10 9dh england"
-        },
-        {
-          "src_name_adj": "king ina church of england academy"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "university of dundee",
-          "src_tag": "['tender']",
-          "src_name_adj": "university of dundee",
-          "src_address_adj": "procurement 3rd floor tower building nethergate dundee dd1 4hn united kingdom",
-          "src_joinfields": "university of dundee procurement 3rd floor tower building nethergate dundee dd1 4hn united kingdom"
-        },
-        {
-          "src_name_adj": "university of wales"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "asra constructin services ltd",
-          "src_tag": "['tender']",
-          "src_name_adj": "asra constructin services ltd",
-          "src_address_adj": "third floor pentagonhouse 5254 southwark street london se1 1un united kingdom",
-          "src_joinfields": "asra constructin services ltd third floor pentagonhouse 5254 southwark street london se1 1un united kingdom"
-        },
-        {
-          "src_name_adj": "tps insurance admin services ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "charing cross housing association c/o bruce stevenson insurance brokers ltd",
-          "src_tag": "['tender']",
-          "src_name_adj": "charing cross housing association co bruce stevenson insurance brokers ltd",
-          "src_address_adj": "144 west george street glasgow g4 9jt united kingdom",
-          "src_joinfields": "charing cross housing association co bruce stevenson insurance brokers ltd 144 west george street glasgow g4 9jt united kingdom"
-        },
-        {
-          "src_name_adj": "downland housing association ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "dhl supply chain ltd acting on behalf of supply chain coordination ltd acting as agent of the nhs business services authority",
-          "src_tag": "['tender']",
-          "src_name_adj": "dhl supply chain ltd acting on behalf of supply chain coordination ltd acting as agent of the nhs business services authority",
-          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
-          "src_joinfields": "dhl supply chain ltd acting on behalf of supply chain coordination ltd acting as agent of the nhs business services authority co skipton house 80 london road london se1 6lh united kingdom"
-        },
-        {
-          "src_name_adj": "excellence in purchasing supply chain ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "tyne and wear fire and rescue service",
-          "src_tag": "['award']",
-          "src_name_adj": "tyne and wear fire and rescue service",
-          "src_address_adj": "nissan way sunderland sr53qy england",
-          "src_joinfields": "tyne and wear fire and rescue service nissan way sunderland sr53qy england"
-        },
-        {
-          "src_name_adj": "dorset combined fire and rescue authority"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "port of tilbury london ltd",
-          "src_tag": "['award']",
-          "src_name_adj": "port of tilbury london ltd",
-          "src_address_adj": "leslie ford house tilbury rm18 7eh united kingdom",
-          "src_joinfields": "port of tilbury london ltd leslie ford house tilbury rm18 7eh united kingdom"
-        },
-        {
-          "src_name_adj": "vertice london ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "bridgewater housing association",
-          "src_tag": "['tender']",
-          "src_name_adj": "bridgewater housing association",
-          "src_address_adj": "bridgewater shopping centre erskine pa8 7aa united kingdom",
-          "src_joinfields": "bridgewater housing association bridgewater shopping centre erskine pa8 7aa united kingdom"
-        },
-        {
-          "src_name_adj": "help the aged housing association united kingdomltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "health solutions team ltd acting on behalf of supply chain coordination ltd acting on behalf of the nhs business services authority",
-          "src_tag": "['planning']",
-          "src_name_adj": "health solutions team ltd acting on behalf of supply chain coordination ltd acting on behalf of the nhs business services authority",
-          "src_address_adj": "foxbridge way normanton wf6 1tl united kingdom",
-          "src_joinfields": "health solutions team ltd acting on behalf of supply chain coordination ltd acting on behalf of the nhs business services authority foxbridge way normanton wf6 1tl united kingdom"
-        },
-        {
-          "src_name_adj": "obriens business services ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "worcestershire health & care nhs trust",
-          "src_tag": "['tender']",
-          "src_name_adj": "worcestershire health care nft",
-          "src_address_adj": "isaac maddox house shrub hill road worcester wr4 9rw united kingdom",
-          "src_joinfields": "worcestershire health care nft isaac maddox house shrub hill road worcester wr4 9rw united kingdom"
-        },
-        {
-          "src_name_adj": "bridgewood health care ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "church of england central services trading limited",
-          "src_tag": "['tenderamendment']",
-          "src_name_adj": "church of england central services trading ltd",
-          "src_address_adj": "church house great smith street london sw1p 3az united kingdom",
-          "src_joinfields": "church of england central services trading ltd church house great smith street london sw1p 3az united kingdom"
-        },
-        {
-          "src_name_adj": "the marlborough church of england school"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "abertay housing association ltd",
-          "src_tag": "['tender']",
-          "src_name_adj": "abertay housing association ltd",
-          "src_address_adj": "147 fintry drive dundee dd4 9he united kingdom",
-          "src_joinfields": "abertay housing association ltd 147 fintry drive dundee dd4 9he united kingdom"
-        },
-        {
-          "src_name_adj": "sussex oakleaf housing association ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "argyll community housing association ltd",
-          "src_tag": "['award']",
-          "src_name_adj": "argyll community housing association ltd",
-          "src_address_adj": "menzies house glenshellach business park oban pa34 4ry united kingdom",
-          "src_joinfields": "argyll community housing association ltd menzies house glenshellach business park oban pa34 4ry united kingdom"
-        },
-        {
-          "src_name_adj": "linccymru housing association ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "beyond housing ltd",
-          "src_tag": "['tender']",
-          "src_name_adj": "beyond housing ltd",
-          "src_address_adj": "social housing landlord redcar ts10 5jr united kingdom",
-          "src_joinfields": "beyond housing ltd social housing landlord redcar ts10 5jr united kingdom"
-        },
-        {
-          "src_name_adj": "durham action on single housing ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs supply chain collaborative procurement partnership llp (acting on behalf of supply chain coordination ltd (sccl) whose registered office is at skipton house, 80 london road, london, se1 6lh",
-          "src_tag": "['tender']",
-          "src_name_adj": "nhs supply chain collaborative procurement partnership llp acting on behalf of supply chain coordination ltd sccl whose registered office is at skipton house 80 london road london se1 6lh",
-          "src_address_adj": "nhs supply chain cpp llp 2nd floor don valley house savile street east sheffield s4 7uq united kingdom",
-          "src_joinfields": "nhs supply chain collaborative procurement partnership llp acting on behalf of supply chain coordination ltd sccl whose registered office is at skipton house 80 london road london se1 6lh nhs supply chain cpp llp 2nd floor don valley house savile street east sheffield s4 7uq united kingdom"
-        },
-        {
-          "src_name_adj": "nos 6 ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
-          "src_tag": "['planning']",
-          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
-          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
-          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
-        },
-        {
-          "src_name_adj": "denco 9 ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "clanmil housing association ltd for iteslf and on behalf of abbeyfield & wesley housing association ltd and connswater homes ltd",
-          "src_tag": "['tender']",
-          "src_name_adj": "clanmil housing association ltd for iteslf and on behalf of abbeyfield wesley housing association ltd and connswater homes ltd",
-          "src_address_adj": "clanmil housing northern whig house 3 waring street belfast bt1 2dx united kingdom",
-          "src_joinfields": "clanmil housing association ltd for iteslf and on behalf of abbeyfield wesley housing association ltd and connswater homes ltd clanmil housing northern whig house 3 waring street belfast bt1 2dx united kingdom"
-        },
-        {
-          "src_name_adj": "tuntum housing association ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination ltd",
-          "src_tag": "['award']",
-          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd",
-          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
-          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd co skipton house 80 london road london se1 6lh united kingdom"
-        },
-        {
-          "src_name_adj": "sage 24 ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
-          "src_tag": "['planning']",
-          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
-          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
-          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
-        },
-        {
-          "src_name_adj": "focus 4 u ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
-          "src_tag": "['planning']",
-          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
-          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
-          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
-        },
-        {
-          "src_name_adj": "fusion 08 ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "argyll community housing association ltd",
-          "src_tag": "['award']",
-          "src_name_adj": "argyll community housing association ltd",
-          "src_address_adj": "menzies house glenshellach business park oban pa34 4ry united kingdom",
-          "src_joinfields": "argyll community housing association ltd menzies house glenshellach business park oban pa34 4ry united kingdom"
-        },
-        {
-          "src_name_adj": "jewish community housing association ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "your housing group limited for and on behalf of itself and its current and future subsidiaries",
-          "src_tag": "['award']",
-          "src_name_adj": "your housing group ltd for and on behalf of itself and its current and future subsidiaries",
-          "src_address_adj": "602 aston avenue birchwood park warrington wa3 6zn united kingdom",
-          "src_joinfields": "your housing group ltd for and on behalf of itself and its current and future subsidiaries 602 aston avenue birchwood park warrington wa3 6zn united kingdom"
-        },
-        {
-          "src_name_adj": "your hire ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "walsall mbc",
-          "src_tag": "['tender']",
-          "src_name_adj": "walsall mbc",
-          "src_address_adj": "civic centre darwall street walsall ws1 1tp united kingdom",
-          "src_joinfields": "walsall mbc civic centre darwall street walsall ws1 1tp united kingdom"
-        },
-        {
-          "src_name_adj": "walsall domestic violence forum ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "healty child programme 0-19 (up to 25 for young people with special educational needs and disabilities)",
-          "src_tag": "['planning']",
-          "src_name_adj": "healty child programme 019 up to 25 for young people with special educational needs and disabilities",
-          "src_address_adj": "west berkshire council newbury rg14 5ld united kingdom",
-          "src_joinfields": "healty child programme 019 up to 25 for young people with special educational needs and disabilities west berkshire council newbury rg14 5ld united kingdom"
-        },
-        {
-          "src_name_adj": "article 19"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "hs2",
-          "src_tag": "['tenderamendment']",
-          "src_name_adj": "hs2",
-          "src_address_adj": "high speed two hs2 ltd two snowhill queensway birmingham b4 6ga england",
-          "src_joinfields": "hs2 high speed two hs2 ltd two snowhill queensway birmingham b4 6ga england"
-        },
-        {
-          "src_name_adj": "1st class plant hire ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs england south east (kent, surrey, sussex) (documents via https://in-tendhost.co.uk/scwcsu/aspx/home)",
-          "src_tag": "['tender']",
-          "src_name_adj": "nhs england south east kent surrey sussex documents via httpsintendhostcoukscwcsuaspxhome",
-          "src_address_adj": "york house 1820 massetts road horley rh6 7de united kingdom",
-          "src_joinfields": "nhs england south east kent surrey sussex documents via httpsintendhostcoukscwcsuaspxhome york house 1820 massetts road horley rh6 7de united kingdom"
-        },
-        {
-          "src_name_adj": "moved ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "the common services agency (more commonly referred to as nhs national services scotland (hereinafter referred to as the \u201cauthority\u201d)",
-          "src_tag": "['award']",
-          "src_name_adj": "the common services agency more commonly referred to as nhs national services scotland hereinafter referred to as the \u201cauthority\u201d",
-          "src_address_adj": "gyle square 1 south gyle crescent edinburgh eh12 9eb united kingdom",
-          "src_joinfields": "the common services agency more commonly referred to as nhs national services scotland hereinafter referred to as the \u201cauthority\u201d gyle square 1 south gyle crescent edinburgh eh12 9eb united kingdom"
-        },
-        {
-          "src_name_adj": "the thornbury centre"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "lps cas \u2014 school building cleaning and facilities service \u2014 moorside primary school, lancaster",
-          "src_tag": "['tender']",
-          "src_name_adj": "lps cas \u2014 school building cleaning and facilities service \u2014 moorside primary school lancaster",
-          "src_address_adj": "ccp floor 2 county hall fishergate preston pr1 0ld united kingdom",
-          "src_joinfields": "lps cas \u2014 school building cleaning and facilities service \u2014 moorside primary school lancaster ccp floor 2 county hall fishergate preston pr1 0ld united kingdom"
-        },
-        {
-          "src_name_adj": "school food trust"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "the common services agency (more commonly known as nhs national services scotland) (\"nss\")",
-          "src_tag": "['tender']",
-          "src_name_adj": "the common services agency more commonly known as nhs national services scotland nss",
-          "src_address_adj": "gyle square nss head office 1 south gyle crescent edinburgh eh12 9eb united kingdom",
-          "src_joinfields": "the common services agency more commonly known as nhs national services scotland nss gyle square nss head office 1 south gyle crescent edinburgh eh12 9eb united kingdom"
-        },
-        {
-          "src_name_adj": "the commonweal school"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "business services organisation, procurement and logistics service on behalf of northern ireland ambulance service",
-          "src_tag": "['award']",
-          "src_name_adj": "business services organisation procurement and logistics service on behalf of northern ireland ambulance service",
-          "src_address_adj": "the cottage 5 greenmount avenue ballymena bt43 6da united kingdom",
-          "src_joinfields": "business services organisation procurement and logistics service on behalf of northern ireland ambulance service the cottage 5 greenmount avenue ballymena bt43 6da united kingdom"
-        },
-        {
-          "src_name_adj": "business storage solutions ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "st mary's and st peter's school wrap around care contract 2019",
-          "src_tag": "['tender']",
-          "src_name_adj": "st marys and st peters school wrap around care contract 2019",
-          "src_address_adj": "somerset road teddington tw11 8rx united kingdom",
-          "src_joinfields": "st marys and st peters school wrap around care contract 2019 somerset road teddington tw11 8rx united kingdom"
-        },
-        {
-          "src_name_adj": "school 21"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs supply chain collaborative procurement partnership llp (acting on behalf of supply chain coordination ltd (sccl) whose registered office is at skipton house, 80 london road, london, se1 6lh",
-          "src_tag": "['tender']",
-          "src_name_adj": "nhs supply chain collaborative procurement partnership llp acting on behalf of supply chain coordination ltd sccl whose registered office is at skipton house 80 london road london se1 6lh",
-          "src_address_adj": "nhs supply chain cpp llp 2nd floor don valley house savile street east sheffield s4 7uq united kingdom",
-          "src_joinfields": "nhs supply chain collaborative procurement partnership llp acting on behalf of supply chain coordination ltd sccl whose registered office is at skipton house 80 london road london se1 6lh nhs supply chain cpp llp 2nd floor don valley house savile street east sheffield s4 7uq united kingdom"
-        },
-        {
-          "src_name_adj": "cartridges 4 causes ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "royal holloway and bedford new college (brand name: royal holloway, university of london)",
-          "src_tag": "['award']",
-          "src_name_adj": "royal holloway and bedford new college brand name royal holloway university of london",
-          "src_address_adj": "egham hill egham tw20 0ex united kingdom",
-          "src_joinfields": "royal holloway and bedford new college brand name royal holloway university of london egham hill egham tw20 0ex united kingdom"
-        },
-        {
-          "src_name_adj": "miggle ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "hs2",
-          "src_tag": "['tenderamendment']",
-          "src_name_adj": "hs2",
-          "src_address_adj": "high speed two hs2 ltd two snowhill queensway birmingham b4 6ga england",
-          "src_joinfields": "hs2 high speed two hs2 ltd two snowhill queensway birmingham b4 6ga england"
-        },
-        {
-          "src_name_adj": "the dare2dream foundation cic"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "the collaborative procurement partnership llp acting on behalf of supply chain coordination ltd a management function of nhs supply chain",
-          "src_tag": "['tender']",
-          "src_name_adj": "the collaborative procurement partnership llp acting on behalf of supply chain coordination ltd a management function of nhs supply chain",
-          "src_address_adj": "foxbridge way normanton wf6 1tl united kingdom",
-          "src_joinfields": "the collaborative procurement partnership llp acting on behalf of supply chain coordination ltd a management function of nhs supply chain foxbridge way normanton wf6 1tl united kingdom"
-        },
-        {
-          "src_name_adj": "mkgfood productsltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs midlands and lancashire csu on behalf of nhs telford and wrekin ccg and nhs shropshire ccg",
-          "src_tag": "['tender']",
-          "src_name_adj": "nhs midlands and lancashire csu on behalf of nhs telford and wrekin ccg and nhs shropshire ccg",
-          "src_address_adj": "heron house 120 grove road stoke on trent st4 4lx united kingdom",
-          "src_joinfields": "nhs midlands and lancashire csu on behalf of nhs telford and wrekin ccg and nhs shropshire ccg heron house 120 grove road stoke on trent st4 4lx united kingdom"
-        },
-        {
-          "src_name_adj": "bows and arrows"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "tower hamlets ccg pediatric audiology services for children and young people at tier 3 level",
-          "src_tag": "['planning']",
-          "src_name_adj": "tower hamlets ccg pediatric audiology services for children and young people at tier 3 level",
-          "src_address_adj": "tower hamlets ccg alderney building mile end hospital london e1 4dg united kingdom",
-          "src_joinfields": "tower hamlets ccg pediatric audiology services for children and young people at tier 3 level tower hamlets ccg alderney building mile end hospital london e1 4dg united kingdom"
-        },
-        {
-          "src_name_adj": "grade 3 ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "the secretary of state for health and social care acting as part of the crown through the department of health and social care",
-          "src_tag": "['tender']",
-          "src_name_adj": "the secretary of state for health and social care acting as part of the crown through the department of health and social care",
-          "src_address_adj": "2nd floor rutland house runcorn wa7 2es united kingdom",
-          "src_joinfields": "the secretary of state for health and social care acting as part of the crown through the department of health and social care 2nd floor rutland house runcorn wa7 2es united kingdom"
-        },
-        {
-          "src_name_adj": "the farm shop essex ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "ministry of defence, combat air, uk military flying training system (ukmfts) project team",
-          "src_tag": "['tender']",
-          "src_name_adj": "ministry of defence combat air uk military flying training system ukmfts project team",
-          "src_address_adj": "mod abbey wood 7001 ground floor bld 1300 bristol bs34 8jh united kingdom",
-          "src_joinfields": "ministry of defence combat air uk military flying training system ukmfts project team mod abbey wood 7001 ground floor bld 1300 bristol bs34 8jh united kingdom"
-        },
-        {
-          "src_name_adj": "hulian ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nottingham college",
-          "src_tag": "['tender']",
-          "src_name_adj": "nottingham college",
-          "src_address_adj": "ng9 4ah nottingham ng9 4ah united kingdom",
-          "src_joinfields": "nottingham college ng9 4ah nottingham ng9 4ah united kingdom"
-        },
-        {
-          "src_name_adj": "nottinghamshire combined fire and rescue authority"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "dfe",
-          "src_tag": "['tender']",
-          "src_name_adj": "dfe",
-          "src_address_adj": null,
-          "src_joinfields": null
-        },
-        {
-          "src_name_adj": "cheekie monkey ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "police and crime commissioner for north wales police & north wales police",
-          "src_tag": "['tender']",
-          "src_name_adj": "police and crime commissioner for north wales police north wales police",
-          "src_address_adj": "force headquarters glany don abergele road colwyn bay north wales ll29 8aw united kingdom",
-          "src_joinfields": "police and crime commissioner for north wales police north wales police force headquarters glany don abergele road colwyn bay north wales ll29 8aw united kingdom"
-        },
-        {
-          "src_name_adj": "gaysha ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "2gether support solutions ltd. on behalf of east kent hospitals university nhs foundation trust",
-          "src_tag": "['planning']",
-          "src_name_adj": "2gether support solutions ltd on behalf of east kent hospitals university nft",
-          "src_address_adj": "trust headquarters kent and canterbury hospital ethelbert road canterbury ct1 3ng united kingdom",
-          "src_joinfields": "2gether support solutions ltd on behalf of east kent hospitals university nft trust headquarters kent and canterbury hospital ethelbert road canterbury ct1 3ng united kingdom"
-        },
-        {
-          "src_name_adj": "2xelliott ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "combined nuclear pension plan trustee ltd c/o nuclear decommissioning authority",
-          "src_tag": "['tender']",
-          "src_name_adj": "combined nuclear pension plan trustee ltd co nuclear decommissioning authority",
-          "src_address_adj": "herdus house westlakes science and technology park moor row ca24 3hu united kingdom",
-          "src_joinfields": "combined nuclear pension plan trustee ltd co nuclear decommissioning authority herdus house westlakes science and technology park moor row ca24 3hu united kingdom"
-        },
-        {
-          "src_name_adj": "commercial ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "rotherham, doncaster and south humber nhs ftplease note this is a restricted tender - do not contact the trust - suppliers will be invited to tender",
-          "src_tag": "['tender']",
-          "src_name_adj": "rotherham doncaster and south humbernftplease note this is a restricted tender do not contact the trust suppliers will be invited to tender",
-          "src_address_adj": "walnut lodge woodfield park tickhill road doncaster dn4 8qn united kingdom",
-          "src_joinfields": "rotherham doncaster and south humbernftplease note this is a restricted tender do not contact the trust suppliers will be invited to tender walnut lodge woodfield park tickhill road doncaster dn4 8qn united kingdom"
-        },
-        {
-          "src_name_adj": "rotherham bond guarantee scheme ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "business services organisation, procurement and logistics service on behalf of western health and social care trust",
-          "src_tag": "['tender']",
-          "src_name_adj": "business services organisation procurement and logistics service on behalf of western health and social care trust",
-          "src_address_adj": "the cottage 5 greenmount avenue ballymena bt43 6da united kingdom",
-          "src_joinfields": "business services organisation procurement and logistics service on behalf of western health and social care trust the cottage 5 greenmount avenue ballymena bt43 6da united kingdom"
-        },
-        {
-          "src_name_adj": "business risk management ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "the supply and support of patient monitors and 12 lead ecgs",
-          "src_tag": "['tender']",
-          "src_name_adj": "the supply and support of patient monitors and 12 lead ecgs",
-          "src_address_adj": null,
-          "src_joinfields": null
-        },
-        {
-          "src_name_adj": "focus 12"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "thames valley housing association ltd (tvh) and metropolitan housing trust ltd (mht) trading as metropolitan thames valley",
-          "src_tag": "['award']",
-          "src_name_adj": "thames valley housing association ltd tvh and metropolitan housing trust ltd mht trading as metropolitan thames valley",
-          "src_address_adj": "premier house 52 london road twickenham tw1 3rp united kingdom",
-          "src_joinfields": "thames valley housing association ltd tvh and metropolitan housing trust ltd mht trading as metropolitan thames valley premier house 52 london road twickenham tw1 3rp united kingdom"
-        },
-        {
-          "src_name_adj": "asda delivery ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "oak tree housing association ltd",
-          "src_tag": "['tender']",
-          "src_name_adj": "oak tree housing association ltd",
-          "src_address_adj": "41 high street greenock pa15 1nr united kingdom",
-          "src_joinfields": "oak tree housing association ltd 41 high street greenock pa15 1nr united kingdom"
-        },
-        {
-          "src_name_adj": "knightstone housing association ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "redruth town council",
-          "src_tag": "['tender']",
-          "src_name_adj": "redruth town council",
-          "src_address_adj": "the chamberspenryn street redruth tr152sp england",
-          "src_joinfields": "redruth town council the chamberspenryn street redruth tr152sp england"
-        },
-        {
-          "src_name_adj": "redr uk"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "kent county council (on behalf of the kent and medway sustainability and transformation partnership)",
-          "src_tag": "['planning']",
-          "src_name_adj": "kent county council on behalf of the kent and medway sustainability and transformation partnership",
-          "src_address_adj": "county hall maidstone me14 1xq united kingdom",
-          "src_joinfields": "kent county council on behalf of the kent and medway sustainability and transformation partnership county hall maidstone me14 1xq united kingdom"
-        },
-        {
-          "src_name_adj": "x l video ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "birmingham community healthcare ns ft",
-          "src_tag": "['award']",
-          "src_name_adj": "birmingham community healthcare ns ft",
-          "src_address_adj": "3 priestley wharf holt street birmingham birmingham b7 4bn united kingdom",
-          "src_joinfields": "birmingham community healthcare ns ft 3 priestley wharf holt street birmingham birmingham b7 4bn united kingdom"
-        },
-        {
-          "src_name_adj": "birmingham cable ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "business services organisation, procurement and logistics service on behalf of northern health and socialcare trust",
-          "src_tag": "['award']",
-          "src_name_adj": "business services organisation procurement and logistics service on behalf of northern health and socialcare trust",
-          "src_address_adj": "the cottage 5 greenmount avenue ballymena bt43 6da united kingdom",
-          "src_joinfields": "business services organisation procurement and logistics service on behalf of northern health and socialcare trust the cottage 5 greenmount avenue ballymena bt43 6da united kingdom"
-        },
-        {
-          "src_name_adj": "business navigators europe ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "st mary&#039;s priory catholic infant and junior schools",
-          "src_tag": "['tender']",
-          "src_name_adj": "st mary039s priory catholic infant and junior schools",
-          "src_address_adj": "hermitage road london n15 5re united kingdom",
-          "src_joinfields": "st mary039s priory catholic infant and junior schools hermitage road london n15 5re united kingdom"
-        },
-        {
-          "src_name_adj": "s1 taxis ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "healty child programme 0-19 (up to 25 for young people with special educational needs and disabilities)",
-          "src_tag": "['planning']",
-          "src_name_adj": "healty child programme 019 up to 25 for young people with special educational needs and disabilities",
-          "src_address_adj": "west berkshire council newbury rg14 5ld united kingdom",
-          "src_joinfields": "healty child programme 019 up to 25 for young people with special educational needs and disabilities west berkshire council newbury rg14 5ld united kingdom"
-        },
-        {
-          "src_name_adj": "15hatfields ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nt&#039;s solutions llp contracting on behalf of north tees &amp; hartlepool nhs foundation trust",
-          "src_tag": "['tender']",
-          "src_name_adj": "nt039s solutions llp contracting on behalf of north tees amp hartlepool nft",
-          "src_address_adj": "university hospital of north tees hardwick stocktonontees ts19 8pe united kingdom",
-          "src_joinfields": "nt039s solutions llp contracting on behalf of north tees amp hartlepool nft university hospital of north tees hardwick stocktonontees ts19 8pe united kingdom"
-        },
-        {
-          "src_name_adj": "amg 3 ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "office of qualifications and examinations regulation (ofqual)",
-          "src_tag": "['tender']",
-          "src_name_adj": "office of qualifications and examinations regulation ofqual",
-          "src_address_adj": "spring place coventry business park herald avenue coventry cv5 6ub england",
-          "src_joinfields": "office of qualifications and examinations regulation ofqual spring place coventry business park herald avenue coventry cv5 6ub england"
-        },
-        {
-          "src_name_adj": "intu ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "this is an award notice and this opportunity is now closed. please see section v (award of contract) for further details. hertfordshire county council",
-          "src_tag": "['award']",
-          "src_name_adj": "this is an award notice and this opportunity is now closed please see section v award of contract for further details hertfordshire county council",
-          "src_address_adj": "pegs lane hertford sg13 8de united kingdom",
-          "src_joinfields": "this is an award notice and this opportunity is now closed please see section v award of contract for further details hertfordshire county council pegs lane hertford sg13 8de united kingdom"
-        },
-        {
-          "src_name_adj": "axe valley home care ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "2buy2",
-          "src_tag": "['award']",
-          "src_name_adj": "2buy2",
-          "src_address_adj": "pencoed technology park pencoed technology park pencoed cf35 5hz united kingdom",
-          "src_joinfields": "2buy2 pencoed technology park pencoed technology park pencoed cf35 5hz united kingdom"
-        },
-        {
-          "src_name_adj": "2m health home care services ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "hertfordshire county council \u2014 this is an award notice and this oportunity is now closed",
-          "src_tag": "['award']",
-          "src_name_adj": "hertfordshire county council \u2014 this is an award notice and this oportunity is now closed",
-          "src_address_adj": "farnham house stevenage sg1 2fq united kingdom",
-          "src_joinfields": "hertfordshire county council \u2014 this is an award notice and this oportunity is now closed farnham house stevenage sg1 2fq united kingdom"
-        },
-        {
-          "src_name_adj": "hertfordshire partnership nft"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nel commissioning support unit, procurement team, 2nd floor, 1 lower marsh, london, se1 7nt",
-          "src_tag": "['planning']",
-          "src_name_adj": "nel commissioning support unit procurement team 2nd floor 1 lower marsh london se1 7nt",
-          "src_address_adj": "nel commissioning support unit 1st floor procurement department clifton house 7577 worship street london se1 7nt united kingdom",
-          "src_joinfields": "nel commissioning support unit procurement team 2nd floor 1 lower marsh london se1 7nt nel commissioning support unit 1st floor procurement department clifton house 7577 worship street london se1 7nt united kingdom"
-        },
-        {
-          "src_name_adj": "ingram no 1 ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "mod",
-          "src_tag": "['tender']",
-          "src_name_adj": "mod",
-          "src_address_adj": "babcock dsg ltd building b15 donnington telford tf2 8jt united kingdom",
-          "src_joinfields": "mod babcock dsg ltd building b15 donnington telford tf2 8jt united kingdom"
-        },
-        {
-          "src_name_adj": "ravenside investments ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs supply chain: food, operated by foodbuy, a trading division of compass contract services (uk) ltd (registered number 03952997) whose registered office is at parklands court, 24 parklands, rubery, birmingham, b45 9pz, on behalf of supply chain coordination limited (\u201csccl\u201d) who are the manage",
-          "src_tag": "['planning']",
-          "src_name_adj": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage",
-          "src_address_adj": "co skipton house 80 london road london se1 6lh united kingdom",
-          "src_joinfields": "nhs supply chain food operated by foodbuy a trading division of compass contract services uk ltd registered number 03952997 whose registered office is at parklands court 24 parklands rubery birmingham b45 9pz on behalf of supply chain coordination ltd \u201csccl\u201d who are the manage co skipton house 80 london road london se1 6lh united kingdom"
-        },
-        {
-          "src_name_adj": "45 new compton street improvement company ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "the united kingdom sports council (trading as uk sport)",
-          "src_tag": "['tender']",
-          "src_name_adj": "the united kingdom sports council trading as uk sport",
-          "src_address_adj": "uk sport 21 bloomsbury street london london wc1b 3hf united kingdom",
-          "src_joinfields": "the united kingdom sports council trading as uk sport uk sport 21 bloomsbury street london london wc1b 3hf united kingdom"
-        },
-        {
-          "src_name_adj": "fkeys ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "guy&#039;s and st thomas&#039; nhs foundation trust c/o pelican procurement services",
-          "src_tag": "['tender']",
-          "src_name_adj": "guy039s and st thomas039 nft co pelican procurement services",
-          "src_address_adj": "ash house tanshire park shackleford road elstead godalming gu8 6lb england",
-          "src_joinfields": "guy039s and st thomas039 nft co pelican procurement services ash house tanshire park shackleford road elstead godalming gu8 6lb england"
-        },
-        {
-          "src_name_adj": "grg 7 ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "newco (church of england, archbishops&#039; council and catholic trust of england and wales) until newco is operational",
-          "src_tag": "['tender']",
-          "src_name_adj": "newco church of england archbishops039 council and catholic trust of england and wales until newco is operational",
-          "src_address_adj": "church house great smith street london sw1p 3ez united kingdom",
-          "src_joinfields": "newco church of england archbishops039 council and catholic trust of england and wales until newco is operational church house great smith street london sw1p 3ez united kingdom"
-        },
-        {
-          "src_name_adj": "rauceby church of england primary school"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "cambridgeshire county council - request for quotation for dial-a-ride services in cambridge city",
-          "src_tag": "['tenderamendment']",
-          "src_name_adj": "cambridgeshire county council request for quotation for dialaride services in cambridge city",
-          "src_address_adj": "one angel square angel street northampton nn1 1ed england",
-          "src_joinfields": "cambridgeshire county council request for quotation for dialaride services in cambridge city one angel square angel street northampton nn1 1ed england"
-        },
-        {
-          "src_name_adj": "elmbridge investment llp"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "the home office \u2014 digital, data and technology \u2014 emergency services mobile communications programme (esmcp)",
-          "src_tag": "['tender']",
-          "src_name_adj": "the home office \u2014 digital data and technology \u2014 emergency services mobile communications programme esmcp",
-          "src_address_adj": "clive house 3rd floor 70 petty france london sw1h 9ex united kingdom",
-          "src_joinfields": "the home office \u2014 digital data and technology \u2014 emergency services mobile communications programme esmcp clive house 3rd floor 70 petty france london sw1h 9ex united kingdom"
-        },
-        {
-          "src_name_adj": "pendle medical ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "north of england commercial procurement collaborative (noecpc) (hosted by and acting through leeds and york partnership nhs foundation trust)",
-          "src_tag": "['award']",
-          "src_name_adj": "north of england commercial procurement collaborative noecpc hosted by and acting through leeds and york partnership nft",
-          "src_address_adj": "saville street sheffield s4 7uq united kingdom",
-          "src_joinfields": "north of england commercial procurement collaborative noecpc hosted by and acting through leeds and york partnership nft saville street sheffield s4 7uq united kingdom"
-        },
-        {
-          "src_name_adj": "the heights hotel ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "health solutions team nhs supply chain acting on behalf of supply chain coordination ltd",
-          "src_tag": "['tender']",
-          "src_name_adj": "health solutions team nhs supply chain acting on behalf of supply chain coordination ltd",
-          "src_address_adj": "skipton house 80 london road london se1 6lh united kingdom",
-          "src_joinfields": "health solutions team nhs supply chain acting on behalf of supply chain coordination ltd skipton house 80 london road london se1 6lh united kingdom"
-        },
-        {
-          "src_name_adj": "pdi innovation ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs london procurement partnership (hosted by guy&#039;s and st thomas&#039; nhs foundation trust)",
-          "src_tag": "['award']",
-          "src_name_adj": "nhs london procurement partnership hosted by guy039s and st thomas039 nft",
-          "src_address_adj": "ground floor 200 great dover street london se1 4yb england",
-          "src_joinfields": "nhs london procurement partnership hosted by guy039s and st thomas039 nft ground floor 200 great dover street london se1 4yb england"
-        },
-        {
-          "src_name_adj": "cab4one ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "north yorkshire county council (as administering authority of the north yorkshire pension fund)",
-          "src_tag": "['tender']",
-          "src_name_adj": "north yorkshire county council as administering authority of the north yorkshire pension fund",
-          "src_address_adj": "north yorkshire county council county hall northallerton dl7 8ad united kingdom",
-          "src_joinfields": "north yorkshire county council as administering authority of the north yorkshire pension fund north yorkshire county council county hall northallerton dl7 8ad united kingdom"
-        },
-        {
-          "src_name_adj": "meyer timber ltd"
-        }
-      ]
-    }
-  ],
-  "match": [
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "northern ireland water",
-          "src_tag": "['award']",
-          "src_name_adj": "northern ireland water",
-          "src_address_adj": "old westland road belfast bt14 6te united kingdom",
-          "src_joinfields": "northern ireland water old westland road belfast bt14 6te united kingdom"
-        },
-        {
-          "src_name_adj": "northern ireland water ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "shaw education trust",
-          "src_tag": "['award']",
-          "src_name_adj": "shaw education trust",
-          "src_address_adj": "the lodge wolstanton high school newcastleunderlyme st5 9ju united kingdom",
-          "src_joinfields": "shaw education trust the lodge wolstanton high school newcastleunderlyme st5 9ju united kingdom"
-        },
-        {
-          "src_name_adj": "the shaw education trust"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "calday graange grammar school",
-          "src_tag": "['award']",
-          "src_name_adj": "calday graange grammar school",
-          "src_address_adj": "grammar school lane wirral ch48 8gg united kingdom",
-          "src_joinfields": "calday graange grammar school grammar school lane wirral ch48 8gg united kingdom"
-        },
-        {
-          "src_name_adj": "calday grange grammar school"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "flagship housing group",
-          "src_tag": "['tenderamendment']",
-          "src_name_adj": "flagship housing group",
-          "src_address_adj": "31 king street norwich nr1 1pd united kingdom",
-          "src_joinfields": "flagship housing group 31 king street norwich nr1 1pd united kingdom"
-        },
-        {
-          "src_name_adj": "flagship housing group ltd"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "nhs tower hamlets clinical commissioning group",
-          "src_tag": "['tenderamendment']",
-          "src_name_adj": "nhs tower hamlets clinical commissioning group",
-          "src_address_adj": "2nd floor alderney building mile end hospital london e1 4dg united kingdom",
-          "src_joinfields": "nhs tower hamlets clinical commissioning group 2nd floor alderney building mile end hospital london e1 4dg united kingdom"
-        },
-        {
-          "src_name_adj": "nhs tower hamlets ccg"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "guy\u2019s and st thomas\u2019 nhs foundation trust",
-          "src_tag": "['tender']",
-          "src_name_adj": "guy\u2019s and st thomas\u2019 nft",
-          "src_address_adj": "great maze pond london se1 4rt united kingdom",
-          "src_joinfields": "guy\u2019s and st thomas\u2019 nft great maze pond london se1 4rt united kingdom"
-        },
-        {
-          "src_name_adj": "guys and st thomass nft"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "alder hey children&#039;s nhs foundation trust",
-          "src_tag": "['tenderamendment']",
-          "src_name_adj": "alder hey children039s nft",
-          "src_address_adj": "eaton road west derby liverpool l12 2ap united kingdom",
-          "src_joinfields": "alder hey children039s nft eaton road west derby liverpool l12 2ap united kingdom"
-        },
-        {
-          "src_name_adj": "alder hey children\u2019s nft"
-        }
-      ]
-    },
-    {
-      "__class__": "tuple",
-      "__value__": [
-        {
-          "src_name": "guy&#039;s and st. thomas&#039; nhs foundation trust",
-          "src_tag": "['tender']",
-          "src_name_adj": "guy039s and st thomas039 nft",
-          "src_address_adj": "procurement department 9th floor borough wing guy039s hospital great maze pond london se1 9rt united kingdom",
-          "src_joinfields": "guy039s and st thomas039 nft procurement department 9th floor borough wing guy039s hospital great maze pond london se1 9rt united kingdom"
-        },
-        {
-          "src_name_adj": "guys and st thomass nft"
-        }
-      ]
-    }
-  ]
+	"distinct": [{
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "cabinet office : cabinet office",
+			"src_tag": "['award']",
+			"src_name_adj": "cabinet office : cabinet office",
+			"src_address_adj": "floor 9 the capital building old hall street liverpool l3 9pp england",
+			"src_joinfields": "cabinet office : cabinet office floor 9 the capital building old hall street liverpool l3 9pp england"
+		}, {
+			"src_name_adj": "nippers nursery yorkshire ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "great notley parish council",
+			"src_tag": "['tender']",
+			"src_name_adj": "great notley parish council",
+			"src_address_adj": "7 mallard closegreat notley braintree cm77 7yd england",
+			"src_joinfields": "great notley parish council 7 mallard closegreat notley braintree cm77 7yd england"
+		}, {
+			"src_name_adj": "lpc pharmaceuticals ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "warwickshire police &amp; west mercia police procurement &amp; contracts department",
+			"src_tag": "['award']",
+			"src_name_adj": "warwickshire police & west mercia police procurement & contracts department",
+			"src_address_adj": "po box 55 worcester wr3 8sp england",
+			"src_joinfields": "warwickshire police & west mercia police procurement & contracts department po box 55 worcester wr3 8sp england"
+		}, {
+			"src_name_adj": "keytravel nw ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "bch procurement (representing the police and crime commissioners for bedfordshire, cambridgeshire and hertfordshire)",
+			"src_tag": "['tender']",
+			"src_name_adj": "bch procurement (representing the police and crime commissioners for bedfordshire, cambridgeshire and hertfordshire)",
+			"src_address_adj": "royston police station melbourn street royston sg8 7bz united kingdom",
+			"src_joinfields": "bch procurement (representing the police and crime commissioners for bedfordshire, cambridgeshire and hertfordshire) royston police station melbourn street royston sg8 7bz united kingdom"
+		}, {
+			"src_name_adj": "arco paper print ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "further competition from the cambridgeshire county council design &amp; build contractor framework for lot 1 (&pound;1m - &pound;2.99m) - st. philip&#039;s primary school",
+			"src_tag": "['award']",
+			"src_name_adj": "further competition from the cambridgeshire county council design & build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school",
+			"src_address_adj": "shire hall castle street angel street cambridge cb3 0ap england",
+			"src_joinfields": "further competition from the cambridgeshire county council design & build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school shire hall castle street angel street cambridge cb3 0ap england"
+		}, {
+			"src_name_adj": "eighty3creative ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "actaccom ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "office of the sussex police and crime commissioner",
+			"src_tag": "['award']",
+			"src_name_adj": "office of the sussex police & crime commissioner",
+			"src_address_adj": "sackville house brooks close lewes east sussex bn7 2fz united kingdom",
+			"src_joinfields": "office of the sussex police & crime commissioner sackville house brooks close lewes east sussex bn7 2fz united kingdom"
+		}, {
+			"src_name_adj": "office of the adjudicator ofcom"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "gla 2009 ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_tag": "['tender']",
+			"src_name_adj": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_address_adj": "nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom",
+			"src_joinfields": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5 nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom"
+		}, {
+			"src_name_adj": "lec 2 ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "nhs midlands and lancashire csu on behalf of nhs telford and wrekin clinical commissioning group",
+			"src_tag": "['tender']",
+			"src_name_adj": "nhs midlands and lancashire csu on behalf of nhs telford and wrekin clinical commissioning group",
+			"src_address_adj": "heron house 120 grove road stokeontrent st4 4lx united kingdom",
+			"src_joinfields": "nhs midlands and lancashire csu on behalf of nhs telford and wrekin clinical commissioning group heron house 120 grove road stokeontrent st4 4lx united kingdom"
+		}, {
+			"src_name_adj": "neca"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "team a5 ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "a1 coaches ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "on24 uk ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "holbeach cars ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_tag": "['tender']",
+			"src_name_adj": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_address_adj": "nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom",
+			"src_joinfields": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5 nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom"
+		}, {
+			"src_name_adj": "4 aces ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_tag": "['tender']",
+			"src_name_adj": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_address_adj": "nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom",
+			"src_joinfields": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5 nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom"
+		}, {
+			"src_name_adj": "caring 4 all"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "19 wheathill road"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_tag": "['tender']",
+			"src_name_adj": "education & training qualification for pearsons higher national certificates (hncs) level 4 & higher national diplomas (hnds) level 5",
+			"src_address_adj": "nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom",
+			"src_joinfields": "education & training qualification for pearsons higher national certificates (hncs) level 4 & higher national diplomas (hnds) level 5 nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom"
+		}, {
+			"src_name_adj": "4 aces ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "further competition from the cambridgeshire county council design &amp; build contractor framework for lot 1 (&pound;1m - &pound;2.99m) - st. philip&#039;s primary school",
+			"src_tag": "['award']",
+			"src_name_adj": "further competition from the cambridgeshire county council design and build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school",
+			"src_address_adj": "shire hall castle street angel street cambridge cb3 0ap england",
+			"src_joinfields": "further competition from the cambridgeshire county council design and build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school shire hall castle street angel street cambridge cb3 0ap england"
+		}, {
+			"src_name_adj": "l c s3 ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "shared services connected limited",
+			"src_tag": "['award']",
+			"src_name_adj": "shared services connected limited",
+			"src_address_adj": "room 6124 tomlinson house 0 fy53ta england",
+			"src_joinfields": "shared services connected limited room 6124 tomlinson house 0 fy53ta england"
+		}, {
+			"src_name_adj": "divine motions healthcare services ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "craigdale housing association",
+			"src_tag": "['award']",
+			"src_name_adj": "craigdale housing association",
+			"src_address_adj": "8385 dougrie road castlemilk glasgow g45 9ns united kingdom",
+			"src_joinfields": "craigdale housing association 8385 dougrie road castlemilk glasgow g45 9ns united kingdom"
+		}, {
+			"src_name_adj": "gundreda housing association ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "thistle housing association ltd",
+			"src_tag": "['award']",
+			"src_name_adj": "thistle housing association ltd",
+			"src_address_adj": "26 glenmore avenue glasgow g42 0eh united kingdom",
+			"src_joinfields": "thistle housing association ltd 26 glenmore avenue glasgow g42 0eh united kingdom"
+		}, {
+			"src_name_adj": "eden housing association ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "greater manchester health &amp; social care partnership",
+			"src_tag": "['tender']",
+			"src_name_adj": "greater manchester health and social care partnership",
+			"src_address_adj": "4th floor 3 piccadilly place manchester m1 3bn england",
+			"src_joinfields": "greater manchester health and social care partnership 4th floor 3 piccadilly place manchester m1 3bn england"
+		}, {
+			"src_name_adj": "elpha lodge residential care home"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "central london community healthcare nhs trust",
+			"src_tag": "['tender']",
+			"src_name_adj": "central london community healthcare nhs trust",
+			"src_address_adj": "57 parsons green london sw6 4ul united kingdom",
+			"src_joinfields": "central london community healthcare nhs trust 57 parsons green london sw6 4ul united kingdom"
+		}, {
+			"src_name_adj": "holistic community care ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_tag": "['tender']",
+			"src_name_adj": "education & training qualification for pearsons higher national certificates (hncs) level 4 & higher national diplomas (hnds) level 5",
+			"src_address_adj": "nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom",
+			"src_joinfields": "education & training qualification for pearsons higher national certificates (hncs) level 4 & higher national diplomas (hnds) level 5 nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom"
+		}, {
+			"src_name_adj": "4 d games"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "northern housing consortium limited",
+			"src_tag": "['award']",
+			"src_name_adj": "northern housing consortium limited",
+			"src_address_adj": "loftus house colima avenue sunderland enterprise park sunderland sr5 3xb england",
+			"src_joinfields": "northern housing consortium limited loftus house colima avenue sunderland enterprise park sunderland sr5 3xb england"
+		}, {
+			"src_name_adj": "northfields care homes ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "further competition from the cambridgeshire county council design &amp; build contractor framework for lot 1 (&pound;1m - &pound;2.99m) - st. philip&#039;s primary school",
+			"src_tag": "['award']",
+			"src_name_adj": "further competition from the cambridgeshire county council design & build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school",
+			"src_address_adj": "shire hall castle street angel street cambridge cb3 0ap england",
+			"src_joinfields": "further competition from the cambridgeshire county council design & build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school shire hall castle street angel street cambridge cb3 0ap england"
+		}, {
+			"src_name_adj": "pbs4 office"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "doncaster and bassetlaw teaching hospitals nhs foundation trust",
+			"src_tag": "['tender']",
+			"src_name_adj": "doncaster & bassetlaw teaching hospitals nhs foundation trust",
+			"src_address_adj": "doncaster royal infirmary armthorpe road doncaster dn2 5lt united kingdom",
+			"src_joinfields": "doncaster & bassetlaw teaching hospitals nhs foundation trust doncaster royal infirmary armthorpe road doncaster dn2 5lt united kingdom"
+		}, {
+			"src_name_adj": "doncaster assets ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the police and crime commissioner and the chief constable of nottinghamshire police and nottinghamshire and city of nottingham fire authority",
+			"src_tag": "['tender']",
+			"src_name_adj": "the police and crime commissioner and the chief constable of nottinghamshire police and nottinghamshire and city of nottingham fire authority",
+			"src_address_adj": "sherwood lodge arnold ng5 8pp united kingdom",
+			"src_joinfields": "the police and crime commissioner and the chief constable of nottinghamshire police and nottinghamshire and city of nottingham fire authority sherwood lodge arnold ng5 8pp united kingdom"
+		}, {
+			"src_name_adj": "sitara haven"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "further competition from the cambridgeshire county council design &amp; build contractor framework for lot 1 (&pound;1m - &pound;2.99m) - st. philip&#039;s primary school",
+			"src_tag": "['award']",
+			"src_name_adj": "further competition from the cambridgeshire county council design and build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school",
+			"src_address_adj": "shire hall castle street angel street cambridge cb3 0ap england",
+			"src_joinfields": "further competition from the cambridgeshire county council design and build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school shire hall castle street angel street cambridge cb3 0ap england"
+		}, {
+			"src_name_adj": "concept 2 ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "north of england commercial procurement collaborative (noe cpc) (hosted by and acting through leeds and york partnership nhs foundation trust",
+			"src_tag": "['tender']",
+			"src_name_adj": "north of england commercial procurement collaborative (noe cpc) (hosted by & acting through leeds & york partnership nhs foundation trust",
+			"src_address_adj": "savile street east sheffield s4 7uq united kingdom",
+			"src_joinfields": "north of england commercial procurement collaborative (noe cpc) (hosted by & acting through leeds & york partnership nhs foundation trust savile street east sheffield s4 7uq united kingdom"
+		}, {
+			"src_name_adj": "netbenefit ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "carter chemist 2005 ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the police and crime commissioner and the chief constable of nottinghamshire police and nottinghamshire and city of nottingham fire authority",
+			"src_tag": "['tender']",
+			"src_name_adj": "the police and crime commissioner and the chief constable of nottinghamshire police and nottinghamshire and city of nottingham fire authority",
+			"src_address_adj": "sherwood lodge arnold ng5 8pp united kingdom",
+			"src_joinfields": "the police and crime commissioner and the chief constable of nottinghamshire police and nottinghamshire and city of nottingham fire authority sherwood lodge arnold ng5 8pp united kingdom"
+		}, {
+			"src_name_adj": "octapharma ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "shanks printers finishers ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_tag": "['tender']",
+			"src_name_adj": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_address_adj": "nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom",
+			"src_joinfields": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5 nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom"
+		}, {
+			"src_name_adj": "5 star tlc ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "defence electronics and components agency (deca) : ministry of defence",
+			"src_tag": "['award']",
+			"src_name_adj": "defence electronics and components agency (deca) : ministry of defence",
+			"src_address_adj": "floor 9 the capital building old hall street liverpool l3 9pp england",
+			"src_joinfields": "defence electronics and components agency (deca) : ministry of defence floor 9 the capital building old hall street liverpool l3 9pp england"
+		}, {
+			"src_name_adj": "olson electronics ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "central housing investment consortium ltd (\u2018chic\u2019)",
+			"src_tag": "['tender']",
+			"src_name_adj": "central housing investment consortium ltd (\u2018chic\u2019)",
+			"src_address_adj": "84 spencer street birmingham b18 6ds united kingdom",
+			"src_joinfields": "central housing investment consortium ltd (\u2018chic\u2019) 84 spencer street birmingham b18 6ds united kingdom"
+		}, {
+			"src_name_adj": "central av ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_tag": "['tender']",
+			"src_name_adj": "education & training qualification for pearsons higher national certificates (hncs) level 4 & higher national diplomas (hnds) level 5",
+			"src_address_adj": "nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom",
+			"src_joinfields": "education & training qualification for pearsons higher national certificates (hncs) level 4 & higher national diplomas (hnds) level 5 nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom"
+		}, {
+			"src_name_adj": "k c training services ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the secretary of state for health and social care acting as part of the crown through the department of health and social care",
+			"src_tag": "['tender']",
+			"src_name_adj": "the secretary of state for health & social care acting as part of the crown through the department of health & social care",
+			"src_address_adj": "2nd floor rutland house runcorn wa7 2es united kingdom",
+			"src_joinfields": "the secretary of state for health & social care acting as part of the crown through the department of health & social care 2nd floor rutland house runcorn wa7 2es united kingdom"
+		}, {
+			"src_name_adj": "jks dental care"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "lgss",
+			"src_tag": "['tenderamendment']",
+			"src_name_adj": "lgss",
+			"src_address_adj": "the guildhall st giles039 square northampton nn1 1de england",
+			"src_joinfields": "lgss the guildhall st giles039 square northampton nn1 1de england"
+		}, {
+			"src_name_adj": "regional international business conventions ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "further competition from the cambridgeshire county council design &amp; build contractor framework for lot 1 (&pound;1m - &pound;2.99m) - st. philip&#039;s primary school",
+			"src_tag": "['award']",
+			"src_name_adj": "further competition from the cambridgeshire county council design and build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school",
+			"src_address_adj": "shire hall castle street angel street cambridge cb3 0ap england",
+			"src_joinfields": "further competition from the cambridgeshire county council design and build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school shire hall castle street angel street cambridge cb3 0ap england"
+		}, {
+			"src_name_adj": "1st taxis ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_tag": "['tender']",
+			"src_name_adj": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5",
+			"src_address_adj": "nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom",
+			"src_joinfields": "education and training qualification for pearsons higher national certificates (hncs) level 4 and higher national diplomas (hnds) level 5 nottingham college beeston high road chilwell nottingham ng9 4ah united kingdom"
+		}, {
+			"src_name_adj": "flair 4 it ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "bd realisations 2015 ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "further competition from the cambridgeshire county council design &amp; build contractor framework for lot 1 (&pound;1m - &pound;2.99m) - st. philip&#039;s primary school",
+			"src_tag": "['award']",
+			"src_name_adj": "further competition from the cambridgeshire county council design & build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school",
+			"src_address_adj": "shire hall castle street angel street cambridge cb3 0ap england",
+			"src_joinfields": "further competition from the cambridgeshire county council design & build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school shire hall castle street angel street cambridge cb3 0ap england"
+		}, {
+			"src_name_adj": "field 2 fence ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the secretary of state for health and social care acting as part of the crown through the department of health and social care",
+			"src_tag": "['tender']",
+			"src_name_adj": "the secretary of state for health and social care acting as part of the crown through the department of health and social care",
+			"src_address_adj": "2nd floor rutland house runcorn wa7 2es united kingdom",
+			"src_joinfields": "the secretary of state for health and social care acting as part of the crown through the department of health and social care 2nd floor rutland house runcorn wa7 2es united kingdom"
+		}, {
+			"src_name_adj": "willow court"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "further competition from the cambridgeshire county council design &amp; build contractor framework for lot 1 (&pound;1m - &pound;2.99m) - st. philip&#039;s primary school",
+			"src_tag": "['award']",
+			"src_name_adj": "further competition from the cambridgeshire county council design and build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school",
+			"src_address_adj": "shire hall castle street angel street cambridge cb3 0ap england",
+			"src_joinfields": "further competition from the cambridgeshire county council design and build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school shire hall castle street angel street cambridge cb3 0ap england"
+		}, {
+			"src_name_adj": "solution 1 ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the corporate officer of the house of lords and the corporate officer of the house of commons acting jointly and in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration and renewal) [bill/act] 2017-19",
+			"src_tag": "['planning']",
+			"src_name_adj": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19",
+			"src_address_adj": "westminster london sw1 0aa united kingdom",
+			"src_joinfields": "the corporate officer of the house of lords & the corporate officer of the house of commons acting jointly & in addition the delivery authority to be established pursuant to the parliamentary buildings (restoration & renewal) [bill/act] 2017-19 westminster london sw1 0aa united kingdom"
+		}, {
+			"src_name_adj": "housing 21 \u2013 winton court"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the police &amp; crime commissioner for lincolnshire",
+			"src_tag": "['tender']",
+			"src_name_adj": "the police & crime commissioner for lincolnshire",
+			"src_address_adj": "force headquarters deepdale lane nettleham lincoln ln2 2lt england",
+			"src_joinfields": "the police & crime commissioner for lincolnshire force headquarters deepdale lane nettleham lincoln ln2 2lt england"
+		}, {
+			"src_name_adj": "the crown"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "further competition from the cambridgeshire county council design &amp; build contractor framework for lot 1 (&pound;1m - &pound;2.99m) - st. philip&#039;s primary school",
+			"src_tag": "['award']",
+			"src_name_adj": "further competition from the cambridgeshire county council design & build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school",
+			"src_address_adj": "shire hall castle street angel street cambridge cb3 0ap england",
+			"src_joinfields": "further competition from the cambridgeshire county council design & build contractor framework for lot 1 (\u00a31m - \u00a32.99m) - st. philip's primary school shire hall castle street angel street cambridge cb3 0ap england"
+		}, {
+			"src_name_adj": "hill care 1 ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "hyde housing association",
+			"src_tag": "['award']",
+			"src_name_adj": "hyde housing association",
+			"src_address_adj": "30 park street null london se1 9eq united kingdom",
+			"src_joinfields": "hyde housing association 30 park street null london se1 9eq united kingdom"
+		}, {
+			"src_name_adj": "elgar housing association ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "city of london police \u2014 the mayor and commonalty and citizens of the city of london in their capacity as police authority for the city of london",
+			"src_tag": "['planning']",
+			"src_name_adj": "city of london police \u2014 the mayor and commonalty and citizens of the city of london in their capacity as police authority for the city of london",
+			"src_address_adj": "city of london corporation guildhall po box 270 london ec2p 2ej united kingdom",
+			"src_joinfields": "city of london police \u2014 the mayor and commonalty and citizens of the city of london in their capacity as police authority for the city of london city of london corporation guildhall po box 270 london ec2p 2ej united kingdom"
+		}, {
+			"src_name_adj": "city gate automation ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "north east hampshire and farnham (nehf) clinical commissioning group and surrey heath (sh) clinical commissioning group",
+			"src_tag": "['award']",
+			"src_name_adj": "north east hampshire & farnham (nehf) clinical commissioning group & surrey heath (sh) clinical commissioning group",
+			"src_address_adj": "aldershot centre for health nehf and surrey heath house sh aldershot nehf gu11 1ay and gu15 3h united kingdom",
+			"src_joinfields": "north east hampshire & farnham (nehf) clinical commissioning group & surrey heath (sh) clinical commissioning group aldershot centre for health nehf and surrey heath house sh aldershot nehf gu11 1ay and gu15 3h united kingdom"
+		}, {
+			"src_name_adj": "buck north east ltd"
+		}]
+	}],
+	"match": [{
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "broadacres housing association",
+			"src_tag": "['tender']",
+			"src_name_adj": "broadacres housing association",
+			"src_address_adj": "broadacres house mount view northallerton dl6 2yd united kingdom",
+			"src_joinfields": "broadacres housing association broadacres house mount view northallerton dl6 2yd united kingdom"
+		}, {
+			"src_name_adj": "broadacres housing association ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "coastal housing group",
+			"src_tag": "['planning']",
+			"src_name_adj": "coastal housing group",
+			"src_address_adj": "3rd floor 220 high street swansea sa1 1nw united kingdom",
+			"src_joinfields": "coastal housing group 3rd floor 220 high street swansea sa1 1nw united kingdom"
+		}, {
+			"src_name_adj": "coastal housing group ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "brighton and hove city council",
+			"src_tag": "['award']",
+			"src_name_adj": "brighton and hove city council",
+			"src_address_adj": null,
+			"src_joinfields": null
+		}, {
+			"src_name_adj": "brighton hove city council 92 cromwell road"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "mayors office for policing and crime (mopac)",
+			"src_tag": "['tender']",
+			"src_name_adj": "mayors office for policing & crime (mopac)",
+			"src_address_adj": "city hall the queens walk london se12aa england",
+			"src_joinfields": "mayors office for policing & crime (mopac) city hall the queens walk london se12aa england"
+		}, {
+			"src_name_adj": "mayors office for policing and crime and metropolis police commissioner"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "brighton and hove city council",
+			"src_tag": "['award']",
+			"src_name_adj": "brighton & hove city council",
+			"src_address_adj": null,
+			"src_joinfields": null
+		}, {
+			"src_name_adj": "brighton hove city council 21 ferndale road"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "plus dane housing limited",
+			"src_tag": "['award']",
+			"src_name_adj": "plus dane housing limited",
+			"src_address_adj": "1315 rodney street liverpool l1 9ef united kingdom",
+			"src_joinfields": "plus dane housing limited 1315 rodney street liverpool l1 9ef united kingdom"
+		}, {
+			"src_name_adj": "plus dane housing group ltd"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "brighton and hove city council",
+			"src_tag": "['award']",
+			"src_name_adj": "brighton and hove city council",
+			"src_address_adj": null,
+			"src_joinfields": null
+		}, {
+			"src_name_adj": "brighton hove city council 21 ferndale road"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "brighton and hove city council",
+			"src_tag": "['award']",
+			"src_name_adj": "brighton & hove city council",
+			"src_address_adj": null,
+			"src_joinfields": null
+		}, {
+			"src_name_adj": "brighton hove city council"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "wirral university teaching hospital nhs foundation trust",
+			"src_tag": "['award']",
+			"src_name_adj": "wirral university teaching hospital nhs foundation trust",
+			"src_address_adj": "clatterbridge hospital bebington ch63 4jy united kingdom",
+			"src_joinfields": "wirral university teaching hospital nhs foundation trust clatterbridge hospital bebington ch63 4jy united kingdom"
+		}, {
+			"src_name_adj": "wirral university teaching hospital nft"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "british red cross",
+			"src_tag": "['tender']",
+			"src_name_adj": "british red cross",
+			"src_address_adj": "1 smithhills street paisley pa1 1ea england",
+			"src_joinfields": "british red cross 1 smithhills street paisley pa1 1ea england"
+		}, {
+			"src_name_adj": "british red cross birmingham"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "surrey &amp; borders partnership n h s foundation trust",
+			"src_tag": "['award']",
+			"src_name_adj": "surrey & borders partnership n h s foundation trust",
+			"src_address_adj": "18 mole business park leatherhead kt227ad england",
+			"src_joinfields": "surrey & borders partnership n h s foundation trust 18 mole business park leatherhead kt227ad england"
+		}, {
+			"src_name_adj": "surrey and borders partnership nft"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "the police and crime commissioner for northamptonshire and the chief constable of northamptonshire police",
+			"src_tag": "['tender']",
+			"src_name_adj": "the police and crime commissioner for northamptonshire and the chief constable of northamptonshire police",
+			"src_address_adj": "wootton hall northamptonshire northamptonshire nn4 0jq united kingdom",
+			"src_joinfields": "the police and crime commissioner for northamptonshire and the chief constable of northamptonshire police wootton hall northamptonshire northamptonshire nn4 0jq united kingdom"
+		}, {
+			"src_name_adj": "northamptonshire police and crime commissioner and chief constable"
+		}]
+	}, {
+		"__class__": "tuple",
+		"__value__": [{
+			"src_name": "stockton borough council",
+			"src_tag": "['tender']",
+			"src_name_adj": "stockton borough council",
+			"src_address_adj": "municipal buildings church road stocktonontees ts18 1ld england",
+			"src_joinfields": "stockton borough council municipal buildings church road stocktonontees ts18 1ld england"
+		}, {
+			"src_name_adj": "stocktonontees borough council"
+		}]
+	}]
 }

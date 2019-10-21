@@ -22,6 +22,7 @@ class Matching(Main):
         self.train = ['--skip_training' if self.in_args.training else '']
         self.matched_fp = self.directories["match_output_file"].format(self.region_dir, self.proc_type)
         self.clustered_fp = self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)
+        self.manual_clustered_fp = self.directories["mancluster_output_file"].format(self.region_dir, self.proc_type)
         self.assigned_fp = self.directories['assigned_output_file'].format(self.region_dir, self.proc_type)
         self.matches_training_file = self.directories['manual_training_file'].format(self.region_dir, self.proc_type)
         self.learned_settings_file = self.directories['learned_settings_file'].format(self.region_dir, self.proc_type)
@@ -43,11 +44,9 @@ class Matching(Main):
 
         # If the matches file doesn't exist
         if not os.path.exists(self.matched_fp):
-
             # For larger files, split arg can be used to break the file into several smaller csvs to then run multiple
             # consecutive matching/clustering sessions
             if not self.in_args.split:
-
                 self.dedupeMatch()
 
             else:
@@ -63,38 +62,15 @@ class Matching(Main):
         if not os.path.exists(self.clustered_fp):
             self.dedupeCluster()
 
+        if not os.path.exists(self.manual_clustered_fp):
+            self.manualclustering()
+
         # ASSIGNING MATCHES
 
-        # If the 'assigned' file doesn't exist
+        # If the 'assigned' file doesn't exist, take each cluster and stretch out the in-cluster matches
         if not os.path.exists(self.assigned_fp):
-            clust_df = pd.read_csv(self.clustered_fp, index_col=None, dtype=self.df_dtypes)
+            self.assignmatcheswithinclusters()
 
-            # Assign matches within clusters
-            clust_df = self.data_processing.AssignRegDataToClusters().assign(clust_df, self.assigned_fp)
-
-            # Convert NaNs to empty strings
-            clust_df = clust_df.fillna(value="")
-
-            # Add string length columns
-            clust_df['src_str_len'] = clust_df['src_name'].str.len().astype(int)
-            clust_df['reg_str_len'] = clust_df['reg_name'].str.len().astype(int)
-
-            # Add match date column
-            # clust_df['match_date'] = pd.to_datetime('today')
-            clust_df['match_date'] = dt.datetime.now(gettz()).isoformat()
-
-            # Add blank match_by column
-            clust_df['match_by'] = ' '
-            clust_df.reg_source = clust_df.reg_source.replace(r'^\s*$', '.', regex=True)
-            clust_df.reg_scheme = clust_df.reg_scheme.replace(r'^\s*$', '.', regex=True)
-
-            # Add levenshtein distance to measure the quality of the matches
-            clust_df = self.data_processing.LevDist(self, clust_df, self.assigned_fp).addLevDist()
-
-            # Filter rows for non-blank source name
-            clust_df = clust_df[pd.notnull(clust_df['src_name'])]
-
-            clust_df.to_csv(self.clustered_fp, index=False)
 
         # else:
         #     # If the assigned file does exist, load it into memory to be returned
@@ -255,3 +231,78 @@ class Matching(Main):
                 copyfile(self.cluster_training_file, self.directories['cluster_training_backup'].format(self.region_dir))
         else:
             pass
+
+
+    def manualclustering(self):
+
+        df = pd.read_csv(self.clustered_fp)
+
+        df['Cluster ID'] = df['Cluster ID'].astype(float)
+        max_clust = df['Cluster ID'].max() + 1
+        # Get count of cluster_ids to see which rows are/aren't in a cluster
+        # Identify the highest cluster id. This is where we start the additional grouping
+        # Use groupby on string adj to group identical strgs. We could either try to add strings to larger clusters, or just segregate it entirely and look only at non clustered strings.
+        # Going to look at just segregated ones for now i.e. not trying add to dedupe-clusters.
+
+        # Get unique cluster id's. Split df into two - >1 x id and 1 x id.
+
+
+        # Below is wrong - if there's only 1 src_name but belongs to a cluster of similar src_names, will be split out and included in 'nonclust'
+        # counts = df.groupby(['Cluster ID','src_name_adj']).size()
+
+        counts = df.groupby(['Cluster ID']).size()
+        new_df = counts.to_frame(name = 'size').reset_index()
+
+        # Do join for clust back to original df
+        clust = new_df[new_df['size'] > 1]
+        # clust = clust.join(df, on='Cluster ID', how='right', lsuffix='_multipleclust')
+        clust = clust.merge(df, on='Cluster ID', how='left')
+        clust = clust.drop(columns=['size']).sort_values('src_name_adj').reset_index(drop=True)
+
+        # Do left join for nonclust back to original df
+        nonclust = new_df[new_df['size']==1]
+        nonclust = nonclust.merge(df, on='Cluster ID', how='left')
+        nonclust = nonclust.drop(columns=['size']).sort_values('src_name_adj').reset_index(drop=True)
+
+        # Now have two dataframes, one with actual clusters (clust) and one with cluster ids but containing only one string (nonclust)
+        # ngroup() is used to assign an increasing index number to each group i.e. a new cluster id
+        nonclust['Group ID'] = nonclust.groupby(['src_name_adj']).ngroup()
+
+        # now need to set this group id to not overlap with old cluster ids
+        nonclust['Group ID'] += max_clust
+        nonclust['Cluster ID'] = nonclust['Group ID']
+        nonclust.drop(columns=['Group ID'], inplace=True)
+        df = pd.concat([clust, nonclust], sort=True)
+        df.to_csv(self.manual_clustered_fp, index=False)
+
+    def assignmatcheswithinclusters(self):
+
+        clust_df = pd.read_csv(self.manual_clustered_fp, index_col=None, dtype=self.df_dtypes)
+
+        # Assign matches within clusters
+        clust_df = self.data_processing.AssignRegDataToClusters().assign(clust_df, self.assigned_fp)
+
+        # Convert NaNs to empty strings
+        clust_df = clust_df.fillna(value="")
+
+        # Add string length columns
+        clust_df['src_str_len'] = clust_df['src_name'].str.len().astype(int)
+        clust_df['reg_str_len'] = clust_df['reg_name'].str.len().astype(int)
+
+        # Add match date column
+        # clust_df['match_date'] = pd.to_datetime('today')
+        clust_df['match_date'] = dt.datetime.now(gettz()).isoformat()
+
+        # Add blank match_by column
+        clust_df['match_by'] = ' '
+        clust_df.reg_source = clust_df.reg_source.replace(r'^\s*$', '.', regex=True)
+        clust_df.reg_scheme = clust_df.reg_scheme.replace(r'^\s*$', '.', regex=True)
+
+        # Add levenshtein distance to measure the quality of the matches
+        clust_df = self.data_processing.LevDist(self, clust_df, self.assigned_fp).addLevDist()
+
+        # Filter rows for non-blank source name
+        clust_df = clust_df[pd.notnull(clust_df['src_name'])]
+
+        clust_df.to_csv(self.assigned_fp, index=False)
+

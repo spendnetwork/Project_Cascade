@@ -13,7 +13,7 @@ class MatchFiltering(Main):
                                 + str(self.conf_file_num) + '.csv'
         self.excluded_matches = self.directories['excluded_matches'].format(self.region_dir, self.proc_type) + '_' \
                                 + str(self.conf_file_num) + '.csv'
-        self.clustered_fp = self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)
+        self.assigned_fp = self.directories["assigned_output_file"].format(self.region_dir, self.proc_type)
 
     def filter(self):
         """
@@ -22,7 +22,7 @@ class MatchFiltering(Main):
         :return extracts_file: contains dataframe with possible acceptable matches
         """
 
-        df = pd.read_csv(self.clustered_fp, index_col=None, dtype=self.df_dtypes)
+        df = pd.read_csv(self.assigned_fp, index_col=None, dtype=self.df_dtypes)
 
         if self.in_args.recycle:
             levendist = str('leven_dist_NA')
@@ -90,7 +90,7 @@ class MatchFiltering(Main):
         Outputs an 'excluded_matches_x' csv file and includes 'filtered-out' matches and unmatched rows.
         '''
 
-        df = pd.read_csv(self.clustered_fp, index_col=None, dtype=self.df_dtypes)
+        df = pd.read_csv(self.assigned_fp, index_col=None, dtype=self.df_dtypes)
 
         if self.in_args.recycle:
             levendist = str('leven_dist_NA')
