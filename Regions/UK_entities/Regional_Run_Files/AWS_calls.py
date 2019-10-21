@@ -61,14 +61,13 @@ class AwsTransfers(Main):
             self.upload_file(files_zip, self.bucket, 'UK_entities/Archive/' + files_zip)
 
         # Download verified matches from s3 bucket if prodn_verified argument (production only)
-        # if self.in_args.prodn_verified:
-        #     self.process_verified_files()
+        if self.in_args.prodn_verified:
+            self.process_verified_files()
 
         # Add confirmed matches/non-matches to training file
         pdb.set_trace()
         if self.in_args.convert_training:
             self.runfile_mods.convert_training.ConvertToTraining.convert(self)
-            # self.runfile_mods.convert_training(self).convert()
 
     def process_verified_files(self):
         """
