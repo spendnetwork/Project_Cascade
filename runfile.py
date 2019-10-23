@@ -70,8 +70,8 @@ def getInputArgs(rootdir, args=None):
                         help='Set cleaned source/source datafile name')
     parser.add_argument('--reg_adj', default='reg_data_adj.csv', type=str, help='Set cleaned registry datafile name')
     parser.add_argument('--recycle', action='store_true', help='Recycle the manual training data')
-    parser.add_argument('--mtraining', action='store_false', help='Modify/contribute to the matching training data')
-    parser.add_argument('--ctraining', action='store_false', help='Modify/contribute to the clustering training data')
+    parser.add_argument('--mtraining', action='store_true', help='Modify/contribute to the matching training data')
+    parser.add_argument('--ctraining', action='store_true', help='Modify/contribute to the clustering training data')
     parser.add_argument('--convert_training', action='store_true',
                         help='Convert confirmed matches to training file for recycle phase')
     parser.add_argument('--config_review', action='store_true', help='Manually review/choose best config file results')
@@ -93,17 +93,17 @@ def getInputArgs(rootdir, args=None):
 
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
     pargs = parser.parse_args(args)
-    # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
-    # Force an error and prompt user to add the training flag
-    if pargs.ctraining == True and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
-        print("Dedupe training files do not exist - running with --training flag to initiate training process")
-        parser.add_argument('--ctraining', action='store_true', help='Modify/contribute to the cluster training data')
-
-    if pargs.mtraining == True and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Matching/matching_training.json")):
-        print("Dedupe training files do not exist - running with --training flag to initiate training process")
-        parser.add_argument('--mtraining', action='store_true', help='Modify/contribute to the matching training data')
-
-    pargs = parser.parse_args(args)
+    # # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
+    # # Force an error and prompt user to add the training flag
+    # if pargs.ctraining == False and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
+    #     print("Dedupe training files do not exist - running with --training flag to initiate training process")
+    #     parser.add_argument('--ctraining', action='store_true', help='Modify/contribute to the cluster training data')
+    #
+    # if pargs.mtraining == False and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Matching/matching_training.json")):
+    #     print("Dedupe training files do not exist - running with --training flag to initiate training process")
+    #     parser.add_argument('--mtraining', action='store_true', help='Modify/contribute to the matching training data')
+    #
+    # pargs = parser.parse_args(args)
 
     return pargs, parser
 

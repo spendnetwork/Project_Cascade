@@ -4,6 +4,7 @@ from runfile import Main, logging
 import pdb
 import glob
 import os
+from collections import defaultdict
 
 class ConvertToTraining(Main):
     def __init__(self, settings):
@@ -35,12 +36,12 @@ class ConvertToTraining(Main):
                                 {
                                     "src_name": str(row.src_name),
                                     "src_tag": str(row.src_tag),
-                                    # "src_name_adj": str(row.src_name_adj),
+                                    "src_name_adj": str(row.src_name),
                                     "src_address_adj": str(row.src_address_adj),
-                                    # "src_joinfields": str(row.src_joinfields)
+                                    "src_joinfields": ''
                                 },
                                 {
-                                    "src_name_adj": str(row.reg_name),
+                                    "src_name_adj": str(row.reg_name_adj),
                                 }
                             ]}
 
@@ -56,19 +57,28 @@ class ConvertToTraining(Main):
                     next
 
             # Write dict to training file.
+            pdb.set_trace()
             with open(self.directories['manual_training_file'].format(self.region_dir, self.proc_type)) as outfile:
-                # Load TextWrapperIO object into json object
-                 data = json.load(outfile)
+                try:
+                    # Load TextWrapperIO object into json object
+                     data = json.load(outfile)
+                except: # If dict empty (training file does not exist)
+                    data = defaultdict() # collections.defaultdict will create keys that don't exist on the fly
             try:
                 # data[X] is a list within the dictionary, which gives access the 'extend' iterator, to iteratively
                 # add each item in manualdict[X] dict (also a list)
                 data['distinct'].extend(manualdict['distinct'])
             except AttributeError:
                 next
+            except KeyError: # If dict empty
+                data['distinct'] = manualdict['distinct']
+
             try:
                 data['match'].extend(manualdict['match'])
             except AttributeError:
                 next
+            except KeyError: # If dict empty
+                data['match'] = manualdict['match']
 
             with open(self.directories['manual_training_file'].format(self.region_dir, self.proc_type), 'w+') as outfile:
                 # Overwrite the training file with the outfile, which now contains the old training file plus the new

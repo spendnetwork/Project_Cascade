@@ -19,8 +19,8 @@ class Matching(Main):
             self.in_args.reg_adj)
         self.src_fields = self.configs['processes'][self.proc_type][1]['dedupe_field_names']['source_data']
         self.reg_fields = self.configs['processes'][self.proc_type][1]['dedupe_field_names']['registry_data']
-        self.mtrain = ['--skip_training' if self.in_args.mtraining else '']
-        self.ctrain = ['--skip_training' if self.in_args.ctraining else '']
+        self.mtrain = ['--skip_training' if not self.in_args.mtraining else '']
+        self.ctrain = ['--skip_training' if not self.in_args.ctraining else '']
         self.matched_fp = self.directories["match_output_file"].format(self.region_dir, self.proc_type)
         self.clustered_fp = self.directories["cluster_output_file"].format(self.region_dir, self.proc_type)
         self.manual_clustered_fp = self.directories["mancluster_output_file"].format(self.region_dir, self.proc_type)
@@ -44,6 +44,7 @@ class Matching(Main):
         # MATCHING
 
         # If the matches file doesn't exist
+
         if not os.path.exists(self.matched_fp):
             # For larger files, split arg can be used to break the file into several smaller csvs to then run multiple
             # consecutive matching/clustering sessions
@@ -120,6 +121,9 @@ class Matching(Main):
                     str(self.mtrain[0])
                 ]
 
+                if self.mtrain[0] == '':
+                    sys.argv = sys.argv[:-1]
+
                 launch_matching()
 
         files = glob.glob(os.path.join(splits_output_dir, '*'))
@@ -194,6 +198,8 @@ class Matching(Main):
                     self.matched_fp,
                 str(self.mtrain[0])
             ]
+            if self.mtrain[0] == '':
+                sys.argv = sys.argv[:-1]
 
             launch_matching()
 
@@ -204,6 +210,7 @@ class Matching(Main):
 
     def dedupeCluster(self):
         if not os.path.exists(self.clustered_fp):
+
             # Copy training file from first clustering session if recycle mode
             if self.in_args.recycle:
                 copyfile(self.directories['cluster_training_backup'].format(self.region_dir),
@@ -216,15 +223,16 @@ class Matching(Main):
                 self.matched_fp,
                 '--field_names',
                     ' '.join(self.src_fields),
-                str(self.ctrain[0]),
                 '--training_file',
                     self.cluster_training_file,
                 '--settings_file',
                     self.learned_settings_file,
                 '--output_file',
-                    self.clustered_fp
+                    self.clustered_fp,
+                str(self.ctrain[0])
             ]
-
+            if self.ctrain[0] == '':
+                sys.argv = sys.argv[:-1]
             launch_clustering()
 
             if not self.in_args.recycle:

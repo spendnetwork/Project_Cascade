@@ -42,7 +42,9 @@ class StatsCalculations(Main):
         statdf.at[self.conf_file_num, 'Pct_Filtered_Matches'] = round(len(filterdf) / len(srcdf) * 100,2)
 
         # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
-        statdf.at[self.conf_file_num, 'Pct_Precision'] = round(len(filterdf) / len(clustdf) * 100, 2)
+        # Doesn't look at verified matches, just the filtered matches vs all matches (therefore is manually decided by the
+        # config files)
+        statdf.at[self.conf_file_num, 'Est_Pct_Precision'] = round(len(filterdf) / len(clustdf) * 100, 2)
         # Recall - how many relevant items have been selected from the entire original source data (TP/TP+FN)
         statdf.at[self.conf_file_num, 'Pct_Recall'] = round(len(filterdf) / len(srcdf) * 100, 2)
 

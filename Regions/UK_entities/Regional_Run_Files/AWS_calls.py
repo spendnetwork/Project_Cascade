@@ -65,7 +65,7 @@ class AwsTransfers(Main):
             self.process_verified_files()
 
         # Add confirmed matches/non-matches to training file
-        pdb.set_trace()
+
         if self.in_args.convert_training:
             self.runfile_mods.convert_training.ConvertToTraining.convert(self)
 

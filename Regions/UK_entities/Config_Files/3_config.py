@@ -3,10 +3,7 @@
         {
       "Name_Only":
         {1 :
-              {"dedupe_field_names": {
-                                      "source_data": ["src_name_adj"],
-                                      "registry_data" : ["reg_name_adj"]
-                                      },
+              {
                 "char_counts" : 0,
                 "min_match_score" : 100,
                 "recycle_phase" : False

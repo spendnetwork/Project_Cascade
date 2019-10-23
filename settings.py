@@ -72,7 +72,8 @@ class UK_Settings:
     stats_cols = ['Config_File', 'Total_Matches', 'Percent_Matches', 'Optim_Matches', 'Percent_Precision',
                   'Percent_Recall', 'Leven_Dist_Avg']
 
-    dbUpload_cols = ['src_name', 'src_id', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N']
+    # We add in the adj names here so the correct fields can be re-added to the training data
+    dbUpload_cols = ['src_name', 'src_id', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N','src_name_adj','reg_name_adj']
 
     # Need to define proc_num here otherwise will not be carried through as part of 'self'
     proc_num = int
