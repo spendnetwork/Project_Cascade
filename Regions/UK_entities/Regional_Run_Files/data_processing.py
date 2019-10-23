@@ -19,8 +19,16 @@ class DataProcessing(Main):
         :param adj_col: the orig_col with removed punctuation and standardised org_suffixes
         :return: adjusted dataframe
         """
+        remove = string.punctuation # i.e. '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+        remove = remove.replace("&","") # i.e. '!"#$%\'()*+,-./:;<=>?@[\\]^_`{|}~' (no '&')
+
+        # df[adj_col] = df[orig_col].str.translate(
+        #     str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
+
+        # Introduced 'remove' to allow the translate method to ignore "&" when removing punctuation
         df[adj_col] = df[orig_col].str.translate(
-            str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
+            str.maketrans({key: None for key in remove})).str.replace("  ", " ").str.lower().str.strip()
+
         return df
 
     def joinFields(self, df, dftype):
@@ -171,9 +179,6 @@ class ProcessSourceData(DataProcessing):
 
             # Decode html entities i.e. "&amp;" into "&"
             df[adj_col] = df[orig_col].apply(html.unescape)
-            #
-            # # Convert "&" to "and"
-            # df[adj_col] = df[adj_col].str.replace('&', 'and')
 
             # Duplicate rows containing 'and' then convert to &
             df1 = DataProcessing.duplicaterowscontainingand(self, df, adj_col)
@@ -185,7 +190,7 @@ class ProcessSourceData(DataProcessing):
             df = pd.concat([df1,df2]).sort_index().reset_index(drop=True)
 
             # df = DataProcessing.remvPunct(self, df, orig_col, adj_col)
-            # df = DataProcessing.remvPunct(self, df, adj_col, adj_col)
+            df = DataProcessing.remvPunct(self, df, adj_col, adj_col)
 
             # Replace organisation suffixes with standardised version
             df[adj_col].replace(self.org_suffixes.org_suffixes_dict, regex=True, inplace=True)
