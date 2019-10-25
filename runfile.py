@@ -209,7 +209,7 @@ class Main:
                             for proc_num in configs['processes'][proc_type]:
                                 self.proc_num = proc_num
 
-                                # Run dedupe for matching and calculate related stats for comparison
+                                # Run dedupe for matching and calculate_internals related stats for comparison
                                 self.data_matching.Matching(self).dedupe()
 
                                 self.match_filtering.MatchFiltering(self).filter()
@@ -219,7 +219,7 @@ class Main:
                         else:
                             continue
                     # Output stats file:
-                    self.data_analysis.StatsCalculations(self).calculate()
+                    self.data_analysis.StatsCalculations(self).calculate_internals()
 
         except StopIteration:
             # Continue if no more config files found

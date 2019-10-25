@@ -203,6 +203,10 @@ class ProcessSourceData(DataProcessing):
             df = df.drop(['src_address_streetaddress', 'src_address_locality', 'src_address_postalcode',
                           'src_address_countryname'], axis=1)
             logging.info("...done")
+
+            # Remove blacklisted entities
+            df = self.filter_blacklisted(df)
+
             df.to_csv(adj_data, index=False)
 
             # If flag 'split' has been used, split the source file into smaller files
@@ -223,9 +227,25 @@ class ProcessSourceData(DataProcessing):
                                                                                   str(self.in_args.src)[:-4] +
                                                                                   str(i) + '.csv'), index=False)
 
-        # else:
-        #     df = pd.read_csv(adj_data, dtype=self.df_dtypes)
-        # return df
+    def filter_blacklisted(self, df):
+        ''' Gets rid of strings we know definitely won't match (because they aren't actually entities)'''
+        bl_file = self.directories["blacklist_file"].format(self.region_dir)
+        bl_df = pd.read_csv(bl_file)
+        orig_col = 'src_name'
+        adj_col = 'src_name_adj'
+        bl_df[adj_col] = bl_df[orig_col].apply(html.unescape)
+        bl_df_adj = DataProcessing.duplicaterowscontainingand(self, bl_df, adj_col)
+        bl_df_adj = DataProcessing.duplicaterowscontainingampersand(self, bl_df_adj, adj_col)
+        bl_df_adj = DataProcessing.remvPunct(self, bl_df_adj, adj_col, adj_col)
+        bl_df_adj = bl_df_adj.drop_duplicates()
+        df_merge = pd.merge(df, bl_df_adj, how='outer', on='src_name_adj',indicator=True)
+        df_with_bl_removed = df_merge[df_merge['_merge'] == 'left_only']
+        df_with_bl_removed = df_with_bl_removed.drop(columns=['_merge','src_name_y'])
+        df_with_bl_removed = df_with_bl_removed.rename(columns={'src_name_x':'src_name'})
+
+        return df_with_bl_removed
+
+
 
 
 class ProcessRegistryData(DataProcessing):

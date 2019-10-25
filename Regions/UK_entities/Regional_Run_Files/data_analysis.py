@@ -20,7 +20,7 @@ class StatsCalculations(Main):
         self.filtered_matches = self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' \
                                 + str(self.conf_file_num) + '.csv'
 
-    def calculate(self):
+    def calculate_internals(self):
 
         # Remove old stats file if exists and if first iteration over config files:
         if os.path.exists(self.directories['stats_file'].format(self.region_dir, self.proc_type)):
@@ -62,3 +62,33 @@ class StatsCalculations(Main):
             main_stat_file.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index=False,
                                   columns=self.stats_cols)
             return main_stat_file
+
+    def calculate_externals(self):
+        '''
+        Calculates final matching statistics by performing analysis over already-matched strings in the database
+        Prioritises already-matched strings and then checks the residual to calculate the overall additional effect
+        of using dedupe
+        '''
+
+        conn, cur = self.db_calls.createConnection()
+
+        # Truncate assigned matches table ready for new upload
+        table = 'matching.assigned_matches'
+        print('Clearing matches.assigned_matches table...')
+        query = self.db_calls.DbCalls.truncate_table(table)
+        cur.execute(query)
+        conn.commit()
+
+        # Upload new assigned matches to db
+        self.db_calls.DbCalls.upload_assigned_matches()
+
+        # Perform join of assigned matches file to orgs lookup to filter for strings already matched in orgs_lookup
+        # and get counts/stats (outputs script_performance_stats_file to /deduped_data)
+        query = self.db_calls.DbCalls.join_matches_to_orgs_lookup()
+        cur.execute(query)
+        conn.commit()
+
+
+
+
+
