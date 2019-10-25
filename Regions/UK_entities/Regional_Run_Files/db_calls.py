@@ -103,15 +103,6 @@ class DbCalls(Main):
         """.format(self.transfer_table, self.upload_table, self.transfer_table)
         return query
 
-    # def upload_assigned_matches(self):
-    #     query = \
-    #     """
-    #     INSERT INTO matching.assigned_matches
-    #         SELECT src_name, src_name_adj, reg_name
-    #         FROM {}
-    #     """.format(self.assigned_output_file.format(self.region_dir, self.proc_type))
-    #     return query
-
     def truncate_table(self, table):
         query = \
         """
