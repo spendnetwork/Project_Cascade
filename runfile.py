@@ -209,7 +209,7 @@ class Main:
                             for proc_num in configs['processes'][proc_type]:
                                 self.proc_num = proc_num
 
-                                # Run dedupe for matching and calculate_internals related stats for comparison
+                                # Run dedupe for matching and calculate related stats for comparison
                                 self.data_matching.Matching(self).dedupe()
 
                                 self.match_filtering.MatchFiltering(self).filter()
