@@ -122,7 +122,7 @@ python runfile.py --training
 ```
 It is recommended that you study the dedupe documentation before modifying the training data, as experimentation is required to prevent over or under-fitting of the matching process. I have provided some notes at the end of this readme to explain my methods.
 
-5. Second, the module takes this matched data and assigns rows into groups called clusters, in the event that two rows within the source data actually refer to the same company. This outputs both a cluster_ID and a confidence score of how likely that row belongs to that cluster.
+5. Second, the module takes this matched data and assigns rows into groups called clusters, in the event that two rows within the source data actually refer to the same company. This outputs both a cluster_ID and a Confidence_Score of how likely that row belongs to that cluster.
 
 ### Further Data Manipulation
 6. We now have our matched and clustered dataset, which means that our source data is now linked to registry/registry data for verification and it is also grouped into clusters so we don't eg: contact the same company twice.

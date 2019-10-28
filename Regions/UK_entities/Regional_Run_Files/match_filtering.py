@@ -29,8 +29,8 @@ class MatchFiltering(Main):
         else:
             levendist = str('leven_dist_N')
 
-        # Round confidence scores to 2dp :
-        df['Confidence Score'] = df['Confidence Score'].map(lambda x: round(x, 2))
+        # Round Confidence_Scores to 2dp :
+        df['Confidence_Score'] = df['Confidence_Score'].map(lambda x: round(x, 2))
 
         # Filter by current match_score:
         df = df[df[levendist] >= self.configs['processes'][self.proc_type][self.proc_num]['min_match_score']]
@@ -75,8 +75,8 @@ class MatchFiltering(Main):
             filtered_file = pd.read_csv(self.filtered_matches, index_col=None, dtype=self.df_dtypes)
             filtered_file = pd.concat([filtered_file, df], ignore_index=True, sort=True)
             filtered_file = filtered_file[
-                ['src_name', 'reg_name', 'src_name_short', 'reg_name_short', 'leven_dist_N', 'Cluster ID',
-                 'Confidence Score', 'leven_dist_NA', 'match_by', 'match_date', 'process_num', 'reg_address',
+                ['src_name', 'reg_name', 'src_name_short', 'reg_name_short', 'leven_dist_N', 'Cluster_ID',
+                 'Confidence_Score', 'leven_dist_NA', 'match_by', 'match_date', 'process_num', 'reg_address',
                  'reg_address_adj', 'reg_created_at', 'reg_id', 'reg_joinfields', 'reg_name_adj', 'reg_scheme',
                  'reg_source', 'reg_str_len', 'src_address_adj', 'src_joinfields', 'src_name_adj', 'src_str_len',
                  'src_tag']]
@@ -97,8 +97,8 @@ class MatchFiltering(Main):
         else:
             levendist = str('leven_dist_N')
 
-        # Round confidence scores to 2dp :
-        df['Confidence Score'] = df['Confidence Score'].map(lambda x: round(x, 2))
+        # Round Confidence_Scores to 2dp :
+        df['Confidence_Score'] = df['Confidence_Score'].map(lambda x: round(x, 2))
 
         # To get excluded matches, this time select rows less than the minimum match score
         df = df[df[levendist] < self.configs['processes'][self.proc_type][self.proc_num]['min_match_score']]
@@ -138,8 +138,8 @@ class MatchFiltering(Main):
         else:
             excluded_file = pd.read_csv(self.excluded_matches, index_col=None, dtype=self.df_dtypes)
             excluded_file = pd.concat([excluded_file, df], ignore_index=True, sort=True)
-            excluded_file = excluded_file[['src_name', 'reg_name', 'src_name_short', 'reg_name_short', 'leven_dist_N', 'Cluster ID',
-                     'Confidence Score', 'leven_dist_NA', 'match_by', 'match_date', 'process_num', 'reg_address',
+            excluded_file = excluded_file[['src_name', 'reg_name', 'src_name_short', 'reg_name_short', 'leven_dist_N', 'Cluster_ID',
+                     'Confidence_Score', 'leven_dist_NA', 'match_by', 'match_date', 'process_num', 'reg_address',
                      'reg_address_adj', 'reg_created_at', 'reg_id', 'reg_joinfields', 'reg_name_adj', 'reg_scheme',
                      'reg_source', 'reg_str_len', 'src_address_adj', 'src_joinfields', 'src_name_adj', 'src_str_len',
                      'src_tag']]
@@ -217,7 +217,7 @@ class VerificationAndUploads(Main):
                 else:
                     break
 
-            best_filtered.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+            best_filtered.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
 
             logging.info("Saving...")
             best_filtered.to_csv(self.unverified_file, index=False, columns=self.dbUpload_cols)

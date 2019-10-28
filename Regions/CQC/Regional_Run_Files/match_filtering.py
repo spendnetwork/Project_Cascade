@@ -25,8 +25,8 @@ class MatchFiltering(Main):
         else:
             levendist = str('leven_dist_N')
 
-        # Round confidence scores to 2dp :
-        df['Confidence Score'] = df['Confidence Score'].map(lambda x: round(x, 2))
+        # Round Confidence_Scores to 2dp :
+        df['Confidence_Score'] = df['Confidence_Score'].map(lambda x: round(x, 2))
 
         # Filter by current match_score:
         df = df[df[levendist] >= self.configs['processes'][self.proc_type][self.proc_num]['min_match_score']]
@@ -70,7 +70,7 @@ class MatchFiltering(Main):
         else:
             filtered_file = pd.read_csv(self.filtered_matches, index_col=None, dtype=self.df_dtypes)
             filtered_file = pd.concat([filtered_file, df], ignore_index=True, sort=True)
-            filtered_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+            filtered_file.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
             filtered_file.to_csv(self.filtered_matches, index=False)
             return filtered_file
 
@@ -143,7 +143,7 @@ class VerificationAndUploads(Main):
                 else:
                     break
 
-            best_filtered.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+            best_filtered.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
 
             logging.info("Saving...")
             best_filtered.to_csv(self.unverified_file, index=False, columns=self.dbUpload_cols)

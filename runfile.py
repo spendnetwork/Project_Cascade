@@ -215,16 +215,18 @@ class Main:
                                 self.match_filtering.MatchFiltering(self).filter()
 
                                 self.match_filtering.MatchFiltering(self).getExcludedandNonMatches()
+
                             break
                         else:
                             continue
-                    # Output stats file:
+                    # Output stats files:
                     self.data_analysis.StatsCalculations(self).calculate_internals()
 
         except StopIteration:
             # Continue if no more config files found
             print("Done")
 
+        # self.data_analysis.StatsCalculations(self).calculate_externals() # long runtime - use concurrency here?
         self.best_config = self.match_filtering.VerificationAndUploads(self).verify()
 
         if in_args.region == 'UK_entities':

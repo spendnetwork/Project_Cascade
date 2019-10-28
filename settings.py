@@ -10,7 +10,7 @@ class Italy_Settings:
 
     runfile_mods = ITA_run_files
 
-    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np.str, 'src_name': np.str,
+    df_dtypes = {'Cluster_ID': np.float64, 'Confidence_Score': np.float, 'id': np.str, 'src_name': np.str,
                  'src_address': np.str,
                  'src_address_adj': np.str, 'src_name_adj': np.str, 'reg_id': np.str, 'reg_name_adj': np.str,
                  'reg_address': np.str,
@@ -39,7 +39,7 @@ class Italy_Settings:
     stats_cols = ['Config_File', 'Total_Matches', 'Percent_Matches', 'Optim_Matches', 'Percent_Precision',
                      'Percent_Recall', 'Leven_Dist_Avg']
 
-    manual_matches_cols = ['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
+    manual_matches_cols = ['Cluster_ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
                                            'reg_address', 'src_name', 'src_name_adj', 'src_address', 'src_address_adj', 'reg_address_adj',
                                            'Manual_Match_N', 'Manual_Match_NA', 'srcjoinfields', 'regjoinfields']
 
@@ -56,7 +56,7 @@ class UK_Settings:
 
     runfile_mods = UK_run_files
 
-    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'ocid': np.str, 'src_name': np.str, 'src_id': np.str,
+    df_dtypes = {'Cluster_ID': np.float64, 'Confidence_Score': np.float, 'ocid': np.str, 'src_name': np.str, 'src_id': np.str,
                  'src_name_adj': np.str, 'src_streetaddress': np.str, 'CH_id': np.str, 'CH_name_adj': np.str,
                  'CH_address': np.str, 'src_name_short': np.str, 'CH_name_short': np.str, 'leven_dist_N': np.int,
                  }
@@ -96,7 +96,7 @@ class UK_entities(UK_Settings):
     def __init__(self):
         super().__init__(self)
 
-    df_dtypes = {'Cluster ID': np.int, 'Confidence Score': np.float,
+    df_dtypes = {'Cluster_ID': np.int, 'Confidence_Score': np.float,
                  'src_name': np.str, 'src_name_adj': np.str, 'src_streetaddress': np.str, 'src_streetaddress_adj': np.str, 'src_name_short': np.str,
                  'src_address_locality': np.str, 'src_address_postalcode': np.str, 'src_address_streetaddress': np.str,
                  'reg_id': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str,  'reg_name_short': np.str,
@@ -154,7 +154,7 @@ class CQC_settings(UK_entities):
     reg_data_source = 'uk_data.cqc_hsca_locations'
     # ocds.cqc_orgs_lookup, ocds.cqc_ratings_locations, ocds.cqc_ratings_providers
 
-    df_dtypes = {'Cluster ID': np.int, 'Confidence Score': np.float,
+    df_dtypes = {'Cluster_ID': np.int, 'Confidence_Score': np.float,
                  'src_name': np.str, 'src_name_adj': np.str,
                  'src_name_short': np.str,
                  'reg_id': np.str, 'reg_name_adj': np.str,

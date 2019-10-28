@@ -43,7 +43,7 @@ def test_clustered_df(settings):
 
 def test_orgids_assigned_to_clusters(settings, test_clustered_df):
     # Tests that any cluster containing rows that have both a match and a none match gets
-    # the match data copied over to the non match rows (highest confidence score)
+    # the match data copied over to the non match rows (highest Confidence_Score)
 
     df_processed = AssignRegDataToClusters.assign(settings, test_clustered_df[0])
     df_processed.to_csv('./df_processed.csv',index=False)

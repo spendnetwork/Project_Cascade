@@ -228,25 +228,25 @@ class AssignRegDataToClusters:
         self.assigned_file = assigned_file
 
     def assign(self):
-        self.df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+        self.df.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
         self.df.reset_index(drop=True, inplace=True)
         tqdm.pandas()
         logging.info("Assigning close matches within clusters...")
-        self.df = self.df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
+        self.df = self.df.groupby(['Cluster_ID']).progress_apply(AssignRegDataToClusters.getMaxId)
         self.df.to_csv(self.assigned_file, index=False)
         return self.df
 
     def getMaxId(group):
         """
         Used by assign_reg_data_to_clusters(). Takes one entire cluster,
-        finds the row with the best confidence score and applies the registry data of that row
+        finds the row with the best Confidence_Score and applies the registry data of that row
         to the rest of the rows in that cluster which don't already have matches
 
         :param group: all rows belonging to one particular cluster
         :return group: the amended cluster to be updated into the main df
         """
 
-        max_conf_idx = group['Confidence Score'].idxmax()
+        max_conf_idx = group['Confidence_Score'].idxmax()
         for index, row in group.iterrows():
             # If the row is unmatched (has no registry id):
             if pd.isnull(row.reg_id):

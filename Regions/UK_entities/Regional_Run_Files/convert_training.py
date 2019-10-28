@@ -57,7 +57,7 @@ class ConvertToTraining(Main):
                     next
 
             # Write dict to training file.
-            pdb.set_trace()
+
             with open(self.directories['manual_training_file'].format(self.region_dir, self.proc_type)) as outfile:
                 try:
                     # Load TextWrapperIO object into json object

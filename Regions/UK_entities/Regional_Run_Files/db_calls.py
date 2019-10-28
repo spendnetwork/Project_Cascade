@@ -112,38 +112,51 @@ class DbCalls(Main):
 
 
     def join_matches_to_orgs_lookup(self):
+
+        # query = \
+        #  """select
+        #        COUNT(t1.src_name) script_string
+        #        ,COUNT(t1.src_name_adj) script_string_adj
+        #        ,COUNT(t2.org_string) ocds_string
+        #        ,COUNT(orgs.legalname) ocds_legalname
+        #        ,COUNT(t1.reg_name) script_regname
+        #        , COUNT(COALESCE(UPPER(orgs.legalname), UPPER(t1.reg_name))) as merge_match
+        # from matching.assigned_matches as t1
+        # LEFT JOIN ocds.orgs_lookup_distinct t2
+        # LEFT JOIN ocds.orgs_ocds orgs ON (t2.scheme = orgs.scheme and t2.id = orgs.id)
+        # ON UPPER(t1.src_name) = UPPER(t2.org_string) OR UPPER(t1.src_name_adj) = UPPER(t2.org_string)
+        # TO {} WITH CSV HEADER;
+        # """.format("'" + stats_file_fp + "'")
         query = \
-         """select
-               COUNT(t1.src_name) script_string
-               ,COUNT(t1.src_name_adj) script_string_adj
-               ,COUNT(t2.org_string) ocds_string
-               ,COUNT(orgs.legalname) ocds_legalname
-               ,COUNT(t1.reg_name) script_regname
-               , COUNT(COALESCE(UPPER(orgs.legalname), UPPER(t1.reg_name))) as merge_match
-        from matching.assigned_matches as t1
-        LEFT JOIN ocds.orgs_lookup_distinct t2
-        LEFT JOIN ocds.orgs_ocds orgs ON (t2.scheme = orgs.scheme and t2.id = orgs.id)
-        ON UPPER(t1.src_name) = UPPER(t2.org_string) OR UPPER(t1.src_name_adj) = UPPER(t2.org_string)
-        TO {} WITH CSV HEADER;
-        """.format(self.directories['script_performance_stats_file'])
+            """select
+                  COUNT(t1.src_name) script_string
+                  ,COUNT(t1.src_name_adj) script_string_adj
+                  ,COUNT(t2.org_string) ocds_string
+                  ,COUNT(orgs.legalname) ocds_legalname
+                  ,COUNT(t1.reg_name) script_regname
+                  , COUNT(COALESCE(UPPER(orgs.legalname), UPPER(t1.reg_name))) as merge_match
+           from matching.assigned_matches as t1
+           LEFT JOIN ocds.orgs_lookup_distinct t2
+           LEFT JOIN ocds.orgs_ocds orgs ON (t2.scheme = orgs.scheme and t2.id = orgs.id)
+           ON UPPER(t1.src_name) = UPPER(t2.org_string) OR UPPER(t1.src_name_adj) = UPPER(t2.org_string);
+           """
         return query
 
 
-    def upload_assigned_matches(self, conn, cur):
+    def upload_assigned_matches(self, conn, cur, assigned_file):
 
-        upload_file = self.directories["assigned_output_file"].format(self.region_dir, self.proc_type)
-        with open(upload_file, 'r') as f:
+        with open(assigned_file, 'r') as f:
             # Get headers dynamically
             reader = csv.reader(f)
             headers = next(reader, None)
             headers = ", ".join(headers)
 
-            # self.headers = headers
+            self.headers = headers
             next(f)  # Skip header row
             # Input the data into the dedupe table
             # copy_expert allows access to csv methods (i.e. char escaping)
             cur.copy_expert(
-                """COPY {}({}) from stdin (format csv)""".format('matching.assigned_matches', headers), f)
+                """COPY {}({}) from stdin (format csv)""".format('matching.assigned_matches', str(headers)), f)
             conn.commit()
 
 class FetchData(DbCalls):

@@ -21,6 +21,7 @@ dirs = {
                   "deduped_dir": '{0}/Outputs/{1}/Deduped_Data/',
 
                   "blacklist_file": '{0}/Data_Inputs/Blacklisted_Entities/blacklisted_entities.csv',
+                  "blacklisted_string_matches": '{0}/Data_Inputs/Adj_Data/blacklisted_string_matches.csv',
 
                   "cluster_training_file": '{0}/Data_Inputs/Training_Files/{1}/Clustering/cluster_training.json',
                   "cluster_output_file": '{0}/Outputs/{1}/Deduped_Data/{1}_matched_clustered.csv',
@@ -40,7 +41,7 @@ dirs = {
                   "backups_dir": "{0}/Data_Inputs/Training_Files/Manual_&_Backups",
                   "cluster_training_backup": "{0}/Data_Inputs/Training_Files/Manual_&_Backups/cluster_training_backup.json",
                   "unverified_matches_dir": "{0}/Outputs/{1}/Unverified_Matches/",
-                  "verified_matches_dir": "{0}/Outputs/{1}/Verified_Matches/",
+                  "verified_matches_dir": "{0}/Outputs/{1}/Verified_Matches/"
 
             }}
 

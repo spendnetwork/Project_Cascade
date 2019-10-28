@@ -77,7 +77,6 @@ class DataProcessing(Main):
         df_dup[adj_col] = df_dup[adj_col].str.replace(" & ", " and ")
         df_adj = pd.concat([df,df_dup]).sort_index().reset_index(drop=True)
 
-        # WONT ALL &'S BE REMOVED IN REMOVEPUNCT? THEREFORE REDUCING DIRECT MATCHES TO ORGS LOOKUP. IS REMOVEPUNCT NEEDED?
         return df_adj
 
 class LevDist(Main):
@@ -153,7 +152,6 @@ class LevDist(Main):
 class ProcessSourceData(DataProcessing):
     def __init__(self, settings):
         super().__init__(settings)
-
     """
 	Takes the source data file as input, org type suffixes are replaced with abbreviated versions
 	and strings reformatted for consistency across the two datasets
@@ -175,7 +173,6 @@ class ProcessSourceData(DataProcessing):
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
             orig_col = str('src_name')
-
 
             # Decode html entities i.e. "&amp;" into "&"
             df[adj_col] = df[orig_col].apply(html.unescape)
@@ -227,8 +224,16 @@ class ProcessSourceData(DataProcessing):
                                                                                   str(self.in_args.src)[:-4] +
                                                                                   str(i) + '.csv'), index=False)
 
+
     def filter_blacklisted(self, df):
-        ''' Gets rid of strings we know definitely won't match (because they aren't actually entities)'''
+        '''
+        Gets rid of strings we know definitely won't match (because they aren't actually entities)
+        Blacklist_file = the stock list of known unmatchable strings
+        blacklist_string_matches = the list of new tenders in the current run that match the blacklist_file - to be saved
+        to archive zip file for checking.
+        '''
+
+
         bl_file = self.directories["blacklist_file"].format(self.region_dir)
         bl_df = pd.read_csv(bl_file)
         orig_col = 'src_name'
@@ -240,12 +245,14 @@ class ProcessSourceData(DataProcessing):
         bl_df_adj = bl_df_adj.drop_duplicates()
         df_merge = pd.merge(df, bl_df_adj, how='outer', on='src_name_adj',indicator=True)
         df_with_bl_removed = df_merge[df_merge['_merge'] == 'left_only']
+        df_bl_only = df_merge[df_merge['_merge'] == 'both']
+
         df_with_bl_removed = df_with_bl_removed.drop(columns=['_merge','src_name_y'])
         df_with_bl_removed = df_with_bl_removed.rename(columns={'src_name_x':'src_name'})
-
+        df_bl_only = df_bl_only.drop(columns=['_merge', 'src_name_y'])
+        df_bl_only = df_bl_only.rename(columns={'src_name_x': 'src_name'})
+        df_bl_only.to_csv(self.directories['blacklisted_string_matches'].format(self.region_dir))
         return df_with_bl_removed
-
-
 
 
 class ProcessRegistryData(DataProcessing):
@@ -332,35 +339,31 @@ class AssignRegDataToClusters:
 	:return altered df
 	"""
 
-    # def __init__(self, df, assigned_file=None):
-        # self.df = df
-        # self.assigned_file = assigned_file
-
     def assign(self, df, assigned_file=None):
-        df.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+        df.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
         df.reset_index(drop=True, inplace=True)
         tqdm.pandas()
         logging.info("Assigning close matches within clusters...")
 
-        df = df.groupby(['Cluster ID']).progress_apply(AssignRegDataToClusters.getMaxId)
+        df = df.groupby(['Cluster_ID']).progress_apply(AssignRegDataToClusters.getMaxId)
         df.to_csv(assigned_file, index=False)
         return df
 
     def getMaxId(group):
         """
         Used by assign_reg_data_to_clusters(). Takes one entire cluster,
-        finds the row with the best confidence score and applies the registry data of that row
+        finds the row with the best Confidence_Score and applies the registry data of that row
         to the rest of the rows in that cluster which don't already have matches
 
         :param group: all rows belonging to one particular cluster
         :return group: the amended cluster to be updated into the main df
         """
 
-        # PREVIOUSLY WAS JUST TAKING THE HIGHEST CONFIDENCE SCORE (EVEN IF NO REG_ID ETC). NEED TO TAKE THE HIGHEST SCORE OF ONLY THOSE IN THE GROUP
+        # PREVIOUSLY WAS JUST TAKING THE HIGHEST Confidence_Score (EVEN IF NO REG_ID ETC). NEED TO TAKE THE HIGHEST SCORE OF ONLY THOSE IN THE GROUP
         # THAT HAVE A REG_ID
         reg_group = group[pd.notnull(group['reg_id'])]
         try:
-            max_conf_idx = reg_group['Confidence Score'].idxmax()
+            max_conf_idx = reg_group['Confidence_Score'].idxmax()
 
         except:
             return group
