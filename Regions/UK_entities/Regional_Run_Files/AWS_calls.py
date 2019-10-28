@@ -97,7 +97,8 @@ class AwsTransfers(Main):
                              verified_fp)
 
         # Upload all files in verified_matches_dir to our database:
-        self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
+        if self.in_args.upload:
+            self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
         for i in range(len(files)):
             verified_fp = os.path.join(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type),
@@ -107,6 +108,7 @@ class AwsTransfers(Main):
                 # verified yet (located via date prefix of verified file incase of name change by team)
                 response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Unverified_Matches/' + os.path.basename(files[i]['Key'])[:10])
                 file = response['Contents'][:]
+
                 s3.delete_object(Bucket=self.bucket, Key=file[i]['Key'])
             except:
                 pass

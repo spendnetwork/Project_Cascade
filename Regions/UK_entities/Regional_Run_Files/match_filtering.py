@@ -184,9 +184,9 @@ class VerificationAndUploads(Main):
             if not files:
                 self.manualMatching()
 
-            if self.in_args.upload:
-                # Add confirmed matches to relevant table
-                self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
+            # if self.in_args.upload:
+            #     # Add confirmed matches to relevant table
+            #     self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
         return self.best_config
 

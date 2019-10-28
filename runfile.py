@@ -76,7 +76,7 @@ def getInputArgs(rootdir, args=None):
                         help='Convert confirmed matches to training file for recycle phase')
     parser.add_argument('--config_review', action='store_true', help='Manually review/choose best config file results')
     parser.add_argument('--terminal_matching', action='store_true', help='Perform manual matching in terminal')
-    parser.add_argument('--upload', action='store_true' , help='Add confirmed matches to database')
+    parser.add_argument('--upload', action='store_true', help='Add confirmed matches to database')
     parser.add_argument('--clear_all', action='store_true', help='Clear all datafiles')
     parser.add_argument('--clear_adj', action='store_true', help='Clear all files except raw data')
     parser.add_argument('--clear_outputs', action='store_true', help='Clear all files except inputs')
@@ -90,6 +90,7 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--prodn_unverified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--prodn_verified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--split', action='store_true', help='split source file and initiate segmented matching')
+
 
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
     pargs = parser.parse_args(args)
@@ -226,7 +227,7 @@ class Main:
             # Continue if no more config files found
             print("Done")
 
-        # self.data_analysis.StatsCalculations(self).calculate_externals() # long runtime - use concurrency here?
+        self.data_analysis.StatsCalculations(self).calculate_externals() # long runtime - use concurrency here?
         self.best_config = self.match_filtering.VerificationAndUploads(self).verify()
 
         if in_args.region == 'UK_entities':
