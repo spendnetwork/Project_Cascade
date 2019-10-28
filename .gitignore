@@ -1,4 +1,5 @@
 *.csv
+!/Regions/UK_entities/Data_Inputs/Blacklisted_Entities/blacklisted_entities.csv
 Config_Files/__pycache__/
 .DS_Store/
 __pycache__/
