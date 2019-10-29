@@ -69,46 +69,46 @@ class StatsCalculations(Main):
         Prioritises already-matched strings and then checks the residual to calculate the overall additional effect
         of using dedupe
         '''
+        if self.in_args.prodn_unverified:
+            conn, cur = self.db_calls.DbCalls.createConnection(self)
 
-        conn, cur = self.db_calls.DbCalls.createConnection(self)
+            # Truncate assigned matches table ready for new upload
+            table = 'matching.assigned_matches'
+            print('Clearing matches.assigned_matches table...')
+            query = self.db_calls.DbCalls.truncate_table(self, table)
+            cur.execute(query)
+            conn.commit()
 
-        # Truncate assigned matches table ready for new upload
-        table = 'matching.assigned_matches'
-        print('Clearing matches.assigned_matches table...')
-        query = self.db_calls.DbCalls.truncate_table(self, table)
-        cur.execute(query)
-        conn.commit()
-
-        # Upload new assigned matches to db
-        assigned_matches_fp = self.directories["assigned_output_file"].format(self.region_dir, self.proc_type)
-        print('Uploading new assigned matches to db...')
-        self.db_calls.DbCalls.upload_assigned_matches(self, conn, cur, assigned_matches_fp)
-        print('Done.')
-
-        # Perform join of assigned matches file to orgs lookup to filter for strings already matched in orgs_lookup
-        # and get counts/stats (outputs script_performance_stats_file to /deduped_data)
-        stats_file_fp = self.directories['script_performance_stats_file'].format(self.region_dir, self.proc_type)
-        if not os.path.exists(stats_file_fp):
-            print('Performing join on matches to orgs_lookup...')
-            query = self.db_calls.DbCalls.join_matches_to_orgs_lookup(self)
-            df = pd.read_sql(query, con=conn)
-            df.to_csv(stats_file_fp, index=False)
-            # cur.execute(query)
-            # conn.commit()
-            conn.close()
+            # Upload new assigned matches to db
+            assigned_matches_fp = self.directories["assigned_output_file"].format(self.region_dir, self.proc_type)
+            print('Uploading new assigned matches to db...')
+            self.db_calls.DbCalls.upload_assigned_matches(self, conn, cur, assigned_matches_fp)
             print('Done.')
 
-        # Alter file to add %
-        df = pd.read_csv(stats_file_fp)
-        bl_df = pd.read_csv(self.directories['blacklisted_string_matches'].format(self.region_dir))
-        df['residual_script_matches'] = df['merge_match'] - df['ocds_legalname']
-        df['ocds_orgslookup_matches_pct'] = round(df['ocds_legalname'] / df['merge_match'] * 100, 2)
-        df['residual_script_matches_pct'] = round(df['residual_script_matches'] / df['merge_match'] * 100,2)
-        df['total_matches_pct'] = '' # NEED TO CHECK THIS - WHERE DOES THE NEW STRING COUNT COME FROM?
-        df['verified_matches'] = ''
-        df['residual_verified_matches_pct'] = ''
-        df['blacklisted_matches'] = len(bl_df)
-        df.to_csv(stats_file_fp, index=False)
+            # Perform join of assigned matches file to orgs lookup to filter for strings already matched in orgs_lookup
+            # and get counts/stats (outputs script_performance_stats_file to /deduped_data)
+            stats_file_fp = self.directories['script_performance_stats_file'].format(self.region_dir, self.proc_type)
+            if not os.path.exists(stats_file_fp):
+                print('Performing join on matches to orgs_lookup...')
+                query = self.db_calls.DbCalls.join_matches_to_orgs_lookup(self)
+                df = pd.read_sql(query, con=conn)
+                df.to_csv(stats_file_fp, index=False)
+                # cur.execute(query)
+                # conn.commit()
+                conn.close()
+                print('Done.')
+
+            # Alter file to add %
+            df = pd.read_csv(stats_file_fp)
+            bl_df = pd.read_csv(self.directories['blacklisted_string_matches'].format(self.region_dir))
+            df['residual_script_matches'] = df['merge_match'] - df['ocds_legalname']
+            df['ocds_orgslookup_matches_pct'] = round(df['ocds_legalname'] / df['merge_match'] * 100, 2)
+            df['residual_script_matches_pct'] = round(df['residual_script_matches'] / df['merge_match'] * 100,2)
+            df['total_matches_pct'] = '' # NEED TO CHECK THIS - WHERE DOES THE NEW STRING COUNT COME FROM?
+            df['verified_matches'] = ''
+            df['residual_verified_matches_pct'] = ''
+            df['blacklisted_matches'] = len(bl_df)
+            df.to_csv(stats_file_fp, index=False)
 
 
 

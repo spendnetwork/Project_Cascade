@@ -100,15 +100,13 @@ class AwsTransfers(Main):
         if self.in_args.upload:
             self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
+        # Loop through retrieved verified matches files from S3 bucket
         for i in range(len(files)):
-            verified_fp = os.path.join(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type),
-                                       os.path.basename(files[i]['Key']))
             try:
                 # Delete from unverified folder (if hasn't been done by team already) so team know which haven't been
                 # verified yet (located via date prefix of verified file incase of name change by team)
                 response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Unverified_Matches/' + os.path.basename(files[i]['Key'])[:10])
                 file = response['Contents'][:]
-
                 s3.delete_object(Bucket=self.bucket, Key=file[i]['Key'])
             except:
                 pass
@@ -128,13 +126,21 @@ class AwsTransfers(Main):
                 # and get the length/count of verified matches from the verified file
                 archive_file = os.path.basename(archive_files[a]['Key'])
                 if archive_file == verified_zip_name:
+                    # Download archive file to local verified folder
+                    dl_archive_fp = os.path.join(os.path.join(self.directories['verified_matches_dir']
+                                                              .format(self.region_dir, self.proc_type), archive_file))
+                    s3.download_file(self.bucket,
+                                     os.path.join('UK_entities/Archive/', archive_file), dl_archive_fp)
 
-                    # open archive file
-                    with ZipFile(archive_file, 'r') as z:
-                        ver_file = pd.read_csv(os.path.join(self.directories['verified_matches_dir']
-                                                            .format(self.region_dir, self.proc_type),
-                                                            os.path.basename(files[i]['Key'])))
+                    # Open archive file
+                    with ZipFile(dl_archive_fp, 'r') as z:
+                        # Open corresponding verified matches file
+                        verified_fp = os.path.join(
+                            self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type),
+                            os.path.basename(files[i]['Key']))
+                        ver_file = pd.read_csv(verified_fp)
                         with z.open('script_performance_stats.csv') as f:
+                            # Add additional stats to script performance stats csv
                             stats_file = pd.read_csv(f)
                             true_positives = len(ver_file[ver_file['Manual_Match_N'] == 'Y'])
                             false_positives = len(ver_file[ver_file['Manual_Match_N'] == 'N'])
@@ -147,17 +153,15 @@ class AwsTransfers(Main):
 
                     stats_file_fp = self.directories['script_performance_stats_file'].format(self.region_dir,
                                                                                              self.proc_type)
-
-                    with ZipFile(archive_file, 'a') as z:
-
+                    with ZipFile(dl_archive_fp, 'a') as z:
+                        # Add/overwrite new stats file and verified matches file to zip file, then re-upload to S3 /Archive
                         z.write(stats_file_fp, os.path.basename(stats_file_fp))
                         z.write(verified_fp, os.path.basename(verified_fp))
-                        # Upload zip file to S3 Archive
-                        self.upload_file(archive_file, self.bucket, 'UK_entities/Archive/' + archive_file)
+                        self.upload_file(dl_archive_fp, self.bucket, 'UK_entities/Archive/' + archive_file)
 
-            # Delete matches csv from s3 verified folder
-            s3.delete_object(Bucket=self.bucket, Key=files[i]['Key'])
-
+            # Delete matches csv from s3 verified folder (if 'upload' arg used)
+            if self.in_args.upload:
+                s3.delete_object(Bucket=self.bucket, Key=files[i]['Key'])
 
     @staticmethod
     def upload_file(file_name, bucket, object_name=None):
