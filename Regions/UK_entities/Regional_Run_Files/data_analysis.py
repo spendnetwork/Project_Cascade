@@ -87,19 +87,20 @@ class StatsCalculations(Main):
 
         # Perform join of assigned matches file to orgs lookup to filter for strings already matched in orgs_lookup
         # and get counts/stats (outputs script_performance_stats_file to /deduped_data)
-        print('Performing join on matches to orgs_lookup...')
         stats_file_fp = self.directories['script_performance_stats_file'].format(self.region_dir, self.proc_type)
-        query = self.db_calls.DbCalls.join_matches_to_orgs_lookup(self)
-        df = pd.read_sql(query, con=conn)
-        df.to_csv(stats_file_fp, index=False)
-        # cur.execute(query)
-        # conn.commit()
-        conn.close()
-        print('Done.')
+        if not os.path.exists(stats_file_fp):
+            print('Performing join on matches to orgs_lookup...')
+            query = self.db_calls.DbCalls.join_matches_to_orgs_lookup(self)
+            df = pd.read_sql(query, con=conn)
+            df.to_csv(stats_file_fp, index=False)
+            # cur.execute(query)
+            # conn.commit()
+            conn.close()
+            print('Done.')
 
         # Alter file to add %
         df = pd.read_csv(stats_file_fp)
-        bl_df = pd.read_csv(self.directories['blacklisted_string_matches'].format(self.region))
+        bl_df = pd.read_csv(self.directories['blacklisted_string_matches'].format(self.region_dir))
         df['residual_script_matches'] = df['merge_match'] - df['ocds_legalname']
         df['ocds_orgslookup_matches_pct'] = round(df['ocds_legalname'] / df['merge_match'] * 100, 2)
         df['residual_script_matches_pct'] = round(df['residual_script_matches'] / df['merge_match'] * 100,2)
