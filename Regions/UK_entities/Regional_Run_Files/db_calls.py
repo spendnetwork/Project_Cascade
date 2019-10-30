@@ -30,6 +30,7 @@ class DbCalls(Main):
         :param upload_file: the dataframe containing the data
         :return: None
         '''
+
         conn, cur = self.createConnection()
         logging.info(f"Connected to {self.upload_table}")
 
@@ -53,11 +54,10 @@ class DbCalls(Main):
         cur.execute(query)
         conn.commit()
 
-        # Also transfer matches to transfer table
+        # Also transfer matches to transfer table (orgs_lookup, where doesn't exist already)
         query = self.transferMatches()
         cur.execute(query)
         conn.commit()
-
 
     def createConnection(self):
         '''
@@ -96,10 +96,11 @@ class DbCalls(Main):
         query = \
         """
         INSERT INTO {}
-            SELECT DISTINCT src_name, reg_scheme, reg_id, reg_name, reg_source, match_date, match_by, reg_created_at FROM {} m
+            SELECT DISTINCT src_name, reg_scheme, reg_id, reg_name, match_source, match_date, match_by, created_at FROM {} m
 
             WHERE
                  NOT EXISTS (SELECT src_name, reg_name FROM {} t WHERE m.src_name = t.org_string)
+                 AND m.manual_match_n LIKE 'Y'
         """.format(self.transfer_table, self.upload_table, self.transfer_table)
         return query
 
@@ -110,23 +111,8 @@ class DbCalls(Main):
         """.format(table)
         return query
 
-
     def join_matches_to_orgs_lookup(self):
 
-        # query = \
-        #  """select
-        #        COUNT(t1.src_name) script_string
-        #        ,COUNT(t1.src_name_adj) script_string_adj
-        #        ,COUNT(t2.org_string) ocds_string
-        #        ,COUNT(orgs.legalname) ocds_legalname
-        #        ,COUNT(t1.reg_name) script_regname
-        #        , COUNT(COALESCE(UPPER(orgs.legalname), UPPER(t1.reg_name))) as merge_match
-        # from matching.assigned_matches as t1
-        # LEFT JOIN ocds.orgs_lookup_distinct t2
-        # LEFT JOIN ocds.orgs_ocds orgs ON (t2.scheme = orgs.scheme and t2.id = orgs.id)
-        # ON UPPER(t1.src_name) = UPPER(t2.org_string) OR UPPER(t1.src_name_adj) = UPPER(t2.org_string)
-        # TO {} WITH CSV HEADER;
-        # """.format("'" + stats_file_fp + "'")
         query = \
             """select
                   COUNT(t1.src_name) script_string
@@ -141,7 +127,6 @@ class DbCalls(Main):
            ON UPPER(t1.src_name) = UPPER(t2.org_string) OR UPPER(t1.src_name_adj) = UPPER(t2.org_string);
            """
         return query
-
 
     def upload_assigned_matches(self, conn, cur, assigned_file):
 
@@ -222,8 +207,8 @@ class FetchData(DbCalls):
            id as reg_id,
            '' as reg_address,
            scheme as reg_scheme,
-           source as reg_source,
-           created_at as reg_created_at
+           'dedupe_script' as match_source,
+           '' as created_at
             from {}
 
             """.format(self.reg_data_source)

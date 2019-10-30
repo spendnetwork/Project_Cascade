@@ -100,6 +100,7 @@ class StatsCalculations(Main):
 
             # Alter file to add %
             df = pd.read_csv(stats_file_fp)
+
             bl_df = pd.read_csv(self.directories['blacklisted_string_matches'].format(self.region_dir))
             df['residual_script_matches'] = df['merge_match'] - df['ocds_legalname']
             df['ocds_orgslookup_matches_pct'] = round(df['ocds_legalname'] / df['merge_match'] * 100, 2)

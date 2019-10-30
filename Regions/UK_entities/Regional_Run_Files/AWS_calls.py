@@ -107,7 +107,8 @@ class AwsTransfers(Main):
                 # verified yet (located via date prefix of verified file incase of name change by team)
                 response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Unverified_Matches/' + os.path.basename(files[i]['Key'])[:10])
                 file = response['Contents'][:]
-                s3.delete_object(Bucket=self.bucket, Key=file[i]['Key'])
+                if self.in_args.upload:
+                    s3.delete_object(Bucket=self.bucket, Key=file[i]['Key'])
             except:
                 pass
 
@@ -134,6 +135,7 @@ class AwsTransfers(Main):
 
                     # Open archive file
                     with ZipFile(dl_archive_fp, 'r') as z:
+
                         # Open corresponding verified matches file
                         verified_fp = os.path.join(
                             self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type),
@@ -154,6 +156,7 @@ class AwsTransfers(Main):
                     stats_file_fp = self.directories['script_performance_stats_file'].format(self.region_dir,
                                                                                              self.proc_type)
                     with ZipFile(dl_archive_fp, 'a') as z:
+
                         # Add/overwrite new stats file and verified matches file to zip file, then re-upload to S3 /Archive
                         z.write(stats_file_fp, os.path.basename(stats_file_fp))
                         z.write(verified_fp, os.path.basename(verified_fp))

@@ -295,7 +295,7 @@ class Matching(Main):
 
         # Add blank match_by column
         clust_df['match_by'] = ' '
-        clust_df.reg_source = clust_df.reg_source.replace(r'^\s*$', '.', regex=True)
+        clust_df.match_source = clust_df.match_source.replace(r'^\s*$', '.', regex=True)
         clust_df.reg_scheme = clust_df.reg_scheme.replace(r'^\s*$', '.', regex=True)
 
         # Add levenshtein distance to measure the quality of the matches
