@@ -208,7 +208,7 @@ class ProcessSourceData(DataProcessing):
 
             # If flag 'split' has been used, split the source file into smaller files
             if self.in_args.split:
-                chunksize = 1000
+                chunksize = self.in_args.splitsize
                 numberofchunks = len(df) // chunksize + 1
                 for i in range(numberofchunks):
                     if i == 0:
