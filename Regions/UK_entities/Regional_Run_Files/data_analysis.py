@@ -75,6 +75,7 @@ class StatsCalculations(Main):
             # Truncate assigned matches table ready for new upload
             table = 'matching.assigned_matches'
             print('Clearing matches.assigned_matches table...')
+
             query = self.db_calls.DbCalls.truncate_table(self, table)
             cur.execute(query)
             conn.commit()

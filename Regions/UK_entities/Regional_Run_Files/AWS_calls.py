@@ -9,9 +9,9 @@ from zipfile import ZipFile
 import pandas as pd
 
 # get the remote database details from .env
-load_dotenv(find_dotenv())
-aws_access_key_id = os.environ.get("aws_access_key_id")
-aws_secret_access_key = os.environ.get("aws_secret_access_key")
+# load_dotenv(find_dotenv())
+# aws_access_key_id = os.environ.get("aws_access_key_id")
+# aws_secret_access_key = os.environ.get("aws_secret_access_key")
 
 
 class AwsTransfers(Main):
@@ -83,7 +83,7 @@ class AwsTransfers(Main):
         """
 
         # Scan s3 verified folder for files
-        s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+        s3 = boto3.client('s3', aws_access_key_id=self.aws_access_key_id, aws_secret_access_key=self.aws_secret_access_key)
         response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Verified_Matches/')
 
         # Ignore first file entry in dict as is just the folder name. Returns a list of files
@@ -115,7 +115,7 @@ class AwsTransfers(Main):
             # For each verified file, iterate over S3 zip files and download the corresponding zip.
             # Need to iterate over both files in /verified and /archive to make sure we aren't adding the wrong information
             # to multiple different files when theres >1 file in these folders.
-            s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+            s3 = boto3.client('s3', aws_access_key_id=self.aws_access_key_id, aws_secret_access_key=self.aws_secret_access_key)
             response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Archive/')
             archive_files = response['Contents'][1:]
 
@@ -166,8 +166,8 @@ class AwsTransfers(Main):
             if self.in_args.upload:
                 s3.delete_object(Bucket=self.bucket, Key=files[i]['Key'])
 
-    @staticmethod
-    def upload_file(file_name, bucket, object_name=None):
+
+    def upload_file(self, file_name, bucket, object_name=None):
         """Upload a file to an S3 bucket
 
         :param file_name: File to upload
@@ -181,7 +181,7 @@ class AwsTransfers(Main):
             object_name = file_name
 
         # Upload the file
-        s3_client = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+        s3_client = boto3.client('s3', aws_access_key_id=self.aws_access_key_id, aws_secret_access_key=self.aws_secret_access_key)
         try:
             s3_client.upload_file(file_name, bucket, object_name)
         except ClientError as e:

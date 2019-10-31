@@ -116,7 +116,7 @@ class UK_entities(UK_Settings):
     reg_data_source = 'ocds.orgs_ocds'
     src_data_source = 'ocds.ocds_tenders_view'
     upload_table = 'matching.uk_entities'
-    transfer_table = 'matching.test_orgs_lookup'
+    transfer_table = 'matching.orgs_lookup'
 
     dedupe_cols = ['src_name','src_tag', 'src_name_adj', 'src_address_adj',
                    'reg_id', 'reg_name', 'reg_name_adj', 'reg_address', 'reg_address_adj','src_joinfields', 'reg_joinfields',

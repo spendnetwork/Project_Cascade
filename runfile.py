@@ -4,12 +4,13 @@ import os
 import ast
 from pathlib import Path
 import yaml
-import settings
+import settings, settings_prodn, settings_staging
 import datetime
 import logging.config
 import sys
 import pdb
 from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
+from dotenv import load_dotenv
 
 
 def createSettingsObj(rootdir, in_args, settings):
@@ -49,6 +50,18 @@ def createSettingsObj(rootdir, in_args, settings):
     settings.in_args = in_args
     settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
 
+    # '.env_production' / '.env_staging'
+    settings.dotenv_file = os.path.join(rootdir,'.env_' + os.environ.get('ENV'))
+
+    # get the remote database details from .env
+    load_dotenv(settings.dotenv_file)
+    settings.host_remote = os.environ.get("HOST_REMOTE")
+    settings.dbname_remote = os.environ.get("DBNAME_REMOTE")
+    settings.user_remote = os.environ.get("USER_REMOTE")
+    settings.password_remote = os.environ.get("PASSWORD_REMOTE")
+    settings.aws_access_key_id = os.environ.get("aws_access_key_id")
+    settings.aws_secret_access_key = os.environ.get("aws_secret_access_key")
+
     # Define config file variables and attach to settings object
     settings.config_path = Path(os.path.join(settings.region_dir, 'Config_Files'))
 
@@ -86,15 +99,18 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--data_from_date', type=str,
                         default=(datetime.date.today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
                         , help='Set source data start date to be downloaded from (inclusive)')
-    parser.add_argument('--data_to_date', type=str, default = datetime.date.today().strftime('%Y-%m-%d'), help='Set source data end date to be downloaded (inclusive)')
+    parser.add_argument('--data_to_date', type=str, default=datetime.date.today().strftime('%Y-%m-%d'),
+                        help='Set source data end date to be downloaded (inclusive)')
     parser.add_argument('--prodn_unverified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--prodn_verified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--split', action='store_true', help='split source file and initiate segmented matching')
     parser.add_argument('--splitsize', default=1000, type=int, help='split source file and initiate segmented matching')
 
+    parser.add_argument('--prodn',action='store_true', help='used to obtain production env database settings. If not used, staging db creds used')
 
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
     pargs = parser.parse_args(args)
+
     # # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
     # # Force an error and prompt user to add the training flag
     # if pargs.ctraining == False and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
@@ -151,6 +167,15 @@ class Main:
         self.transfer_table = settings.transfer_table
         self.best_config = settings.best_config
 
+        # Dotenv vars
+        self.dotenv_file = settings.dotenv_file
+        self.host_remote = settings.host_remote
+        self.dbname_remote = settings.dbname_remote
+        self.user_remote = settings.user_remote
+        self.password_remote = settings.password_remote
+        self.aws_access_key_id = settings.aws_access_key_id
+        self.aws_secret_access_key = settings.aws_secret_access_key
+
     def run_main(self):
 
         # Build project folders
@@ -161,6 +186,7 @@ class Main:
 
         # If not using recycle mode
         if not in_args.recycle:
+
             try:
                 # If registry/registry data file doesn't exist, pull from database
                 self.db_calls.FetchData.checkDataExists(self)
@@ -237,8 +263,18 @@ class Main:
 
 
 if __name__ == '__main__':
+
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = getInputArgs(rootdir)
+    # Set environment variable (prodn, staging(default if prodn arg not called))
+    # https: // able.bio / rhett / how - to - set - and -get - environment - variables - in -python - -274
+    # rgt5
+    if in_args.prodn:
+        os.environ['ENV'] = 'production'
+        settings = settings_prodn
+    else:
+        os.environ['ENV'] = 'staging'
+        settings = settings_staging
 
     settingsobj = createSettingsObj(rootdir, in_args, settings)
 

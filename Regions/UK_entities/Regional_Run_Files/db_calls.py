@@ -9,14 +9,6 @@ from runfile import Main, logging
 import glob
 
 
-# get the remote database details from .env
-load_dotenv(find_dotenv())
-host_remote = os.environ.get("HOST_REMOTE")
-dbname_remote = os.environ.get("DBNAME_REMOTE")
-user_remote = os.environ.get("USER_REMOTE")
-password_remote = os.environ.get("PASSWORD_REMOTE")
-
-
 class DbCalls(Main):
     def __init__(self, settings):
         super().__init__(settings)
@@ -67,7 +59,7 @@ class DbCalls(Main):
         :return cur : the cursor (temporary storage for retrieved data
         '''
         logging.info('Connecting to database...')
-        conn = psy.connect(host=host_remote, dbname=dbname_remote, user=user_remote, password=password_remote)
+        conn = psy.connect(host=self.host_remote, dbname=self.dbname_remote, user=self.user_remote, password=self.password_remote)
         cur = conn.cursor()
         return conn, cur
 
@@ -162,9 +154,10 @@ class FetchData(DbCalls):
 
     def checkDataExists(self):
         # If registry data doesn't exist:
+
         if not os.path.exists(self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg)):
             # Check env file exists
-            env_fpath = os.path.join('.', '.env')
+            env_fpath = self.dotenv_file
             if not os.path.exists(env_fpath):
                 logging.info("Database credentials not found. Please complete the .env file using the '.env template'")
                 sys.exit()
@@ -181,13 +174,14 @@ class FetchData(DbCalls):
                 self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_src_data'].format(
                     self.in_args.src)):
 
-            env_fpath = os.path.join('.', '.env')
+            env_fpath = self.dotenv_file
             if not os.path.exists(env_fpath):
                 logging.info(
                     "Database credentials not found. Please complete the .env file using the '.env template'")
                 sys.exit()
 
             # Load source data
+
             query = self.db_calls.FetchData.createSourceDataSQLQuery(self)
             df = self.db_calls.FetchData.fetchdata(self, query)
             df.to_csv(
@@ -220,32 +214,56 @@ class FetchData(DbCalls):
         """
 
         logging.info("Obtaining source data...")
-        query = \
-            """
-            SELECT            
-            distinct t.buyer as src_name,
-            t.json -> 'releases' -> 0 -> 'tag' as src_tag,
-            t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'locality' as src_address_locality,
-            t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'postalCode' as src_address_postalcode,
-            t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'countryName' as src_address_countryname,
-            t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'streetAddress' as src_address_streetaddress,
-            t.source as source
-            
-              FROM {0} as t
-            WHERE TRUE
-              AND (t.source in (
-                  'cf_notices',
-                  ''
-               )
-              OR (source = 'ted_notices' AND countryname = 'United Kingdom')
-              )
-              AND t.releasedate >= {1}
-              AND t.releasedate <= {2}
-               --AND t.json -> 'releases' -> 0 -> 'tag' ? 'tender'
-               --AND t.json -> 'releases' -> 0 -> 'tag' ? 'award'
-            ;
-    
-            """.format(self.src_data_source, "'" + self.in_args.data_from_date + "'", "'" + self.in_args.data_to_date + "'")
+        if self.in_args.prodn:
+            query = \
+                """
+                SELECT            
+                distinct t.buyer as src_name,
+                t.json -> 'releases' -> 0 -> 'tag' as src_tag,
+                t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'locality' as src_address_locality,
+                t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'postalCode' as src_address_postalcode,
+                t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'countryName' as src_address_countryname,
+                t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'streetAddress' as src_address_streetaddress,
+                t.source as source
+                
+                  FROM {0} as t
+                WHERE TRUE
+                  AND (t.source in (
+                      'cf_notices',
+                      ''
+                   )
+                  OR (source = 'ted_notices' AND countryname = 'United Kingdom')
+                  )
+                  AND t.releasedate >= {1}
+                  AND t.releasedate <= {2}
+                   --AND t.json -> 'releases' -> 0 -> 'tag' ? 'tender'
+                   --AND t.json -> 'releases' -> 0 -> 'tag' ? 'award'
+                ;
+        
+                """.format(self.src_data_source, "'" + self.in_args.data_from_date + "'", "'" + self.in_args.data_to_date + "'")
+        else:
+            query = \
+                """
+                SELECT            
+                distinct t.buyer as src_name,
+                t.json -> 'releases' -> 0 -> 'tag' as src_tag,
+                t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'locality' as src_address_locality,
+                t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'postalCode' as src_address_postalcode,
+                t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'countryName' as src_address_countryname,
+                t.json -> 'releases' -> 0 -> 'buyer' -> 'address' ->> 'streetAddress' as src_address_streetaddress,
+                t.source as source
+
+                  FROM {0} as t
+                WHERE TRUE
+                  AND t.releasedate >= '2009-09-11 00:00:00.000000'
+                  AND t.releasedate <= '2015-09-11 00:00:00.000000'
+                  AND countryname = 'United Kingdom'
+                   
+                   LIMIT 2000
+                ;
+
+                """.format(self.src_data_source)
+
         return query
 
 
