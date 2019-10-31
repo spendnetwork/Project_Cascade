@@ -83,6 +83,7 @@ class AwsTransfers(Main):
         """
 
         # Scan s3 verified folder for files
+
         s3 = boto3.client('s3', aws_access_key_id=self.aws_access_key_id, aws_secret_access_key=self.aws_secret_access_key)
         response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Verified_Matches/')
 
@@ -101,14 +102,17 @@ class AwsTransfers(Main):
             self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
 
         # Loop through retrieved verified matches files from S3 bucket
+
         for i in range(len(files)):
             try:
                 # Delete from unverified folder (if hasn't been done by team already) so team know which haven't been
                 # verified yet (located via date prefix of verified file incase of name change by team)
-                response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Unverified_Matches/' + os.path.basename(files[i]['Key'])[:10])
-                file = response['Contents'][:]
+                # response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Unverified_Matches/')
+                # unver_files = response['Contents'][:]
+
                 if self.in_args.upload:
-                    s3.delete_object(Bucket=self.bucket, Key=file[i]['Key'])
+                    pdb.set_trace()
+                    s3.delete_object(Bucket=self.bucket, Key=os.path.join('UK_entities','Unverified_Matches', os.path.basename(files[i]['Key'])))
             except:
                 pass
 
