@@ -103,16 +103,12 @@ class StatsCalculations(Main):
             df = pd.read_csv(stats_file_fp)
 
             bl_df = pd.read_csv(self.directories['blacklisted_string_matches'].format(self.region_dir))
-            df['residual_script_matches'] = df['merge_match'] - df['ocds_legalname']
-            df['ocds_orgslookup_matches_pct'] = round(df['ocds_legalname'] / df['merge_match'] * 100, 2)
-            df['residual_script_matches_pct'] = round(df['residual_script_matches'] / df['merge_match'] * 100,2)
-            df['total_matches_pct'] = '' # NEED TO CHECK THIS - WHERE DOES THE NEW STRING COUNT COME FROM?
-            df['verified_matches'] = ''
-            df['residual_verified_matches_pct'] = ''
+            df['residual_script_matches'] = df['merged_matches'] - df['database_matches']
+            df['pct_database_matches_of_merged_matches'] = round(df['database_matches'] / df['merged_matches'] * 100, 2)
+            df['pct_residual_script_matches_of_merged_matches'] = round(df['residual_script_matches'] / df['merged_matches'] * 100,2)
+            df['pct_total_match_rate'] = round(df['merged_matches'] / df['script_string'] * 100, 2)
             df['blacklisted_matches'] = len(bl_df)
             df.to_csv(stats_file_fp, index=False)
-
-
 
 
 

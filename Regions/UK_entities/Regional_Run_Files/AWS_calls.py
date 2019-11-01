@@ -107,9 +107,6 @@ class AwsTransfers(Main):
             try:
                 # Delete from unverified folder (if hasn't been done by team already) so team know which haven't been
                 # verified yet (located via date prefix of verified file incase of name change by team)
-                # response = s3.list_objects(Bucket=self.bucket, Prefix='UK_entities/Unverified_Matches/')
-                # unver_files = response['Contents'][:]
-
                 if self.in_args.upload:
                     pdb.set_trace()
                     s3.delete_object(Bucket=self.bucket, Key=os.path.join('UK_entities','Unverified_Matches', os.path.basename(files[i]['Key'])))
@@ -153,6 +150,7 @@ class AwsTransfers(Main):
                             unverified = len(ver_file) - true_positives - false_positives
                             stats_file['true_positives'] = true_positives
                             stats_file['false_positives'] = false_positives
+                            stats_file['script_precision'] = round((true_positives / (false_positives + true_positives)) * 100, 2)
                             stats_file['unverified'] = unverified
                             stats_file.to_csv(self.directories['script_performance_stats_file'].format(self.region_dir, self.proc_type)
                                               ,index=False)
