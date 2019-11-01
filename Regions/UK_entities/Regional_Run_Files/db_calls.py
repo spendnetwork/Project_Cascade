@@ -106,18 +106,55 @@ class DbCalls(Main):
     def join_matches_to_orgs_lookup(self):
 
         query = \
-            """select
-                  COUNT(t1.src_name) script_string
-                  ,COUNT(t1.src_name_adj) script_string_adj
-                  ,COUNT(t2.org_string) ocds_string
-                  ,COUNT(orgs.legalname) ocds_legalname
-                  ,COUNT(t1.reg_name) script_regname
-                  , COUNT(COALESCE(UPPER(orgs.legalname), UPPER(t1.reg_name))) as merge_match
-           from matching.assigned_matches as t1
-           LEFT JOIN ocds.orgs_lookup_distinct t2
-           LEFT JOIN ocds.orgs_ocds orgs ON (t2.scheme = orgs.scheme and t2.id = orgs.id)
-           ON UPPER(t1.src_name) = UPPER(t2.org_string) OR UPPER(t1.src_name_adj) = UPPER(t2.org_string);
-           """
+        """
+        CREATE
+        TEMPORARY
+        TABLE
+        ocdstbl as
+        (
+            SELECT t2.org_string
+        , orgs.legalname
+        FROM ocds.orgs_lookup_distinct t2
+        LEFT JOIN
+        ocds.orgs_ocds orgs ON (t2.scheme = orgs.scheme and t2.id = orgs.id)
+        );
+
+        SELECT
+        t1.src_name
+        script_string
+        , t1.src_name_adj
+        script_string_adj
+        , ocdstbl.org_string
+        ocds_string
+        , ocdstbl.legalname
+        ocds_legalname
+        , t1.reg_name
+        script_regname
+        , COALESCE(UPPER(ocdstbl.legalname), UPPER(t1.reg_name)) as merge_match
+        FROM
+        matching.assigned_matches as t1
+        LEFT
+        JOIN
+        ocdstbl
+        ON
+        UPPER(t1.src_name) = UPPER(ocdstbl.org_string)
+        OR
+        UPPER(t1.src_name_adj) = UPPER(ocdstbl.org_string)
+
+    ;"""
+
+        #  """select
+        #        COUNT(t1.src_name) script_string
+        #        ,COUNT(t1.src_name_adj) script_string_adj
+        #        ,COUNT(t2.org_string) ocds_string
+        #        ,COUNT(orgs.legalname) ocds_legalname
+        #        ,COUNT(t1.reg_name) script_regname
+        #        , COUNT(COALESCE(UPPER(orgs.legalname), UPPER(t1.reg_name))) as merge_match
+        # from matching.assigned_matches as t1
+        # LEFT JOIN ocds.orgs_lookup_distinct t2
+        # LEFT JOIN ocds.orgs_ocds orgs ON (t2.scheme = orgs.scheme and t2.id = orgs.id)
+        # ON UPPER(t1.src_name) = UPPER(t2.org_string) OR UPPER(t1.src_name_adj) = UPPER(t2.org_string);
+        # """
         return query
 
     def upload_assigned_matches(self, conn, cur, assigned_file):
