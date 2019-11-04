@@ -108,7 +108,7 @@ class AwsTransfers(Main):
                 # Delete from unverified folder (if hasn't been done by team already) so team know which haven't been
                 # verified yet (located via date prefix of verified file incase of name change by team)
                 if self.in_args.upload:
-                    pdb.set_trace()
+
                     s3.delete_object(Bucket=self.bucket, Key=os.path.join('UK_entities','Unverified_Matches', os.path.basename(files[i]['Key'])))
             except:
                 pass
