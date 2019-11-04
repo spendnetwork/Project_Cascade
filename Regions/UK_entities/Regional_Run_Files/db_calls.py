@@ -92,10 +92,11 @@ class DbCalls(Main):
         """
         INSERT INTO {}
             SELECT DISTINCT src_name, reg_scheme, reg_id, reg_name, match_source, match_date, match_by, created_at FROM {} m
-
+            
             WHERE
                  NOT EXISTS (SELECT src_name, reg_name FROM {} t WHERE m.src_name = t.org_string)
                  AND m.manual_match_n LIKE 'Y'
+            ON CONFLICT DO NOTHING
         """.format(self.transfer_table, self.upload_table, self.transfer_table)
         return query
 
