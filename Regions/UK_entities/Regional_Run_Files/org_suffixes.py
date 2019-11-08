@@ -1,4 +1,5 @@
 org_suffixes_dict = {
+
     'limited liability partnership': 'llp',
     ' limited liability partnership': 'llp',
     ' limited liability partnership ': 'llp',

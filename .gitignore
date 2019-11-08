@@ -1,4 +1,5 @@
 *.csv
+!/Regions/UK_entities/Data_Inputs/Blacklisted_Entities/blacklisted_entities.csv
 Config_Files/__pycache__/
 .DS_Store/
 __pycache__/
@@ -7,7 +8,7 @@ __pycache__
 .idea/
 *.zip
 .idea/workspace.xml
-*.env
+*.env*
 /Regions/UK_entities/SQL/
 /Regions/UK_entities/Archive/
 *.pyc

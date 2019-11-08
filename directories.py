@@ -10,6 +10,7 @@ dirs = {
                   "raw_reg_data": "{0}",
 
                   "adj_src_data": "{0}",
+                  "adj_src_data1": "src_adj_adjonly.csv",
                   "adj_reg_data": "{0}",
                   "proc_type_dir": '{0}/Outputs/{1}',
                   "proc_type_matches_dir": '{0}/Outputs/{1}/Filtered_Matches',
@@ -19,10 +20,15 @@ dirs = {
                   "match_output_file": '{0}/Outputs/{1}/Deduped_Data/{1}_matched.csv',
                   "deduped_dir": '{0}/Outputs/{1}/Deduped_Data/',
 
+                  "blacklist_file": '{0}/Data_Inputs/Blacklisted_Entities/blacklisted_entities.csv',
+                  "blacklisted_string_matches": '{0}/Data_Inputs/Adj_Data/blacklisted_string_matches.csv',
+
                   "cluster_training_file": '{0}/Data_Inputs/Training_Files/{1}/Clustering/cluster_training.json',
                   "cluster_output_file": '{0}/Outputs/{1}/Deduped_Data/{1}_matched_clustered.csv',
+                  "mancluster_output_file":'{0}/Outputs/{1}/Deduped_Data/{1}_matched_clustered_manually.csv',
 
                   "assigned_output_file": '{0}/Outputs/{1}/Deduped_Data/{1}_matched_clust_assigned.csv',
+                  "script_performance_stats_file": '{0}/Outputs/{1}/Deduped_Data/script_performance_stats.csv',
 
                   "filtered_matches": "{0}/Outputs/{1}/Filtered_Matches/Filtered_Matches",
                   "excluded_matches": "{0}/Outputs/{1}/Filtered_Matches/Excluded_Matches",
@@ -35,7 +41,7 @@ dirs = {
                   "backups_dir": "{0}/Data_Inputs/Training_Files/Manual_&_Backups",
                   "cluster_training_backup": "{0}/Data_Inputs/Training_Files/Manual_&_Backups/cluster_training_backup.json",
                   "unverified_matches_dir": "{0}/Outputs/{1}/Unverified_Matches/",
-                  "verified_matches_dir": "{0}/Outputs/{1}/Verified_Matches/",
+                  "verified_matches_dir": "{0}/Outputs/{1}/Verified_Matches/"
 
             }}
 

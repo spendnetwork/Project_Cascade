@@ -140,9 +140,9 @@ class CascadeExtraction(Main):
 
         levendist = str('leven_dist_N')
 
-        # Round confidence scores to 2dp :
+        # Round Confidence_Scores to 2dp :
 
-        clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
+        clustdf['Confidence_Score'] = clustdf['Confidence_Score'].map(lambda x: round(x, 2))
 
         # Filter by current match_score:
         clustdf = clustdf[clustdf[levendist] >= self.configs['processes'][self.proc_type][self.proc_num]['min_match_score']]
@@ -192,7 +192,7 @@ class CascadeExtraction(Main):
                 self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index_col=None)
             extracts_file = pd.concat([extracts_file, clustdf], ignore_index=True, sort=True)
-            extracts_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+            extracts_file.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
             extracts_file.to_csv(
                 self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index=False)
@@ -281,7 +281,7 @@ class VerificationAndUploads(Main):
                 else:
                     break
 
-            manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+            manual_match_file.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
 
             logging.info("Saving...")
             manual_match_file.to_csv(
@@ -404,9 +404,9 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #         levendist = str('leven_dist_N')
 #
 #
-#     # Round confidence scores to 2dp :
+#     # Round Confidence_Scores to 2dp :
 #     # pdb.set_trace()
-#     clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
+#     clustdf['Confidence_Score'] = clustdf['Confidence_Score'].map(lambda x: round(x, 2))
 #
 #     # Filter by current match_score:
 #     clustdf = clustdf[clustdf[levendist] >= config_files['processes'][proc_type][proc_num]['min_match_score']]
@@ -440,7 +440,7 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #         extracts_file = pd.read_csv(
 #             directories['filtered_matches'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv', index_col=None)
 #         extracts_file = pd.concat([extracts_file, clustdf], ignore_index=True, sort=True)
-#         extracts_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+#         extracts_file.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
 #         extracts_file.to_csv(directories['filtered_matches'].format(region_dir, proc_type) + '_' + str(conf_file_num) + '.csv',
 #                              index=False)
 #         return extracts_file
@@ -495,14 +495,14 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #             else:
 #                 break
 #
-#         manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+#         manual_match_file.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
 #
 #         logging.info("Saving...")
 #         manual_match_file.to_csv(directories['unverified_matches_file'].format(region_dir, proc_type) + '_' + str(best_config) + '.csv',
 #                                  index=False,
 #                                  # columns=['reg_id', 'id', 'reg_name',
 #                                  #          'src_name','reg_address', 'src_address', 'leven_dist_N', 'leven_dist_NA','Manual_Match_N','Manual_Match_NA'])
-#                                 columns = ['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
+#                                 columns = ['Cluster_ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
 #                                            'reg_address', 'src_name', 'src_name_adj', 'src_address', 'src_address_adj', 'reg_address_adj',
 #                                            'Manual_Match_N', 'Manual_Match_NA', 'srcjoinfields', 'regjoinfields'])
 #         return manual_match_file
@@ -513,7 +513,7 @@ def dedupe_matchTEST(src_file, reg_df, region_dir, directories, config_files, pr
 #                                  # columns=['reg_id', 'id', 'reg_name',
 #                                  #          'src_name', 'reg_address', 'src_address', 'leven_dist_N', 'leven_dist_NA',
 #                                  #          'Manual_Match_N', 'Manual_Match_NA'])
-#                                  columns=['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
+#                                  columns=['Cluster_ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
 #                                           'reg_address','src_name', 'src_name_adj', 'src_address', 'src_address_adj', 'reg_address_adj', 'Manual_Match_N','Manual_Match_NA', 'srcjoinfields', 'regjoinfields'])
 #         if not in_args.recycle:
 #             if not in_args.upload:

@@ -43,12 +43,11 @@ def test_clustered_df(settings):
 
 def test_orgids_assigned_to_clusters(settings, test_clustered_df):
     # Tests that any cluster containing rows that have both a match and a none match gets
-    # the match data copied over to the non match rows (highest confidence score)
+    # the match data copied over to the non match rows (highest Confidence_Score)
 
     df_processed = AssignRegDataToClusters.assign(settings, test_clustered_df[0])
     df_processed.to_csv('./df_processed.csv',index=False)
     assert_frame_equal(df_processed, test_clustered_df[1])
-
 
 def test_addlevdist(settings, test_clustered_df):
     # Assert the levenshtein distance column can be added and populated
@@ -78,4 +77,10 @@ def test_regdataprocessing(settings, createTempProjectDirectory, adjust_default_
     assert os.path.exists(os.path.join(tmp_root,settings.directories['adj_dir'].format(settings.region_dir),in_args.reg_adj))
 
 
+def test_adj():
+    pass
+    # test to make sure that adj col are lower case... noted from bug introduced
 
+def test_short():
+    pass
+    # test to make sure that the short column doesnt contain any ltds etc...noted from bug introduced

@@ -20,7 +20,7 @@ class StatsCalculations(Main):
         self.filtered_matches = self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' \
                                 + str(self.conf_file_num) + '.csv'
 
-    def calculate(self):
+    def calculate_internals(self):
 
         # Remove old stats file if exists and if first iteration over config files:
         if os.path.exists(self.directories['stats_file'].format(self.region_dir, self.proc_type)):
@@ -42,7 +42,9 @@ class StatsCalculations(Main):
         statdf.at[self.conf_file_num, 'Pct_Filtered_Matches'] = round(len(filterdf) / len(srcdf) * 100,2)
 
         # Precision - how many of the selected items are relevant to us? (TP/TP+FP)
-        statdf.at[self.conf_file_num, 'Pct_Precision'] = round(len(filterdf) / len(clustdf) * 100, 2)
+        # Doesn't look at verified matches, just the filtered matches vs all matches (therefore is manually decided by the
+        # config files)
+        statdf.at[self.conf_file_num, 'Est_Pct_Precision'] = round(len(filterdf) / len(clustdf) * 100, 2)
         # Recall - how many relevant items have been selected from the entire original source data (TP/TP+FN)
         statdf.at[self.conf_file_num, 'Pct_Recall'] = round(len(filterdf) / len(srcdf) * 100, 2)
 
@@ -60,3 +62,53 @@ class StatsCalculations(Main):
             main_stat_file.to_csv(self.directories['stats_file'].format(self.region_dir, self.proc_type), index=False,
                                   columns=self.stats_cols)
             return main_stat_file
+
+    def calculate_externals(self):
+        '''
+        Calculates final matching statistics by performing analysis over already-matched strings in the database
+        Prioritises already-matched strings and then checks the residual to calculate the overall additional effect
+        of using dedupe
+        '''
+        if self.in_args.prodn_unverified:
+            conn, cur = self.db_calls.DbCalls.createConnection(self)
+
+            # Truncate assigned matches table ready for new upload
+            table = 'matching.assigned_matches'
+            print('Clearing matches.assigned_matches table...')
+
+            query = self.db_calls.DbCalls.truncate_table(self, table)
+            cur.execute(query)
+            conn.commit()
+
+            # Upload new assigned matches to db
+            assigned_matches_fp = self.directories["assigned_output_file"].format(self.region_dir, self.proc_type)
+            print('Uploading new assigned matches to db...')
+            self.db_calls.DbCalls.upload_assigned_matches(self, conn, cur, assigned_matches_fp)
+            print('Done.')
+
+            # Perform join of assigned matches file to orgs lookup to filter for strings already matched in orgs_lookup
+            # and get counts/stats (outputs script_performance_stats_file to /deduped_data)
+            stats_file_fp = self.directories['script_performance_stats_file'].format(self.region_dir, self.proc_type)
+            if not os.path.exists(stats_file_fp):
+                print('Performing join on matches to orgs_lookup...')
+                query = self.db_calls.DbCalls.join_matches_to_orgs_lookup(self)
+                df = pd.read_sql(query, con=conn)
+                df.to_csv(stats_file_fp, index=False)
+                # cur.execute(query)
+                # conn.commit()
+                conn.close()
+                print('Done.')
+
+            # Alter file to add %
+            df = pd.read_csv(stats_file_fp)
+
+            bl_df = pd.read_csv(self.directories['blacklisted_string_matches'].format(self.region_dir))
+            df['residual_script_matches'] = df['merged_matches'] - df['database_matches']
+            df['pct_database_matches_of_merged_matches'] = round(df['database_matches'] / df['merged_matches'] * 100, 2)
+            df['pct_residual_script_matches_of_merged_matches'] = round(df['residual_script_matches'] / df['merged_matches'] * 100,2)
+            df['pct_total_match_rate'] = round(df['merged_matches'] / df['script_string'] * 100, 2)
+            df['blacklisted_matches'] = len(bl_df)
+            df.to_csv(stats_file_fp, index=False)
+
+
+

@@ -247,7 +247,7 @@ class VerificationAndUploads(Main):
                 else:
                     break
 
-            manual_match_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+            manual_match_file.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
 
             logging.info("Saving...")
             manual_match_file.to_csv(
@@ -279,8 +279,8 @@ class CascadeExtraction(Main):
 
         levendist = str('leven_dist_N')
 
-        # Round confidence scores to 2dp :
-        clustdf['Confidence Score'] = clustdf['Confidence Score'].map(lambda x: round(x, 2))
+        # Round Confidence_Scores to 2dp :
+        clustdf['Confidence_Score'] = clustdf['Confidence_Score'].map(lambda x: round(x, 2))
 
         # Filter by current match_score:
         clustdf = clustdf[clustdf[levendist] >= self.configs['processes'][self.proc_type][self.proc_num]['min_match_score']]
@@ -329,7 +329,7 @@ class CascadeExtraction(Main):
                 self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index_col=None)
             extracts_file = pd.concat([extracts_file, clustdf], ignore_index=True, sort=True)
-            extracts_file.sort_values(by=['Cluster ID'], inplace=True, axis=0, ascending=True)
+            extracts_file.sort_values(by=['Cluster_ID'], inplace=True, axis=0, ascending=True)
             extracts_file.to_csv(
                 self.directories['filtered_matches'].format(self.region_dir, self.proc_type) + '_' + str(self.conf_file_num) + '.csv',
                 index=False)

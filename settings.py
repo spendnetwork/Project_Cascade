@@ -10,7 +10,7 @@ class Italy_Settings:
 
     runfile_mods = ITA_run_files
 
-    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'id': np.str, 'src_name': np.str,
+    df_dtypes = {'Cluster_ID': np.float64, 'Confidence_Score': np.float, 'id': np.str, 'src_name': np.str,
                  'src_address': np.str,
                  'src_address_adj': np.str, 'src_name_adj': np.str, 'reg_id': np.str, 'reg_name_adj': np.str,
                  'reg_address': np.str,
@@ -39,7 +39,7 @@ class Italy_Settings:
     stats_cols = ['Config_File', 'Total_Matches', 'Percent_Matches', 'Optim_Matches', 'Percent_Precision',
                      'Percent_Recall', 'Leven_Dist_Avg']
 
-    manual_matches_cols = ['Cluster ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
+    manual_matches_cols = ['Cluster_ID', 'leven_dist_N', 'leven_dist_NA', 'reg_id', 'id', 'reg_name', 'reg_name_adj',
                                            'reg_address', 'src_name', 'src_name_adj', 'src_address', 'src_address_adj', 'reg_address_adj',
                                            'Manual_Match_N', 'Manual_Match_NA', 'srcjoinfields', 'regjoinfields']
 
@@ -56,7 +56,7 @@ class UK_Settings:
 
     runfile_mods = UK_run_files
 
-    df_dtypes = {'Cluster ID': np.float64, 'Confidence Score': np.float, 'ocid': np.str, 'src_name': np.str, 'src_id': np.str,
+    df_dtypes = {'Cluster_ID': np.float64, 'Confidence_Score': np.float, 'ocid': np.str, 'src_name': np.str, 'src_id': np.str,
                  'src_name_adj': np.str, 'src_streetaddress': np.str, 'CH_id': np.str, 'CH_name_adj': np.str,
                  'CH_address': np.str, 'src_name_short': np.str, 'CH_name_short': np.str, 'leven_dist_N': np.int,
                  }
@@ -72,7 +72,8 @@ class UK_Settings:
     stats_cols = ['Config_File', 'Total_Matches', 'Percent_Matches', 'Optim_Matches', 'Percent_Precision',
                   'Percent_Recall', 'Leven_Dist_Avg']
 
-    dbUpload_cols = ['src_name', 'src_id', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N']
+    # We add in the adj names here so the correct fields can be re-added to the training data
+    dbUpload_cols = ['src_name', 'src_id', 'CH_name', 'Manual_Match_N', 'company_url', 'CH_id', 'CH_address', 'leven_dist_N','src_name_adj','reg_name_adj']
 
     # Need to define proc_num here otherwise will not be carried through as part of 'self'
     proc_num = int
@@ -95,14 +96,14 @@ class UK_entities(UK_Settings):
     def __init__(self):
         super().__init__(self)
 
-    df_dtypes = {'Cluster ID': np.int, 'Confidence Score': np.float,
+    df_dtypes = {'Cluster_ID': np.int, 'Confidence_Score': np.float,
                  'src_name': np.str, 'src_name_adj': np.str, 'src_streetaddress': np.str, 'src_streetaddress_adj': np.str, 'src_name_short': np.str,
                  'src_address_locality': np.str, 'src_address_postalcode': np.str, 'src_address_streetaddress': np.str,
                  'reg_id': np.str, 'reg_name_adj': np.str, 'reg_address': np.str, 'reg_address_adj': np.str,  'reg_name_short': np.str,
                  'leven_dist_N': np.int, 'leven_dist_NA': np.int,
                  'Manual_Match_N':np.str,  'Manual_Match_NA': np.str,
                  'src_joinfields':np.str, 'reg_joinfields': np.str, 'src_tag':np.str,
-                 'reg_source': np.str, 'reg_created_at': np.str, 'reg_scheme':np.str, 'src_address_adj': np.str,
+                 'match_source': np.str, 'created_at': np.str, 'reg_scheme':np.str, 'src_address_adj': np.str,
                  'match_by': np.str, 'match_date':np.str
                  }
 
@@ -115,15 +116,15 @@ class UK_entities(UK_Settings):
     reg_data_source = 'ocds.orgs_ocds'
     src_data_source = 'ocds.ocds_tenders_view'
     upload_table = 'matching.uk_entities'
-    transfer_table = 'matching.test_orgs_lookup'
+    transfer_table = 'matching.orgs_lookup'
 
     dedupe_cols = ['src_name','src_tag', 'src_name_adj', 'src_address_adj',
                    'reg_id', 'reg_name', 'reg_name_adj', 'reg_address', 'reg_address_adj','src_joinfields', 'reg_joinfields',
-                   'reg_source', 'reg_created_at', 'reg_scheme']
+                   'match_source', 'created_at', 'reg_scheme']
 
     raw_src_data_cols = ['src_name','src_tag','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress']
 
-    dbUpload_cols = ['src_name', 'reg_name','leven_dist_N',  'Manual_Match_N', 'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA', 'reg_id',  'src_tag', 'src_id', 'reg_source', 'reg_created_at', 'reg_scheme','match_date', 'match_by']
+    dbUpload_cols = ['src_name', 'reg_name','leven_dist_N',  'Manual_Match_N', 'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA', 'reg_id',  'src_tag', 'src_id', 'match_source', 'created_at', 'reg_scheme','match_date', 'match_by']
 
     manual_matches_cols = [ 'src_name','src_tag',  'reg_name', 'Manual_Match_N', 'leven_dist_N',
                            'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA',
@@ -135,7 +136,7 @@ class UK_entities(UK_Settings):
                             'src_joinfields',
                             'reg_joinfields',
                             'reg_source',
-                            'reg_created_at',
+                            'created_at',
                             'reg_scheme',
                             'match_by',
                             'match_date'
@@ -153,7 +154,7 @@ class CQC_settings(UK_entities):
     reg_data_source = 'uk_data.cqc_hsca_locations'
     # ocds.cqc_orgs_lookup, ocds.cqc_ratings_locations, ocds.cqc_ratings_providers
 
-    df_dtypes = {'Cluster ID': np.int, 'Confidence Score': np.float,
+    df_dtypes = {'Cluster_ID': np.int, 'Confidence_Score': np.float,
                  'src_name': np.str, 'src_name_adj': np.str,
                  'src_name_short': np.str,
                  'reg_id': np.str, 'reg_name_adj': np.str,

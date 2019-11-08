@@ -78,10 +78,25 @@ class ClearFiles(Setup):
             self.clear_extract_matches()
             self.clear_deduped_data()
 
-        if self.in_args.clear_post_matching:
+        if self.in_args.clear_filtered:
             self.clear_extract_matches()
             self.clear_unverified_matches()
             self.clear_verified_matches()
+
+        if self.in_args.clear_clustered:
+            self.clear_clustered_data()
+            self.clear_extract_matches()
+            self.clear_unverified_matches()
+            self.clear_verified_matches()
+
+        if self.in_args.clear_manclustered:
+            # Clears all verified, unverified, filtered, assigned and manually clustered files. (Keeps deduped matched and clustered).
+            self.clear_manually_clustered_data()
+            self.clear_extract_matches()
+            self.clear_unverified_matches()
+            self.clear_verified_matches()
+
+
 
     @staticmethod
     def removeFiles(fp):
@@ -113,3 +128,11 @@ class ClearFiles(Setup):
         self.removeFiles(os.path.join(self.directories['adj_dir'].format(self.region_dir), '*'))
         self.removeFiles(os.path.join(self.directories['splits_inputs_dir'].format(self.region_dir), '*'))
 
+    def clear_clustered_data(self):
+        self.removeFiles(self.directories["cluster_output_file"].format(self.region_dir, self.proc_type))
+        self.removeFiles(self.directories["mancluster_output_file"].format(self.region_dir, self.proc_type))
+        self.removeFiles(self.directories['assigned_output_file'].format(self.region_dir, self.proc_type))
+
+    def clear_manually_clustered_data(self):
+        self.removeFiles(self.directories["mancluster_output_file"].format(self.region_dir, self.proc_type))
+        self.removeFiles(self.directories['assigned_output_file'].format(self.region_dir, self.proc_type))

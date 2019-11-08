@@ -13,5 +13,7 @@ def test_raw_files_dirs_exist(transfer_data_files):
 def test_clear_files():
     pass
 
-
+def test_training_files():
+    pass
+    # test to check that if no training files present, the training flags get added and called individually.
 
