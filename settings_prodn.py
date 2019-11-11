@@ -103,7 +103,7 @@ class UK_entities(UK_Settings):
                  'leven_dist_N': np.int, 'leven_dist_NA': np.int,
                  'Manual_Match_N':np.str,  'Manual_Match_NA': np.str,
                  'src_joinfields':np.str, 'reg_joinfields': np.str, 'src_tag':np.str,
-                 'match_source': np.str, 'created_at': np.str, 'reg_scheme':np.str, 'src_address_adj': np.str,
+                 'match_source': np.str,'reg_scheme':np.str, 'src_address_adj': np.str,
                  'match_by': np.str, 'match_date':np.str
                  }
 
@@ -120,11 +120,11 @@ class UK_entities(UK_Settings):
 
     dedupe_cols = ['src_name','src_tag', 'src_name_adj', 'src_address_adj',
                    'reg_id', 'reg_name', 'reg_name_adj', 'reg_address', 'reg_address_adj','src_joinfields', 'reg_joinfields',
-                   'match_source', 'created_at', 'reg_scheme']
+                   'match_source', 'reg_scheme']
 
     raw_src_data_cols = ['src_name','src_tag','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress']
 
-    dbUpload_cols = ['src_name', 'reg_name','leven_dist_N',  'Manual_Match_N', 'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA', 'reg_id',  'src_tag', 'src_id', 'match_source', 'created_at', 'reg_scheme','match_date', 'match_by']
+    dbUpload_cols = ['src_name', 'reg_name','leven_dist_N',  'Manual_Match_N', 'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA', 'reg_id',  'src_tag', 'src_id', 'match_source', 'reg_scheme','match_date', 'match_by']
 
     manual_matches_cols = [ 'src_name','src_tag',  'reg_name', 'Manual_Match_N', 'leven_dist_N',
                            'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA',
@@ -136,7 +136,7 @@ class UK_entities(UK_Settings):
                             'src_joinfields',
                             'reg_joinfields',
                             'reg_source',
-                            'created_at',
+
                             'reg_scheme',
                             'match_by',
                             'match_date'

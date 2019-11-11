@@ -205,8 +205,8 @@ class FetchData(DbCalls):
            id as reg_id,
            '' as reg_address,
            scheme as reg_scheme,
-           'dedupe_script' as match_source,
-           '' as created_at
+           'dedupe_script' as match_source
+           
             from {}
 
             """.format(self.reg_data_source)

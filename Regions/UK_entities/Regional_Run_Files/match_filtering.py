@@ -77,7 +77,7 @@ class MatchFiltering(Main):
             filtered_file = filtered_file[
                 ['src_name', 'reg_name', 'src_name_short', 'reg_name_short', 'leven_dist_N', 'Cluster_ID',
                  'Confidence_Score', 'leven_dist_NA', 'match_by', 'match_date', 'process_num', 'reg_address',
-                 'reg_address_adj', 'created_at', 'reg_id', 'reg_joinfields', 'reg_name_adj', 'reg_scheme',
+                 'reg_address_adj', 'reg_id', 'reg_joinfields', 'reg_name_adj', 'reg_scheme',
                  'match_source', 'reg_str_len', 'src_address_adj', 'src_joinfields', 'src_name_adj', 'src_str_len',
                  'src_tag']]
             filtered_file.sort_values(by=['leven_dist_N'], inplace=True, axis=0, ascending=False)
@@ -140,7 +140,7 @@ class MatchFiltering(Main):
             excluded_file = pd.concat([excluded_file, df], ignore_index=True, sort=True)
             excluded_file = excluded_file[['src_name', 'reg_name', 'src_name_short', 'reg_name_short', 'leven_dist_N', 'Cluster_ID',
                      'Confidence_Score', 'leven_dist_NA', 'match_by', 'match_date', 'process_num', 'reg_address',
-                     'reg_address_adj', 'created_at', 'reg_id', 'reg_joinfields', 'reg_name_adj', 'reg_scheme',
+                     'reg_address_adj', 'reg_id', 'reg_joinfields', 'reg_name_adj', 'reg_scheme',
                      'match_source', 'reg_str_len', 'src_address_adj', 'src_joinfields', 'src_name_adj', 'src_str_len',
                      'src_tag']]
             excluded_file.sort_values(by=['leven_dist_N'], inplace=True, axis=0, ascending=False)

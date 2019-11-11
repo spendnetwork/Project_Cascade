@@ -318,7 +318,7 @@ class ProcessRegistryData(DataProcessing):
 
             dffullmerge['reg_joinfields'] = dffullmerge['reg_joinfields'].astype(str)
             dffullmerge['match_source'] = dffullmerge['match_source'].astype(str)
-            dffullmerge['created_at'] = dffullmerge['created_at'].astype(str)
+
             dffullmerge['reg_scheme'] = dffullmerge['reg_scheme'].astype(str)
             dffullmerge['reg_id'] = dffullmerge['reg_id'].astype(str)
             dffullmerge['reg_address_adj'] = dffullmerge['reg_address_adj'].astype(str)
@@ -378,5 +378,5 @@ class AssignRegDataToClusters:
                 group.at[index, 'reg_address_adj'] = group['reg_address_adj'][max_conf_idx]
                 group.at[index, 'reg_scheme'] = group['reg_scheme'][max_conf_idx]
                 group.at[index, 'match_source'] = group['match_source'][max_conf_idx]
-                group.at[index, 'created_at'] = group['created_at'][max_conf_idx]
+
         return group
