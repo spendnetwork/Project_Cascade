@@ -91,7 +91,7 @@ class DbCalls(Main):
         query = \
         """
         INSERT INTO {}
-            SELECT DISTINCT src_name, reg_scheme, reg_id, reg_name, match_source, match_date, match_by, created_at FROM {} m
+            SELECT DISTINCT src_name, reg_scheme, reg_id, reg_name, match_source, match_date, match_by FROM {} m
             
             WHERE
                  NOT EXISTS (SELECT src_name, reg_name FROM {} t WHERE m.src_name = t.org_string)
