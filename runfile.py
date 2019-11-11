@@ -31,7 +31,7 @@ def createSettingsObj(rootdir, in_args, settings):
         settings = settings.CQC_settings
 
     # If any production flags are being called use production logger...
-    if in_args.prodn_verified or in_args.prodn_unverified:
+    if in_args.verified or in_args.unverified:
         config_stdout_root_logger_with_papertrail(app_name='entity_matching', level=logging.DEBUG)
 
     # ...else use local logger
@@ -101,8 +101,8 @@ def getInputArgs(rootdir, args=None):
                         , help='Set source data start date to be downloaded from (inclusive)')
     parser.add_argument('--data_to_date', type=str, default=datetime.date.today().strftime('%Y-%m-%d'),
                         help='Set source data end date to be downloaded (inclusive)')
-    parser.add_argument('--prodn_unverified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
-    parser.add_argument('--prodn_verified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
+    parser.add_argument('--unverified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
+    parser.add_argument('--verified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--split', action='store_true', help='split source file and initiate segmented matching')
     parser.add_argument('--splitsize', default=1000, type=int, help='split source file and initiate segmented matching')
 

@@ -69,7 +69,7 @@ class StatsCalculations(Main):
         Prioritises already-matched strings and then checks the residual to calculate the overall additional effect
         of using dedupe
         '''
-        if self.in_args.prodn_unverified:
+        if self.in_args.unverified:
             conn, cur = self.db_calls.DbCalls.createConnection(self)
 
             # Truncate assigned matches table ready for new upload

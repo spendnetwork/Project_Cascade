@@ -201,14 +201,14 @@ class AwsTransfers(Main):
         :return: None
         '''
 
-        if self.in_args.prodn_unverified:
+        if self.in_args.unverified:
             files = glob.glob(os.path.join(self.directories['unverified_matches_dir'].format(self.region_dir, self.proc_type), '*'))
 
             for filepath in files:
                 filename = os.path.basename(filepath)
                 self.upload_file(filepath, self.bucket, 'Unverified_matches/' + filename)
 
-        if self.in_args.prodn_verified:
+        if self.in_args.verified:
             self.download_verified_files()
 
     def download_verified_files(self):

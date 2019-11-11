@@ -29,8 +29,8 @@ class AwsTransfers(Main):
         Core function for the class. Checks args and either uploads to or downloads from s3 bucket
         """
 
-        # Upload unverified matches to s3 bucket if prodn_unverified argument used (production only)
-        if self.in_args.prodn_unverified:
+        # Upload unverified matches to s3 bucket if unverified argument used (production only)
+        if self.in_args.unverified:
             files = glob.glob(os.path.join(self.directories['unverified_matches_dir'].format(self.region_dir, self.proc_type), '*'))
 
             # Loop through files found in unverified_matches folder
@@ -55,7 +55,7 @@ class AwsTransfers(Main):
 
             stats_file_fp = self.directories['script_performance_stats_file'].format(self.region_dir, self.proc_type)
 
-            # Assign zip file which will contain above files
+            # Assign zip file which  will contain above files
             files_zip = self.unverified_file[:10] + "_files.zip"
 
             with ZipFile(files_zip, 'w') as myzip:
@@ -67,8 +67,8 @@ class AwsTransfers(Main):
 
             self.upload_file(files_zip, self.bucket, 'UK_entities/Archive/' + files_zip)
 
-        # Download verified matches from s3 bucket if prodn_verified argument (production only)
-        if self.in_args.prodn_verified:
+        # Download verified matches from s3 bucket if verified argument (production only)
+        if self.in_args.verified:
             self.process_verified_files()
 
         # Add confirmed matches/non-matches to training file
