@@ -1,0 +1,11 @@
+.ipynb_checkpoints/
+.vscode/
+env/
+
+
+*.pkl
+*.csv
+*.txt
+
+!requirements.txt
+!runtime.txt

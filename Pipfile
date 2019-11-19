@@ -22,6 +22,10 @@ pandas = "==0.24.2"
 pyyaml = "*"
 pytest-pgsql = "*"
 core = {editable = true,path = "./../core"}
+sklearn = "*"
+snorkel = "*"
+keras = "*"
+bottle = "*"
 
 [requires]
 python_version = "3.6"

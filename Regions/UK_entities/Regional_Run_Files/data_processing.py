@@ -60,7 +60,6 @@ class DataProcessing(Main):
         df_dup[adj_col] = df_dup[adj_col].str.replace(" and ", " & ")
         df_adj = pd.concat([df,df_dup]).sort_index().reset_index(drop=True)
 
-        # WONT ALL &'S BE REMOVED IN REMOVEPUNCT? THEREFORE REDUCING DIRECT MATCHES TO ORGS LOOKUP. IS REMOVEPUNCT NEEDED?
         return df_adj
 
     def duplicaterowscontainingampersand(self, df, adj_col):
