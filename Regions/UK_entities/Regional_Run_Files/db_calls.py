@@ -232,16 +232,10 @@ class FetchData(DbCalls):
                 
                   FROM {0} as t
                 WHERE TRUE
-                  AND (t.source in (
-                      'cf_notices',
-                      ''
-                   )
-                  OR (source = 'ted_notices' AND countryname = 'United Kingdom')
-                  )
+                  AND t.countryname IN ('United Kingdom','England','Scotland','Northern Ireland','Wales')
+                  AND t.buyer NOTNULL
                   AND t.releasedate >= {1}
                   AND t.releasedate <= {2}
-                   --AND t.json -> 'releases' -> 0 -> 'tag' ? 'tender'
-                   --AND t.json -> 'releases' -> 0 -> 'tag' ? 'award'
                 ;
         
                 """.format(self.src_data_source, "'" + self.in_args.data_from_date + "'", "'" + self.in_args.data_to_date + "'")
@@ -259,9 +253,10 @@ class FetchData(DbCalls):
 
                   FROM {0} as t
                 WHERE TRUE
+                  AND t.buyer NOTNULL
                   AND t.releasedate >= '2009-09-11 00:00:00.000000'
                   AND t.releasedate <= '2015-09-11 00:00:00.000000'
-                  AND countryname = 'United Kingdom'
+                  AND t.countryname IN ('United Kingdom','England','Scotland','Northern Ireland','Wales')
                    
                    LIMIT 2000
                 ;
