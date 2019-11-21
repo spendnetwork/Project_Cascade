@@ -29,7 +29,7 @@ def createSettingsObj(rootdir, in_args, settings):
 
     if in_args.region == 'CQC':
         settings = settings.CQC_settings
-
+    pdb.set_trace()
     # If any production flags are being called use production logger...
     if in_args.verified or in_args.unverified:
         config_stdout_root_logger_with_papertrail(app_name='entity_matching', level=logging.DEBUG)

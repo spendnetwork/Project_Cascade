@@ -12,7 +12,7 @@ load_dotenv()
 def load_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--datadir', default='./data')
-    parser.add_argument('--datafile', type=str, default='2019-11-11_matches.csv')
+    parser.add_argument('--datafile', type=str, default='french_data.csv')
     args = parser.parse_args()
     filename = os.path.splitext(args.datafile)[0]
     parser.add_argument('--outfile', type=str, default=filename + '_googleentities.csv')
@@ -56,9 +56,12 @@ def analyze_entities(row, client):
 
         # Convert response to dictionary (can't use json.loads for google response)
         respdict = MessageToDict(response)
+        # pdb.set_trace()
         for i in range(len(respdict['entities'])):
             resptype = respdict['entities'][i]['type']
+
             if resptype == 'ADDRESS':
+                # pdb.set_trace()
                 address_data = respdict['entities'][i]['metadata']
                 # Assign to row object and return to dataframe
                 for key, value in address_data.items():
@@ -73,7 +76,9 @@ def main():
     df = load_data(args)
 
     client = initialise_google_NL_api()
-    df = df[:10]
+    # df = df[:10]
+    # pdb.set_trace()
+
     df = df.apply(analyze_entities, client=client, axis=1)
     save_data(df, args)
 
