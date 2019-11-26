@@ -193,11 +193,12 @@ class ProcessSourceData(DataProcessing):
 
             # # Remove punctuation and double spacing in address
             adj_col = str('src_address_adj')
-            df[adj_col] = df['src_address_streetaddress'] + ', ' + df['src_address_locality'] + ', ' + df['src_address_postalcode'] + ', ' + df['src_address_countryname']
+            cols = ['src_address_streetaddress', 'src_address_locality', 'src_address_postalcode',
+                          'src_address_countryname']
+            df[adj_col] = df[cols].apply(lambda x: ', '.join(x.dropna()),axis=1)
             df = DataProcessing.remvPunct(self, df, adj_col, adj_col)
             df = DataProcessing.joinFields(self, df, 'src')
-            df = df.drop(['src_address_streetaddress', 'src_address_locality', 'src_address_postalcode',
-                          'src_address_countryname'], axis=1)
+            df = df.drop(cols, axis=1)
             logging.info("...done")
 
             # Remove blacklisted entities

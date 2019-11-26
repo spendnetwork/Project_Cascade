@@ -43,7 +43,7 @@ def analyze_entities(row, client):
       text_content The text content to analyze
     """
     # Get address from row object (from datafile)
-    text_content = row.src_address_adj
+    text_content = row.src_address
     # text_content = row.combolala
     if pd.notnull(text_content):
         # Google API configs
