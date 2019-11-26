@@ -13,7 +13,7 @@ load_dotenv()
 def load_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--datadir', default='./data')
-    parser.add_argument('--datafile', type=str, default='2019-11-11_matches.csv')
+    parser.add_argument('--datafile', type=str, default='src_data_adj_21_25nov.csv')
     args = parser.parse_args()
     filename = os.path.splitext(args.datafile)[0]
     parser.add_argument('--outfile', type=str, default=filename + '_googleentities.csv')
@@ -43,8 +43,8 @@ def analyze_entities(row, client):
       text_content The text content to analyze
     """
     # Get address from row object (from datafile)
-    text_content = row.src_address
-    # text_content = row.combolala
+    text_content = row.src_address_adj
+
     if pd.notnull(text_content):
         # Google API configs
         type_ = enums.Document.Type.PLAIN_TEXT
@@ -98,14 +98,22 @@ def main():
     args = load_args()
 
     df = load_data(args)
+    df = df.drop_duplicates()
 
     client = initialise_google_NL_api()
-    # df = df[:100]
+    # Shuffle dataframe (frac=1 means keep all rows), and reset index
+    # df = df.sample(frac=1).reset_index(drop=True)
+    # Take sample of shuffled dataframe
+    # df = df[:1000]
 
     df = df.apply(analyze_entities, client=client, axis=1)
 
     # Clean up json string
     df['json'] = df['json'].apply(remove_whitespace_unless_in_quotes)
+
+    df = df.reindex(columns=['src_name','src_address_adj','street_number','street_name','sublocality',
+                             'locality','narrow_region','broad_region','country','postal_code','json','source', 'src_name_adj','src_tag',
+                             'src_joinfields'])
 
     save_data(df, args)
 

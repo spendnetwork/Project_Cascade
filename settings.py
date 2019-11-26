@@ -122,7 +122,7 @@ class UK_entities(UK_Settings):
                    'reg_id', 'reg_name', 'reg_name_adj', 'reg_address', 'reg_address_adj','src_joinfields', 'reg_joinfields',
                    'match_source', 'reg_scheme']
 
-    raw_src_data_cols = ['src_name','src_tag','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress']
+    raw_src_data_cols = ['src_name','src_tag','src_address_locality','src_address_postalcode', 'src_address_countryname','src_address_streetaddress','source']
 
     dbUpload_cols = ['src_name', 'reg_name','leven_dist_N',  'Manual_Match_N', 'src_address_adj', 'reg_address_adj', 'Manual_Match_NA', 'leven_dist_NA', 'reg_id',  'src_tag', 'src_id', 'match_source', 'reg_scheme','match_date', 'match_by']
 

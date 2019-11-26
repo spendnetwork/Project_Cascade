@@ -167,7 +167,7 @@ class ProcessSourceData(DataProcessing):
         if not os.path.exists(adj_data):
             df = pd.read_csv(raw_data, usecols=self.raw_src_data_cols,
                              dtype=self.df_dtypes)
-
+            pdb.set_trace()
             logging.info("Re-organising source data...")
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
@@ -196,9 +196,13 @@ class ProcessSourceData(DataProcessing):
             cols = ['src_address_streetaddress', 'src_address_locality', 'src_address_postalcode',
                           'src_address_countryname']
             df[adj_col] = df[cols].apply(lambda x: ', '.join(x.dropna()),axis=1)
+
             df = DataProcessing.remvPunct(self, df, adj_col, adj_col)
+
             df = DataProcessing.joinFields(self, df, 'src')
+
             df = df.drop(cols, axis=1)
+
             logging.info("...done")
 
             # Remove blacklisted entities
