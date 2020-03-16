@@ -265,8 +265,6 @@ class Main:
 
 if __name__ == '__main__':
 
-    division_by_zero = 1 / 0
-
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = getInputArgs(rootdir)
     # Set environment variable (prodn, staging(default if prodn arg not called))
