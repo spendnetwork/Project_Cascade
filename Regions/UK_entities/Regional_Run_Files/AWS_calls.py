@@ -98,11 +98,11 @@ class AwsTransfers(Main):
                              verified_fp)
 
         # Upload all files in verified_matches_dir to our database:
-        if self.in_args.upload:
-            self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
-
+        # if self.in_args.upload:
+        #     self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
+        #
         # Loop through retrieved verified matches files from S3 bucket
-
+        pdb.set_trace()
         for i in range(len(files)):
             try:
                 # Delete from unverified folder (if hasn't been done by team already) so team know which haven't been
