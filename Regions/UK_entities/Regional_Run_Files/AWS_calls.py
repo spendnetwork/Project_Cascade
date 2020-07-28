@@ -98,19 +98,18 @@ class AwsTransfers(Main):
                              verified_fp)
 
         # Upload all files in verified_matches_dir to our database:
-        # if self.in_args.upload:
-        #     self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
-        #
+        if self.in_args.upload:
+            self.runfile_mods.db_calls.DbCalls(self).addDataToTable()
+
         # Loop through retrieved verified matches files from S3 bucket
-        pdb.set_trace()
+
         for i in range(len(files)):
             try:
                 # Delete from unverified folder (if hasn't been done by team already) so team know which haven't been
                 # verified yet (located via date prefix of verified file incase of name change by team)
                 if self.in_args.upload:
-
                     s3.delete_object(Bucket=self.bucket, Key=os.path.join('UK_entities','Unverified_Matches', os.path.basename(files[i]['Key'])))
-            except:
+            except FileNotFoundError:
                 pass
 
             # For each verified file, iterate over S3 zip files and download the corresponding zip.
@@ -150,7 +149,10 @@ class AwsTransfers(Main):
                             unverified = len(ver_file) - true_positives - false_positives
                             stats_file['true_positives'] = true_positives
                             stats_file['false_positives'] = false_positives
-                            stats_file['script_precision'] = round((true_positives / (false_positives + true_positives)) * 100, 2)
+                            try:
+                                stats_file['script_precision'] = round((true_positives / (false_positives + true_positives)) * 100, 2)
+                            except ZeroDivisionError:
+                                stats_file['script_precision'] = 0
                             stats_file['unverified'] = unverified
                             stats_file.to_csv(self.directories['script_performance_stats_file'].format(self.region_dir, self.proc_type)
                                               ,index=False)

@@ -11,8 +11,8 @@ import sys
 import pdb
 from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
 from dotenv import load_dotenv
-import sentry_sdk
-sentry_sdk.init("https://e690e6e8120b4d38b909772ecf4380ce@sentry.io/4917852")
+# import sentry_sdk
+# sentry_sdk.init("https://e690e6e8120b4d38b909772ecf4380ce@sentry.io/4917852")
 
 def createSettingsObj(rootdir, in_args, settings):
 
