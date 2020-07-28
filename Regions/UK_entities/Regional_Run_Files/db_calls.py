@@ -236,7 +236,7 @@ class FetchData(DbCalls):
                   AND t.buyer NOTNULL
                   AND t.releasedate >= {1}
                   AND t.releasedate <= {2}
-                  LIMIT 100
+                  
                 ;
         
                 """.format(self.src_data_source, "'" + self.in_args.data_from_date + "'", "'" + self.in_args.data_to_date + "'")

@@ -53,7 +53,14 @@ def createSettingsObj(rootdir, in_args, settings):
 
     # '.env_production' / '.env_staging'
     settings.dotenv_file = os.path.join(rootdir,'.env_' + os.environ.get('ENV'))
-
+    # Clear any existing db creds (in webapps these load automatically from an env file closer to the root)
+    try:
+        del os.environ["HOST_REMOTE"]
+        del os.environ["DBNAME_REMOTE"]
+        del os.environ["USER_REMOTE"]
+        del os.environ["PASSWORD_REMOTE"]
+    except:
+        next
     # get the remote database details from .env
     load_dotenv(settings.dotenv_file)
     settings.host_remote = os.environ.get("HOST_REMOTE")
