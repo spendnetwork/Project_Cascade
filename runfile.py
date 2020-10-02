@@ -28,6 +28,9 @@ def createSettingsObj(rootdir, in_args, settings):
     if in_args.region == 'UK_entities':
         settings = settings.UK_entities
 
+    if in_args.region == 'UK_suppliers':
+        settings = settings.UK_suppliers
+
     if in_args.region == 'CQC':
         settings = settings.CQC_settings
 
