@@ -161,10 +161,10 @@ class FetchData(DbCalls):
 
         if not os.path.exists(self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_reg_data'].format(self.in_args.reg)):
             # Check env file exists
-            env_fpath = self.dotenv_file
-            if not os.path.exists(env_fpath):
-                logging.info("Database credentials not found. Please complete the .env file using the '.env template'")
-                sys.exit()
+            # env_fpath = self.dotenv_file
+            # if not os.path.exists(env_fpath):
+            #     logging.info("Database credentials not found. Please complete the .env file using the '.env template'")
+            #     sys.exit()
 
             # Load registry data
             query = self.db_calls.FetchData.createRegistryDataSQLQuery(self)
@@ -178,11 +178,11 @@ class FetchData(DbCalls):
                 self.directories['raw_dir'].format(self.region_dir) + self.directories['raw_src_data'].format(
                     self.in_args.src)):
 
-            env_fpath = self.dotenv_file
-            if not os.path.exists(env_fpath):
-                logging.info(
-                    "Database credentials not found. Please complete the .env file using the '.env template'")
-                sys.exit()
+            # env_fpath = self.dotenv_file
+            # if not os.path.exists(env_fpath):
+            #     logging.info(
+            #         "Database credentials not found. Please complete the .env file using the '.env template'")
+            #     sys.exit()
 
             # Load source data
 
