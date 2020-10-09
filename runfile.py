@@ -252,9 +252,8 @@ class Main:
         self.data_analysis.StatsCalculations(self).calculate_externals() # long runtime - use concurrency here?
         self.best_config = self.match_filtering.VerificationAndUploads(self).verify()
 
-        if in_args.region == 'UK_entities':
-            self.AWS_calls = self.runfile_mods.AWS_calls
-            self.AWS_calls.AwsTransfers(self).transfer()
+        self.AWS_calls = self.runfile_mods.AWS_calls
+        self.AWS_calls.AwsTransfers(self).transfer()
 
 
 if __name__ == '__main__':
