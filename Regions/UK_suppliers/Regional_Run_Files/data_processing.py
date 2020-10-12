@@ -26,8 +26,11 @@ class DataProcessing(Main):
         #     str.maketrans({key: None for key in string.punctuation})).str.replace("  ", " ").str.lower().str.strip()
 
         # Introduced 'remove' to allow the translate method to ignore "&" when removing punctuation
-        df[adj_col] = df[orig_col].str.translate(
-            str.maketrans({key: None for key in remove})).str.replace("  ", " ").str.lower().str.strip()
+        try:
+            df[adj_col] = df[orig_col].str.translate(
+                str.maketrans({key: None for key in remove})).str.replace("  ", " ").str.lower().str.strip()
+        except:
+            df[adj_col] = df[orig_col]
 
         return df
 
@@ -173,6 +176,8 @@ class ProcessSourceData(DataProcessing):
             # Remove punctuation and double spacing in name
             adj_col = str('src_name_adj')
             orig_col = str('src_name')
+
+            df = df.dropna(subset=[orig_col])
 
             # Decode html entities i.e. "&amp;" into "&"
             df[adj_col] = df[orig_col].apply(html.unescape)

@@ -4,13 +4,14 @@ import os
 import ast
 from pathlib import Path
 import yaml
-import settings, settings_prodn, settings_staging
+import settings
 import datetime
 import logging.config
 import sys
 import pdb
-from core.logging_config import add_papertrail_logging_to_webapps, config_stdout_root_logger_with_papertrail
-from dotenv import load_dotenv
+from core.logging_config import config_stdout_root_logger_with_papertrail
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
 # import sentry_sdk
 # sentry_sdk.init("https://e690e6e8120b4d38b909772ecf4380ce@sentry.io/4917852")
 
@@ -19,20 +20,11 @@ def createSettingsObj(rootdir, in_args, settings):
     # Silence warning for df['process_num'] = str(proc_num)
     pd.options.mode.chained_assignment = None
 
-    if in_args.region == 'Italy':
-        settings = settings.Italy_Settings
-
-    if in_args.region == 'UK':
-        settings = settings.UK_Settings
-
     if in_args.region == 'UK_entities':
         settings = settings.UK_entities
 
     if in_args.region == 'UK_suppliers':
         settings = settings.UK_suppliers
-
-    if in_args.region == 'CQC':
-        settings = settings.CQC_settings
 
     # If any production flags are being called use production logger...
     if in_args.verified or in_args.unverified:
@@ -55,7 +47,7 @@ def createSettingsObj(rootdir, in_args, settings):
     settings.region_dir = os.path.join(rootdir, 'Regions', in_args.region)
 
     # '.env_production' / '.env_staging'
-    settings.dotenv_file = os.path.join(rootdir,'.env_' + os.environ.get('ENV'))
+
     # Clear any existing db creds (in webapps these load automatically from an env file closer to the root)
     try:
         del os.environ["HOST_REMOTE"]
@@ -65,7 +57,11 @@ def createSettingsObj(rootdir, in_args, settings):
     except:
         next
     # get the remote database details from .env
-    load_dotenv(settings.dotenv_file)
+    if in_args.prodn:
+        env_file = '.env_production'
+    else:
+        env_file = '.env_staging'
+    load_dotenv(env_file)
     settings.host_remote = os.environ.get("HOST_REMOTE")
     settings.dbname_remote = os.environ.get("DBNAME_REMOTE")
     settings.user_remote = os.environ.get("USER_REMOTE")
@@ -122,18 +118,6 @@ def getInputArgs(rootdir, args=None):
     # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
     pargs = parser.parse_args(args)
 
-    # # If the clustering training file does not exist (therefore the matching train file too as this is created before the former)
-    # # Force an error and prompt user to add the training flag
-    # if pargs.ctraining == False and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Clustering/cluster_training.json")):
-    #     print("Dedupe training files do not exist - running with --training flag to initiate training process")
-    #     parser.add_argument('--ctraining', action='store_true', help='Modify/contribute to the cluster training data')
-    #
-    # if pargs.mtraining == False and not os.path.exists(os.path.join(rootdir,"Regions",pargs.region,"Data_Inputs/Training_Files/Name_Only/Matching/matching_training.json")):
-    #     print("Dedupe training files do not exist - running with --training flag to initiate training process")
-    #     parser.add_argument('--mtraining', action='store_true', help='Modify/contribute to the matching training data')
-    #
-    # pargs = parser.parse_args(args)
-
     return pargs, parser
 
 
@@ -179,7 +163,7 @@ class Main:
         self.best_config = settings.best_config
 
         # Dotenv vars
-        self.dotenv_file = settings.dotenv_file
+        # self.dotenv_file = settings.dotenv_file
         self.host_remote = settings.host_remote
         self.dbname_remote = settings.dbname_remote
         self.user_remote = settings.user_remote
@@ -268,9 +252,8 @@ class Main:
         self.data_analysis.StatsCalculations(self).calculate_externals() # long runtime - use concurrency here?
         self.best_config = self.match_filtering.VerificationAndUploads(self).verify()
 
-        if in_args.region == 'UK_entities':
-            self.AWS_calls = self.runfile_mods.AWS_calls
-            self.AWS_calls.AwsTransfers(self).transfer()
+        self.AWS_calls = self.runfile_mods.AWS_calls
+        self.AWS_calls.AwsTransfers(self).transfer()
 
 
 if __name__ == '__main__':
@@ -280,12 +263,6 @@ if __name__ == '__main__':
     # Set environment variable (prodn, staging(default if prodn arg not called))
     # https: // able.bio / rhett / how - to - set - and -get - environment - variables - in -python - -274
     # rgt5
-    if in_args.prodn:
-        os.environ['ENV'] = 'production'
-        settings = settings_prodn
-    else:
-        os.environ['ENV'] = 'staging'
-        settings = settings_staging
 
     settingsobj = createSettingsObj(rootdir, in_args, settings)
 
