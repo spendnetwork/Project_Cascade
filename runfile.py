@@ -8,12 +8,11 @@ import settings
 import datetime
 import logging.config
 import sys
-import pdb
 from core.logging_config import config_stdout_root_logger_with_papertrail
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
-# import sentry_sdk
-# sentry_sdk.init("https://e690e6e8120b4d38b909772ecf4380ce@sentry.io/4917852")
+from dotenv import load_dotenv
+import sentry_sdk
+sentry_sdk.init("https://e690e6e8120b4d38b909772ecf4380ce@sentry.io/4917852")
+
 
 def createSettingsObj(rootdir, in_args, settings):
 
@@ -112,10 +111,8 @@ def getInputArgs(rootdir, args=None):
     parser.add_argument('--verified', action='store_true', help='DO NOT USE - for production scripts only to transfer matches to s3 buckets ')
     parser.add_argument('--split', action='store_true', help='split source file and initiate segmented matching')
     parser.add_argument('--splitsize', default=1000, type=int, help='split source file and initiate segmented matching')
-
     parser.add_argument('--prodn',action='store_true', help='used to obtain production env database settings. If not used, staging db creds used')
-
-    # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260580
+    # Added args as a parameter per https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments/55260580#55260 580
     pargs = parser.parse_args(args)
 
     return pargs, parser
@@ -251,19 +248,12 @@ class Main:
 
         self.data_analysis.StatsCalculations(self).calculate_externals() # long runtime - use concurrency here?
         self.best_config = self.match_filtering.VerificationAndUploads(self).verify()
-
         self.AWS_calls = self.runfile_mods.AWS_calls
         self.AWS_calls.AwsTransfers(self).transfer()
 
 
 if __name__ == '__main__':
-
     rootdir = os.path.dirname(os.path.abspath(__file__))
     in_args, _ = getInputArgs(rootdir)
-    # Set environment variable (prodn, staging(default if prodn arg not called))
-    # https: // able.bio / rhett / how - to - set - and -get - environment - variables - in -python - -274
-    # rgt5
-
     settingsobj = createSettingsObj(rootdir, in_args, settings)
-
     Main(settingsobj).run_main()
