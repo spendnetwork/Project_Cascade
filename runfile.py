@@ -169,85 +169,87 @@ class Main:
         self.aws_secret_access_key = settings.aws_secret_access_key
 
     def run_main(self):
+        if self.in_args.unverified:
+            # Build project folders
+            self.setup.Setup(self).setupRawDirs()
 
-        # Build project folders
-        self.setup.Setup(self).setupRawDirs()
+            # Delete csvs from previous runs
+            self.setup.ClearFiles(self).clearFiles()
 
-        # Delete csvs from previous runs
-        self.setup.ClearFiles(self).clearFiles()
+            # If not using recycle mode
+            if not in_args.recycle:
 
-        # If not using recycle mode
-        if not in_args.recycle:
+                try:
+                    # If registry/registry data file doesn't exist, pull from database
+                    self.db_calls.FetchData.checkDataExists(self)
+                except:
+                    # Will fail if checkDataExists function doesn't exist (i.e. registry data sourced externally (not from db))
+                    pass
 
             try:
-                # If registry/registry data file doesn't exist, pull from database
-                self.db_calls.FetchData.checkDataExists(self)
-            except:
-                # Will fail if checkDataExists function doesn't exist (i.e. registry data sourced externally (not from db))
-                pass
+                # For each config file read it and convert to dictionary for accessing
+                pyfiles = "*_config.py"
+                for conf_file in self.config_path.glob(pyfiles):
+                    with open(conf_file) as config_file:
+                        file_contents = []
+                        file_contents.append(config_file.read())
 
-        try:
-            # For each config file read it and convert to dictionary for accessing
-            pyfiles = "*_config.py"
-            for conf_file in self.config_path.glob(pyfiles):
-                with open(conf_file) as config_file:
-                    file_contents = []
-                    file_contents.append(config_file.read())
+                        # Convert list to dictionary
+                        configs = ast.literal_eval(file_contents[0])
+                        self.configs = configs
 
-                    # Convert list to dictionary
-                    configs = ast.literal_eval(file_contents[0])
-                    self.configs = configs
+                        conf_file_num = int(conf_file.name[0])
+                        self.conf_file_num = conf_file_num
 
-                    conf_file_num = int(conf_file.name[0])
-                    self.conf_file_num = conf_file_num
+                        # Clean registry and source datasets for linking
+                        # source df needed in memory for stats
+                        self.data_processing.ProcessSourceData(self).clean()
 
-                    # Clean registry and source datasets for linking
-                    # source df needed in memory for stats
-                    self.data_processing.ProcessSourceData(self).clean()
+                        try:
+                            self.data_processing.ProcessRegistryData(self).clean()
+                        except FileNotFoundError:
+                            # Skip if registry data not downloaded yet (i.e. UK)
+                            next
 
-                    try:
-                        self.data_processing.ProcessRegistryData(self).clean()
-                    except FileNotFoundError:
-                        # Skip if registry data not downloaded yet (i.e. UK)
-                        next
+                        # For each process type (eg: Name & Add, Name only) outlined in the configs file:
+                        for proc_type in configs['processes']:
+                            self.proc_type = proc_type
 
-                    # For each process type (eg: Name & Add, Name only) outlined in the configs file:
-                    for proc_type in configs['processes']:
-                        self.proc_type = proc_type
+                            # Get first process number from config file
+                            main_proc_num = min(configs['processes'][proc_type].keys())
+                            main_proc_configs = configs['processes'][proc_type][main_proc_num]
 
-                        # Get first process number from config file
-                        main_proc_num = min(configs['processes'][proc_type].keys())
-                        main_proc_configs = configs['processes'][proc_type][main_proc_num]
+                            # If args.recycle matches the recycle setting for the first process type
+                            if in_args.recycle == main_proc_configs['recycle_phase']:
 
-                        # If args.recycle matches the recycle setting for the first process type
-                        if in_args.recycle == main_proc_configs['recycle_phase']:
+                                # Create working directories if don't exist
+                                self.setup.Setup(self).SetupDirs()
 
-                            # Create working directories if don't exist
-                            self.setup.Setup(self).SetupDirs()
+                                # Iterate over each process number in the config file
+                                for proc_num in configs['processes'][proc_type]:
+                                    self.proc_num = proc_num
 
-                            # Iterate over each process number in the config file
-                            for proc_num in configs['processes'][proc_type]:
-                                self.proc_num = proc_num
+                                    # Run dedupe for matching and calculate related stats for comparison
+                                    self.data_matching.Matching(self).dedupe()
 
-                                # Run dedupe for matching and calculate related stats for comparison
-                                self.data_matching.Matching(self).dedupe()
+                                    self.match_filtering.MatchFiltering(self).filter()
 
-                                self.match_filtering.MatchFiltering(self).filter()
+                                    self.match_filtering.MatchFiltering(self).getExcludedandNonMatches()
 
-                                self.match_filtering.MatchFiltering(self).getExcludedandNonMatches()
+                                break
+                            else:
+                                continue
+                        # Output stats files:
+                        self.data_analysis.StatsCalculations(self).calculate_internals()
 
-                            break
-                        else:
-                            continue
-                    # Output stats files:
-                    self.data_analysis.StatsCalculations(self).calculate_internals()
+            except StopIteration:
+                # Continue if no more config files found
+                print("Done")
 
-        except StopIteration:
-            # Continue if no more config files found
-            print("Done")
+            self.data_analysis.StatsCalculations(self).calculate_externals() # long runtime - use concurrency here?
+            self.best_config = self.match_filtering.VerificationAndUploads(self).verify()
 
-        self.data_analysis.StatsCalculations(self).calculate_externals() # long runtime - use concurrency here?
-        self.best_config = self.match_filtering.VerificationAndUploads(self).verify()
+
         self.AWS_calls = self.runfile_mods.AWS_calls
         self.AWS_calls.AwsTransfers(self).transfer()
 
