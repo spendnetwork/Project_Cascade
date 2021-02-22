@@ -28,7 +28,7 @@ class DbCalls(Main):
 
         files = glob.glob(os.path.join(self.directories['verified_matches_dir'].format(self.region_dir, self.proc_type),'*'))
         for upload_file in files:
-            with open(upload_file, 'r') as f:
+            with open(upload_file, 'r', encoding='utf-8-sig') as f:
                 # Get headers dynamically
                 reader = csv.reader(f)
                 headers = next(reader, None)
