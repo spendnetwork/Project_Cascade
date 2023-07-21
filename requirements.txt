@@ -15,7 +15,7 @@ dedupe-variable-datetime==0.1.5
 docutils==0.14
 DoubleMetaphone==0.1
 fastcluster==1.1.25
-future==0.17.1
+future==0.18.3
 fuzzywuzzy==0.17.0
 haversine==2.1.2
 highered==0.2.1
